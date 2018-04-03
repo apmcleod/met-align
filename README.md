@@ -18,11 +18,11 @@ Run the project from the command line as follows:
 
 `$ java -cp bin metalign.Main ARGS Files`  
 
-Files should be a list of 1 or more music files (MIDI/**krn) or directories containing only music
+Files should be a list of 1 or more music files (MIDI/krn) or directories containing only music
 files. Any directory entered will be searched recursively for files.
 
 ARGS:
- * `-T` = Use tracks as correct voice (instead of channels) *Only used for MIDI files.
+ * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-p` = Use verbose printing.
  * `-P` = Use super verbose printing.
  * `-l` = Print logging (time, hypothesis count, and notes at each step).
@@ -52,13 +52,13 @@ Grammars for the LPCFG can be generated as follows:
 
 `$ java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner ARGS Files`
 
-Files should be a list of 1 or more music files (MIDI/**krn/(noteB)[#Temperley-File-Modifications]) or directories containing only music
+Files should be a list of 1 or more music files (MIDI/krn/(noteB)[#Temperley-File-Modifications]) or directories containing only music
 files. Any directory entered will be searched recursively for files.
 
 ARGS:
  * `-g FILE` = Write the grammar out to the given FILE.
  * `-v` = Use verbose printing.
- * `-T` = Use tracks as correct voice (instead of channels) *Only used for MIDI files.
+ * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-l` = Do NOT use lexicalisation.
  * `-e` = Extend each note within each voice to the next note's onset.
  * `-m INT` = Throw out notes whose length is shorter than INT microseconds, once extended.
@@ -75,11 +75,11 @@ The parameters for the beat tracking HMM must be set manually after an automatic
 
 `$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer [ARGS] Files`
 
-Files should be a list of 1 or more music files (MIDI/**krn/(noteB)[#Temperley-File-Modifications]) or directories containing only music
+Files should be a list of 1 or more music files (MIDI/krn/(noteB)[#Temperley-File-Modifications]) or directories containing only music
 files. Any directory entered will be searched recursively for files.  
 
 ARGS:
- * `-T` = Use tracks as correct voice (instead of channels) *Only used for MIDI files.
+ * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-s` INT = Use INT as the sub beat length.
  * `-X` = Input files are xml directories from CrestMusePEDB.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See (Anacrusis Files)[#Anacrusis-Files] for information about the anacrusis file format.
@@ -101,7 +101,7 @@ ARGS:
  * `-E FILE` = Evaluate the Main output (from std in) given the ground truth FILE.
  * `-F` = Calculate means and standard deviations of the -E FILE results (read from std in).
  * `-w INT` = Use the given INT as the window length for accepted grouping matches, in microseconds. (Default = 70000).
- * `-T` = Use tracks as correct voice (instead of channels) *Only used for MIDI files.
+ * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-s INT` = Use INT as the sub beat length.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See (Anacrusis Files)[#Anacrusis-Files] for information about the anacrusis file format.
  
