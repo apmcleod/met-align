@@ -1,7 +1,7 @@
 # Metrical Alignment
 
 ## Project Overview
-This is a model for meter detection and alignment from live performance MIDI data.
+This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#Anacrusis-Files) are found in the `anacrusis` directory, and pre-trained grammars are found in the `grammars` directory.
 
 ## Documentation
 This document contains some basic examples and a general overview of how to use
@@ -28,9 +28,9 @@ ARGS:
  * `-l` = Print logging (time, hypothesis count, and notes at each step).
  * `-J` = Run with incremental joint processing.
  * `-VClass` = Use the given class for voice separation. (FromFile (default) or Hmm)
- * `-BClass` = Use the given class for beat tracking. (FromFile (default) or Hmm). See (Training)[#Training-the-Beat-Tracking-HMM] for information on how to train the HMM parameters.
+ * `-BClass` = Use the given class for beat tracking. (FromFile (default) or Hmm). See [Training](#Training-the-Beat-Tracking-HMM) for information on how to train the HMM parameters.
  * `-HClass` = Use the given class for hierarchy detection. (FromFile (default) or lpcfg).
- * `-g FILE` = Load a grammar in from the given file. Used only with -Hlpcfg. See (Generating)[#Generating-an-LPCFG-Grammar-File], or use a pretrained one from the grammars directory.
+ * `-g FILE` = Load a grammar in from the given file. Used only with -Hlpcfg. See [Generating](#Generating-an-LPCFG-Grammar-File), or use a pretrained one from the grammars directory.
  * `-x` = Extract the trees of the song for testing from the loaded grammar when testing. Used only with -Hlpcfg.
  * `-e` = Extend each note within each voice to the next note's onset.
  * `-m INT` = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended.
@@ -38,7 +38,7 @@ ARGS:
  * `-b INT` = Use INT as the beam size.
  * `-v INT` = Use INT as the voice beam size.
  * `-E FILE` = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.
- * `-a FILE` = Search recursively under the given FILE for anacrusis files. See (Anacrusis Files)[#Anacrusis-Files] for information about the anacrusis file format.
+ * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#Anacrusis-Files) for information about the anacrusis file format.
  
  Usage examples:
  
@@ -52,7 +52,7 @@ Grammars for the LPCFG can be generated as follows:
 
 `$ java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner ARGS Files`
 
-Files should be a list of 1 or more music files (MIDI/krn/(noteB)[#Temperley-File-Modifications]) or directories containing only music
+Files should be a list of 1 or more music files (MIDI/krn/[noteB](#Temperley-File-Modifications)) or directories containing only music
 files. Any directory entered will be searched recursively for files.
 
 ARGS:
@@ -63,7 +63,7 @@ ARGS:
  * `-e` = Extend each note within each voice to the next note's onset.
  * `-m INT` = Throw out notes whose length is shorter than INT microseconds, once extended.
  * `-s INT` = Use INT as the sub beat length.
- * `-a FILE` = Search recursively under the given FILE for anacrusis files. See (Anacrusis Files)[#Anacrusis-Files] for information about the anacrusis file format.
+ * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#Anacrusis-Files) for information about the anacrusis file format.
  
  Usage example:
  
@@ -75,14 +75,14 @@ The parameters for the beat tracking HMM must be set manually after an automatic
 
 `$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer [ARGS] Files`
 
-Files should be a list of 1 or more music files (MIDI/krn/(noteB)[#Temperley-File-Modifications]) or directories containing only music
+Files should be a list of 1 or more music files (MIDI/krn/[noteB](#Temperley-File-Modifications)) or directories containing only music
 files. Any directory entered will be searched recursively for files.  
 
 ARGS:
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-s` INT = Use INT as the sub beat length.
  * `-X` = Input files are xml directories from CrestMusePEDB.
- * `-a FILE` = Search recursively under the given FILE for anacrusis files. See (Anacrusis Files)[#Anacrusis-Files] for information about the anacrusis file format.
+ * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#Anacrusis-Files) for information about the anacrusis file format.
  
 Usage examples:  
 
@@ -103,7 +103,7 @@ ARGS:
  * `-w INT` = Use the given INT as the window length for accepted grouping matches, in microseconds. (Default = 70000).
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-s INT` = Use INT as the sub beat length.
- * `-a FILE` = Search recursively under the given FILE for anacrusis files. See (Anacrusis Files)[#Anacrusis-Files] for information about the anacrusis file format.
+ * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#Anacrusis-Files) for information about the anacrusis file format.
  
 Usage examples:  
 
@@ -120,4 +120,4 @@ They contain a single line with a single number, the number of MIDI ticks in the
 
 
 ### Temperley File Modifications
-The misc corpus contains noteB files from (David Temperley)[http://www.link.cs.cmu.edu/melisma/melisma2003/nbfiles/misc/], to which I have added a single line at the beginning of the form `Bar bpb sbpb a`, where `bpb` is the number of beats per bar, `sbpb` is the number of sub beats per beat, and `a` is the anacrusis length, in sub beats.
+The misc corpus contains noteB files from [David Temperley](http://www.link.cs.cmu.edu/melisma/melisma2003/nbfiles/misc/), to which I have added a single line at the beginning of the form `Bar bpb sbpb a`, where `bpb` is the number of beats per bar, `sbpb` is the number of sub beats per beat, and `a` is the anacrusis length, in sub beats.
