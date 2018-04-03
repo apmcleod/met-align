@@ -1,0 +1,3809 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deviation init-silence="0.9557291666666666"
+  target="bac-wtc101-p-wiener-p002-003_nodoctype.xml" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <non-partwise>
+    <measure number="1">
+      <control beat="1.0">
+        <tempo>71.51028663189663</tempo>
+      </control>
+      <control beat="1.0">
+        <tempo-deviation>0.9492970208873949</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0577524914286993</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910928</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.158961902479071</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="2">
+      <control beat="1.0">
+        <tempo-deviation>1.0100044165805069</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0899574049025098</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.1352762822028954</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.1589619024790718</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="3">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0899574049025098</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.010004416580508</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="4">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0689827766727993</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0689827766727993</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="5">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910944</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.1597962882979889</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="6">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0899574049025098</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="7">
+      <control beat="1.0">
+        <tempo-deviation>1.0797299225508772</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0790067276931745</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>0.9913581811974853</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.1589619024790674</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="8">
+      <control beat="1.0">
+        <tempo-deviation>1.0488001591444711</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>0.9913581811974853</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0899574049025098</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="9">
+      <control beat="1.0">
+        <tempo-deviation>0.9962628598923353</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0826324223426829</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0379877863697864</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0399980919599134</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="10">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910921</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.009371581733029</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0899574049025098</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.028708202072738</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="11">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.991358181197477</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="12">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0287082020727334</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0280517194932364</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="13">
+      <control beat="1.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0280517194932455</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0488001591444664</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0682739021524648</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="14">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0287082020727423</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="15">
+      <control beat="1.0">
+        <tempo-deviation>1.1117715972711546</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0488001591444664</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="16">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0488001591444664</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="17">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0100044165805013</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="18">
+      <control beat="1.0">
+        <tempo-deviation>1.0373194104609895</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.037987786369782</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.037987786369791</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0202387868561829</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="19">
+      <control beat="1.0">
+        <tempo-deviation>0.991358181197477</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.009371581733029</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.1597962882979862</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.9907484898191355</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="20">
+      <control beat="1.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910968</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0689827766727946</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="21">
+      <control beat="1.0">
+        <tempo-deviation>1.0280517194932364</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0100044165805186</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.089957404902515</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="22">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.1194975986420592</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="23">
+      <control beat="1.0">
+        <tempo-deviation>1.0221808657651625</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0906953584603258</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.008739539415109</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.8564364935916482</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="24">
+      <control beat="1.0">
+        <tempo-deviation>0.9646449367939681</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0183040736067648</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>0.9816922879012275</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.1148491657065045</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="25">
+      <control beat="1.0">
+        <tempo-deviation>1.0005944375440372</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0804540874888764</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0195930661050174</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="26">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.095144149861268</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0273960742639596</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0273960742639774</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="27">
+      <control beat="1.0">
+        <tempo-deviation>1.0273960742639774</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0273960742639596</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0267412647838952</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.1049088096336743</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="28">
+      <control beat="1.0">
+        <tempo-deviation>0.9858978240183118</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0884844894904657</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>0.9728001476122671</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.013180531098056</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="29">
+      <control beat="1.0">
+        <tempo-deviation>0.9116904609201579</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0467557143898008</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0081082881388712</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0675659671609696</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="30">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="31">
+      <control beat="1.0">
+        <tempo-deviation>1.0481177907911061</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0481177907910875</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0488001591444758</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.9132409549013062</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="32">
+      <control beat="1.0">
+        <tempo-deviation>0.9349721674091163</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>0.9865015581420131</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0313425380575614</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>1.0189481622048795</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="33">
+      <control beat="1.0">
+        <tempo-deviation>0.9981146495947358</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>1.0081082881388712</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>1.0087395394150918</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.945952462974701</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="34">
+      <control beat="1.0">
+        <tempo-deviation>0.8399150388143417</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>0.9617653996691888</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>0.8559814263793445</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+    </measure>
+    <measure number="35">
+      <control beat="1.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="2.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="3.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="4.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="5.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="6.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="7.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+      <control beat="8.0">
+        <tempo-deviation>0.4305069600336467</tempo-deviation>
+      </control>
+    </measure>
+  </non-partwise>
+  <partwise/>
+  <notewise>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.16677609980302033</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[16])">
+      <attack>0.05524454920447852</attack>
+      <release>-0.008535784635587573</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[2])">
+      <attack>0.042133176193282273</attack>
+      <release>0.08028874484384207</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[3])">
+      <attack>0.04375368296994697</attack>
+      <release>0.02232435981615233</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[4])">
+      <attack>0.0</attack>
+      <release>0.002133946158896949</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[5])">
+      <attack>-0.04514116874589627</attack>
+      <release>0.043007222586999405</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[6])">
+      <attack>-0.004267892317793787</attack>
+      <release>0.02478660538411037</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[7])">
+      <attack>-0.002133946158896838</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.10647482014388499</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[19])">
+      <attack>-0.03789850357839941</attack>
+      <release>0.03699059561128525</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[9])">
+      <attack>3.2530904359162616E-4</attack>
+      <release>1.626545217959796E-4</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[10])">
+      <attack>-0.018705270006505903</attack>
+      <release>-0.01886792452830166</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[11])">
+      <attack>0.0</attack>
+      <release>0.026258992805755332</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[12])">
+      <attack>-0.04784172661870509</attack>
+      <release>0.06474820143884885</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[13])">
+      <attack>0.03669064748201434</attack>
+      <release>0.30893416927899686</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='1']/note[14])">
+      <attack>0.03705035971223003</attack>
+      <release>0.018181818181818177</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.1271989174560214</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[16])">
+      <attack>0.02774294670846389</attack>
+      <release>0.04157857646229739</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[2])">
+      <attack>3.134796238243309E-4</attack>
+      <release>-0.00893416927899704</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[3])">
+      <attack>-0.02774294670846411</attack>
+      <release>0.01556156968876861</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[4])">
+      <attack>0.0</attack>
+      <release>0.009810554803789007</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[5])">
+      <attack>-0.02943166441136666</attack>
+      <release>-0.01962110960757768</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[6])">
+      <attack>-0.05953991880920145</attack>
+      <release>0.06326116373477708</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[7])">
+      <attack>-0.08964817320703633</attack>
+      <release>0.178999295278365</release>
+      <dynamics>0.39</dynamics>
+      <end-dynamics>0.39</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[22])">
+      <attack>0.0</attack>
+      <release>0.1717631750162654</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[19])">
+      <attack>0.021317829457364268</attack>
+      <release>0.17241379310344823</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[9])">
+      <attack>0.0010570824524311906</attack>
+      <release>0.021670190274841294</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[10])">
+      <attack>-0.023431994362227093</attack>
+      <release>-0.0028188865398169893</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[11])">
+      <attack>0.0</attack>
+      <release>0.0262589928057555</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[12])">
+      <attack>-0.019064748201438747</attack>
+      <release>0.007194244604316724</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[13])">
+      <attack>0.0028776978417268673</attack>
+      <release>0.029136690647482477</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='2']/note[14])">
+      <attack>-0.026258992805755055</attack>
+      <release>0.1964866623292127</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.0859269282814612</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[16])">
+      <attack>0.019355888093688933</attack>
+      <release>-0.020297699594045593</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[2])">
+      <attack>-0.019193233571893398</attack>
+      <release>-0.019355888093689266</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[3])">
+      <attack>-0.03822381262199115</attack>
+      <release>-0.038386467143786795</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[4])">
+      <attack>0.0</attack>
+      <release>0.009810554803789007</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[5])">
+      <attack>-0.01048714479025703</attack>
+      <release>-6.765899864680236E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[6])">
+      <attack>2.220446049250313E-16</attack>
+      <release>0.009810554803789118</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[7])">
+      <attack>-0.0301082543978346</attack>
+      <release>-0.020297699594045593</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[22])">
+      <attack>0.0</attack>
+      <release>0.17241379310344823</release>
+      <dynamics>0.7000000000000001</dynamics>
+      <end-dynamics>0.7000000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[19])">
+      <attack>-0.00924764890282112</attack>
+      <release>-0.15354586857514652</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[9])">
+      <attack>-0.03667711598746054</attack>
+      <release>-0.04592476489028163</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[10])">
+      <attack>-0.027742946708463445</attack>
+      <release>0.04814573845152895</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[11])">
+      <attack>0.0</attack>
+      <release>-1.6265452179575757E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[12])">
+      <attack>-1.6265452179575757E-4</attack>
+      <release>-3.2530904359151513E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[13])">
+      <attack>-0.019193233571893398</attack>
+      <release>-0.019355888093689266</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='3']/note[14])">
+      <attack>-0.03822381262199115</attack>
+      <release>-0.038386467143786795</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.11745189117451915</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[16])">
+      <attack>-1.6265452179575757E-4</attack>
+      <release>0.018867924528301883</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[2])">
+      <attack>-3.2530904359151513E-4</attack>
+      <release>-4.879635653873837E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[3])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[4])">
+      <attack>0.0</attack>
+      <release>0.004810882548108741</release>
+      <dynamics>0.59</dynamics>
+      <end-dynamics>0.59</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[5])">
+      <attack>0.004810882548108741</attack>
+      <release>0.009621765096217483</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[6])">
+      <attack>0.009621765096217483</attack>
+      <release>0.014432647644326169</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[7])">
+      <attack>0.014432647644326169</attack>
+      <release>0.018867924528301883</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.1831453218314535</release>
+      <dynamics>0.58</dynamics>
+      <end-dynamics>0.58</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[19])">
+      <attack>-0.057417046193884214</attack>
+      <release>-0.03915063039150657</release>
+      <dynamics>0.58</dynamics>
+      <end-dynamics>0.58</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[9])">
+      <attack>-0.05757970071567997</attack>
+      <release>-0.05774235523747584</release>
+      <dynamics>0.5700000000000001</dynamics>
+      <end-dynamics>0.5700000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[10])">
+      <attack>-0.05774235523747584</attack>
+      <release>-0.057905009759271486</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[11])">
+      <attack>0.0</attack>
+      <release>0.004810882548108741</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[12])">
+      <attack>-0.038984737889847465</attack>
+      <release>-0.034173855341738724</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[13])">
+      <attack>-0.019575315195753284</attack>
+      <release>-0.014764432647644488</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='4']/note[14])">
+      <attack>0.029031187790311552</attack>
+      <release>0.033181522446324</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.07026675341574318</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[16])">
+      <attack>4.8796356538705066E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[2])">
+      <attack>3.253090435912931E-4</attack>
+      <release>1.6265452179553552E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[3])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179525797E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[5])">
+      <attack>-1.6265452179525797E-4</attack>
+      <release>-3.2530904359051593E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[6])">
+      <attack>3.253090435924033E-4</attack>
+      <release>1.6265452179708983E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[7])">
+      <attack>1.6265452179708983E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.23326133909287372</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[19])">
+      <attack>-1.6265452179575757E-4</attack>
+      <release>0.09564085881587506</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[9])">
+      <attack>-3.2530904359151513E-4</attack>
+      <release>-4.879635653873837E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[10])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[11])">
+      <attack>0.0</attack>
+      <release>0.026457883369330082</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[12])">
+      <attack>-0.03689704823614143</attack>
+      <release>-0.010439164866811346</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[13])">
+      <attack>-0.026277897768179237</attack>
+      <release>1.7998560115073392E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='5']/note[14])">
+      <attack>-0.02285817134629331</attack>
+      <release>0.0032530904359141175</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.07482108002602494</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[16])">
+      <attack>4.8796356538705066E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[2])">
+      <attack>3.253090435912931E-4</attack>
+      <release>1.6265452179553552E-4</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[3])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179575757E-4</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[5])">
+      <attack>-1.6265452179575757E-4</attack>
+      <release>-3.2530904359151513E-4</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[6])">
+      <attack>3.253090435912931E-4</attack>
+      <release>1.6265452179553552E-4</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[7])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[22])">
+      <attack>0.0</attack>
+      <release>0.038873994638069696</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[19])">
+      <attack>-1.6265452179575757E-4</attack>
+      <release>0.038873994638069696</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[9])">
+      <attack>-3.2530904359151513E-4</attack>
+      <release>-4.879635653873837E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[10])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[11])">
+      <attack>0.0</attack>
+      <release>0.009810554803789007</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[12])">
+      <attack>0.009810554803789007</attack>
+      <release>0.019621109607578013</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[13])">
+      <attack>0.019621109607578013</attack>
+      <release>0.02943166441136691</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='6']/note[14])">
+      <attack>0.02943166441136691</attack>
+      <release>0.038873994638069696</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.1306095110515738</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[16])">
+      <attack>0.007372654155495928</attack>
+      <release>0.05415384615384631</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[2])">
+      <attack>0.014745308310991856</attack>
+      <release>0.022117962466487673</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[3])">
+      <attack>-0.022117962466488117</attack>
+      <release>-0.014745308310992189</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[4])">
+      <attack>0.0</attack>
+      <release>0.007200267916945835</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[5])">
+      <attack>-0.026289350301406472</attack>
+      <release>-0.01908908238446061</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[6])">
+      <attack>-0.05391828533154708</attack>
+      <release>-0.04671801741460124</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[7])">
+      <attack>-0.017247153382451197</attack>
+      <release>-0.010046885465505362</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.10575539568345627</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[19])">
+      <attack>0.040461538461539326</attack>
+      <release>0.09505208333333325</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[9])">
+      <attack>0.027384615384616895</attack>
+      <release>0.01369230769230989</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[10])">
+      <attack>0.01369230769230989</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[11])">
+      <attack>0.0</attack>
+      <release>0.0262589928057545</release>
+      <dynamics>0.5700000000000001</dynamics>
+      <end-dynamics>0.5700000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[12])">
+      <attack>-0.012589928057554739</attack>
+      <release>0.013669064748199733</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[13])">
+      <attack>-0.025179856115109478</attack>
+      <release>0.0010791366906449662</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='7']/note[14])">
+      <attack>-0.008273381294966464</attack>
+      <release>0.01627604166666665</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.16861538461538228</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[16])">
+      <attack>-2.498001805406602E-16</attack>
+      <release>-0.05415384615384344</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[2])">
+      <attack>-4.996003610813204E-16</attack>
+      <release>-7.771561172376096E-16</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[3])">
+      <attack>-7.771561172376096E-16</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[4])">
+      <attack>0.0</attack>
+      <release>-0.013692307692307004</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[5])">
+      <attack>-0.013076923076922375</attack>
+      <release>-0.02676923076922938</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[6])">
+      <attack>-0.02676923076922938</attack>
+      <release>-0.04046153846153644</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[7])">
+      <attack>-0.04046153846153644</attack>
+      <release>-0.05415384615384344</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[22])">
+      <attack>0.0</attack>
+      <release>0.03586889301175009</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[19])">
+      <attack>4.8796356538705066E-4</attack>
+      <release>0.03648732220160785</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[9])">
+      <attack>3.253090435912931E-4</attack>
+      <release>1.6265452179553552E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[10])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[11])">
+      <attack>0.0</attack>
+      <release>0.009810554803789007</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[12])">
+      <attack>0.009810554803789007</attack>
+      <release>0.019621109607578013</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[13])">
+      <attack>0.020297699594046148</attack>
+      <release>0.030108254397835155</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='8']/note[14])">
+      <attack>0.030108254397835155</attack>
+      <release>0.03648732220160785</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.12163978494623495</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[16])">
+      <attack>-0.010049474335189046</attack>
+      <release>-6.720430107508557E-4</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[2])">
+      <attack>-0.020098948670378092</attack>
+      <release>-0.030148423005567193</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[3])">
+      <attack>-0.030148423005567193</attack>
+      <release>-0.040197897340756183</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[4])">
+      <attack>0.0</attack>
+      <release>0.0107526881720435</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[5])">
+      <attack>-0.03293010752688133</attack>
+      <release>-0.022177419354837802</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[6])">
+      <attack>-0.022177419354837802</attack>
+      <release>-0.011424731182794301</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[7])">
+      <attack>-0.011424731182794301</attack>
+      <release>-6.720430107508557E-4</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[22])">
+      <attack>0.0</attack>
+      <release>0.0019518542615484706</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[19])">
+      <attack>-5.551115123125783E-17</attack>
+      <release>0.0019518542615484706</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[9])">
+      <attack>-1.1102230246251565E-16</attack>
+      <release>-2.220446049250313E-16</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[10])">
+      <attack>-2.220446049250313E-16</attack>
+      <release>0.0</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[11])">
+      <attack>0.0</attack>
+      <release>4.841833440924481E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[12])">
+      <attack>4.841833440924481E-4</attack>
+      <release>9.683666881848962E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[13])">
+      <attack>9.683666881848962E-4</attack>
+      <release>0.0014525500322773999</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='9']/note[14])">
+      <attack>0.0014525500322773999</attack>
+      <release>0.0019518542615484706</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.179824561403506</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[16])">
+      <attack>-1.6265452179575757E-4</attack>
+      <release>-0.03759398496240274</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[2])">
+      <attack>3.253090435912931E-4</attack>
+      <release>1.6265452179553552E-4</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[3])">
+      <attack>1.6265452179553552E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[4])">
+      <attack>0.0</attack>
+      <release>-0.009398496240600684</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[5])">
+      <attack>-0.009398496240600684</attack>
+      <release>-0.01879699248120137</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[6])">
+      <attack>-0.01879699248120137</attack>
+      <release>-0.02819548872180211</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[7])">
+      <attack>-0.027568922305762023</attack>
+      <release>-0.03696741854636265</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[22])">
+      <attack>0.0</attack>
+      <release>0.018867924528301796</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[19])">
+      <attack>-0.03010825439783485</attack>
+      <release>-0.019157088122606192</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[9])">
+      <attack>-0.02029769959404587</attack>
+      <release>-0.010487144790256808</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[10])">
+      <attack>-0.010487144790256808</attack>
+      <release>-6.765899864678016E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.004789272030651548</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[12])">
+      <attack>-0.004789272030651548</attack>
+      <release>-0.009578544061303096</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[13])">
+      <attack>-0.009578544061303096</attack>
+      <release>-0.014367816091954588</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='10']/note[14])">
+      <attack>-0.014367816091954588</attack>
+      <release>-0.019157088122606192</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.07486979166666341</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[16])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[2])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[3])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[4])">
+      <attack>0.0</attack>
+      <release>8.881784197001252E-16</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[5])">
+      <attack>8.881784197001252E-16</attack>
+      <release>1.7763568394002505E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[6])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[7])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.05476923076923601</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[19])">
+      <attack>4.879635653881609E-4</attack>
+      <release>-0.011692307692313109</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[9])">
+      <attack>3.2530904359351354E-4</attack>
+      <release>1.6265452179875517E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[10])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.013692307692309003</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[12])">
+      <attack>-0.013692307692309003</attack>
+      <release>-0.027384615384618005</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[13])">
+      <attack>-0.026769230769233376</attack>
+      <release>-0.040461538461542323</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='11']/note[14])">
+      <attack>-0.040461538461542323</attack>
+      <release>0.02537410540013023</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.14623243933589214</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[16])">
+      <attack>4.879635653881609E-4</attack>
+      <release>-0.018518518518523708</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[2])">
+      <attack>3.2530904359351354E-4</attack>
+      <release>1.6265452179875517E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[3])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.4</dynamics>
+      <end-dynamics>0.4</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[4])">
+      <attack>0.0</attack>
+      <release>-0.00478927203065263</release>
+      <dynamics>0.4</dynamics>
+      <end-dynamics>0.4</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[5])">
+      <attack>-0.00478927203065263</attack>
+      <release>-0.00957854406130526</release>
+      <dynamics>0.4</dynamics>
+      <end-dynamics>0.4</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[6])">
+      <attack>-0.008939974457218391</attack>
+      <release>-0.013729246487871105</release>
+      <dynamics>0.4</dynamics>
+      <end-dynamics>0.4</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[7])">
+      <attack>-0.013729246487871105</attack>
+      <release>-0.018518518518523708</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.019783024888326173</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[19])">
+      <attack>0.0388744307091749</attack>
+      <release>0.0188802083333334</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[9])">
+      <attack>3.2530904359351354E-4</attack>
+      <release>1.6265452179875517E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[10])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.004945756222081543</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[12])">
+      <attack>0.014199106573068332</attack>
+      <release>0.009253350350986733</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[13])">
+      <attack>0.009253350350986733</attack>
+      <release>0.0043075941289052455</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='12']/note[14])">
+      <attack>0.0043075941289052455</attack>
+      <release>-6.381620931762422E-4</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.1442246330567929</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[16])">
+      <attack>8.881784197001252E-16</attack>
+      <release>-0.019144862795146045</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[2])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[3])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[4])">
+      <attack>0.0</attack>
+      <release>-0.004945756222079406</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[5])">
+      <attack>-0.004307594128907771</attack>
+      <release>-0.009253350350987177</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[6])">
+      <attack>-0.009253350350987177</attack>
+      <release>-0.014199106573066556</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[7])">
+      <attack>-0.014199106573066556</attack>
+      <release>-0.019144862795146045</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.09814323607426612</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[19])">
+      <attack>-1.3322676295501878E-15</attack>
+      <release>0.018867924528301796</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[9])">
+      <attack>-2.6645352591003757E-15</attack>
+      <release>-3.9968028886505635E-15</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[10])">
+      <attack>-3.9968028886505635E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[11])">
+      <attack>0.0</attack>
+      <release>0.004641909814324829</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[12])">
+      <attack>0.00530503978779967</attack>
+      <release>0.0099469496021245</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[13])">
+      <attack>0.0099469496021245</attack>
+      <release>0.014588859416449274</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='13']/note[14])">
+      <attack>0.014588859416449274</attack>
+      <release>0.018867924528301796</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.10286458333333004</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[16])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[2])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[3])">
+      <attack>-4.8796356539060337E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[4])">
+      <attack>0.0</attack>
+      <release>8.881784197001252E-16</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[5])">
+      <attack>8.881784197001252E-16</attack>
+      <release>1.7763568394002505E-15</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[6])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[7])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.019157088122601973</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[19])">
+      <attack>4.8796356538594043E-4</attack>
+      <release>-0.01851851851851516</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[9])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[10])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.004789272030650493</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[12])">
+      <attack>-0.004789272030650493</attack>
+      <release>-0.009578544061300986</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[13])">
+      <attack>-0.008939974457214173</attack>
+      <release>-0.013729246487864666</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='14']/note[14])">
+      <attack>-0.013729246487864666</attack>
+      <release>-0.01851851851851516</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.10540013012361382</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[16])">
+      <attack>-0.005003450655625491</attack>
+      <release>-6.506180871788114E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[2])">
+      <attack>0.010006901311247152</attack>
+      <release>0.025017253278119878</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[3])">
+      <attack>-0.0150103519668765</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179470286E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[5])">
+      <attack>-1.6265452179470286E-4</attack>
+      <release>-3.253090435894057E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[6])">
+      <attack>-3.253090435894057E-4</attack>
+      <release>-4.8796356538405306E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[7])">
+      <attack>-4.8796356538405306E-4</attack>
+      <release>-6.506180871788114E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.11125569290825921</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[19])">
+      <attack>-1.3322676295501878E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[9])">
+      <attack>-2.6645352591003757E-15</attack>
+      <release>-3.9968028886505635E-15</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[10])">
+      <attack>-3.9968028886505635E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[11])">
+      <attack>0.0</attack>
+      <release>-1.6265452179470286E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[12])">
+      <attack>4.879635653881609E-4</attack>
+      <release>3.2530904359351354E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[13])">
+      <attack>3.2530904359351354E-4</attack>
+      <release>1.6265452179875517E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='15']/note[14])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.09954456733896833</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[16])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>-6.506180871788114E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[2])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[3])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179470286E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[5])">
+      <attack>-1.6265452179470286E-4</attack>
+      <release>-3.253090435894057E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[6])">
+      <attack>-3.253090435894057E-4</attack>
+      <release>-4.8796356538405306E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[7])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[22])">
+      <attack>0.0</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[19])">
+      <attack>-1.6265452179470286E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[9])">
+      <attack>-3.253090435894057E-4</attack>
+      <release>-4.8796356538405306E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[10])">
+      <attack>-4.8796356538405306E-4</attack>
+      <release>-6.506180871788114E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[11])">
+      <attack>0.0</attack>
+      <release>-1.3322676295501878E-15</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[12])">
+      <attack>-1.3322676295501878E-15</attack>
+      <release>-2.6645352591003757E-15</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[13])">
+      <attack>-2.6645352591003757E-15</attack>
+      <release>-3.9968028886505635E-15</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='16']/note[14])">
+      <attack>-3.9968028886505635E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[21])">
+      <attack>0.0</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[16])">
+      <attack>4.879635653881609E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[2])">
+      <attack>3.2530904359351354E-4</attack>
+      <release>1.6265452179875517E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[3])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179689555E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[5])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>-3.253090435937911E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[6])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[7])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.03699059561129081</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[19])">
+      <attack>-1.6265452179470286E-4</attack>
+      <release>-0.03699059561129081</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[9])">
+      <attack>-3.253090435894057E-4</attack>
+      <release>-4.8796356538405306E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[10])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.009247648902822703</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[12])">
+      <attack>-0.009247648902822703</attack>
+      <release>-0.018495297805645405</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[13])">
+      <attack>-0.018495297805645405</attack>
+      <release>-0.027742946708468108</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='17']/note[14])">
+      <attack>-0.027742946708468108</attack>
+      <release>-0.03699059561129081</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.12757731958763308</release>
+      <dynamics>0.64</dynamics>
+      <end-dynamics>0.64</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[16])">
+      <attack>4.8293625241585536E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[2])">
+      <attack>3.2195750161212455E-4</attack>
+      <release>1.6097875080844926E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[3])">
+      <attack>1.6097875080844926E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.1657341758564144E-15</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[5])">
+      <attack>-1.1657341758564144E-15</attack>
+      <release>-2.3314683517128287E-15</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[6])">
+      <attack>-2.3314683517128287E-15</attack>
+      <release>-3.552713678800501E-15</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[7])">
+      <attack>-3.552713678800501E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[22])">
+      <attack>0.0</attack>
+      <release>0.12676923076923008</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[19])">
+      <attack>9.992007221626409E-16</attack>
+      <release>0.1083076923076917</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[9])">
+      <attack>1.9984014443252818E-15</attack>
+      <release>2.9976021664879227E-15</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[10])">
+      <attack>2.9976021664879227E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.004274857504749235</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[12])">
+      <attack>-0.004274857504749235</attack>
+      <release>-0.00854971500949847</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[13])">
+      <attack>-0.00854971500949847</attack>
+      <release>-0.012824572514247845</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='18']/note[14])">
+      <attack>-0.012824572514247845</attack>
+      <release>0.12676923076923008</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.11779448621553579</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[16])">
+      <attack>-0.013692307692309003</attack>
+      <release>0.055435565154787404</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[2])">
+      <attack>-0.027384615384618005</attack>
+      <release>0.010615384615380363</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[3])">
+      <attack>-0.0041538461538502824</attack>
+      <release>0.0520050125313285</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[4])">
+      <attack>0.0</attack>
+      <release>0.041353383458647586</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[5])">
+      <attack>-0.06453634085212967</attack>
+      <release>-0.07393483709273041</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[6])">
+      <attack>-0.07393483709273041</attack>
+      <release>-0.08333333333333104</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[7])">
+      <attack>-0.08333333333333104</attack>
+      <release>0.1612670986321088</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.17650676506764795</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[19])">
+      <attack>-0.016018718502520707</attack>
+      <release>-0.05473554735547037</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[9])">
+      <attack>0.010439164866808626</attack>
+      <release>0.03689704823613804</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[10])">
+      <attack>-0.0264578833693333</attack>
+      <release>0.0</release>
+      <dynamics>0.44</dynamics>
+      <end-dynamics>0.44</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.013837638376382994</release>
+      <dynamics>0.43</dynamics>
+      <end-dynamics>0.43</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[12])">
+      <attack>-0.013222632226321474</attack>
+      <release>-0.02706027060270444</release>
+      <dynamics>0.4</dynamics>
+      <end-dynamics>0.4</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[13])">
+      <attack>-0.02706027060270444</attack>
+      <release>-0.040897908979087405</release>
+      <dynamics>0.38</dynamics>
+      <end-dynamics>0.38</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='19']/note[14])">
+      <attack>-0.040897908979087405</attack>
+      <release>0.06184895833333356</release>
+      <dynamics>0.36</dynamics>
+      <end-dynamics>0.36</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.0975927130774279</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[16])">
+      <attack>8.881784197001252E-16</attack>
+      <release>0.0</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[2])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[3])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179689555E-4</release>
+      <dynamics>0.35000000000000003</dynamics>
+      <end-dynamics>0.35000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[5])">
+      <attack>4.8796356538594043E-4</attack>
+      <release>3.253090435889616E-4</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[6])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[7])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[22])">
+      <attack>0.0</attack>
+      <release>0.01850670070197822</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[19])">
+      <attack>-1.6265452179470286E-4</attack>
+      <release>0.01850670070197822</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[9])">
+      <attack>3.2530904359351354E-4</attack>
+      <release>1.6265452179875517E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[10])">
+      <attack>1.6265452179875517E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[11])">
+      <attack>0.0</attack>
+      <release>0.004810882548107631</release>
+      <dynamics>0.42</dynamics>
+      <end-dynamics>0.42</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[12])">
+      <attack>0.004810882548107631</attack>
+      <release>0.009621765096215262</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[13])">
+      <attack>0.009621765096215262</attack>
+      <release>0.014432647644322949</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='20']/note[14])">
+      <attack>0.015096217650958588</attack>
+      <release>0.01914486279514988</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.09467084639497403</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[16])">
+      <attack>0.013560944479896642</attack>
+      <release>-0.037617554858923374</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[2])">
+      <attack>0.009253350350986733</attack>
+      <release>0.0043075941289052455</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[3])">
+      <attack>0.0043075941289052455</attack>
+      <release>-6.381620931762422E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[4])">
+      <attack>0.0</attack>
+      <release>-0.009247648902818595</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[5])">
+      <attack>-0.009247648902818595</attack>
+      <release>-0.01849529780563719</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[6])">
+      <attack>-0.01849529780563719</attack>
+      <release>-0.027742946708455785</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[7])">
+      <attack>-0.027742946708455785</attack>
+      <release>-0.03699059561127438</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[22])">
+      <attack>0.0</attack>
+      <release>0.03773584905660359</release>
+      <dynamics>0.66</dynamics>
+      <end-dynamics>0.66</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[19])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>0.03773584905660359</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[9])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[10])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[11])">
+      <attack>0.0</attack>
+      <release>0.009810554803790172</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[12])">
+      <attack>0.009810554803790172</attack>
+      <release>0.019621109607580345</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[13])">
+      <attack>0.019621109607580345</attack>
+      <release>0.029431664411370462</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='21']/note[14])">
+      <attack>0.030108254397838707</attack>
+      <release>0.038386467143786414</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.10019518542615924</release>
+      <dynamics>0.71</dynamics>
+      <end-dynamics>0.71</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[16])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.63</dynamics>
+      <end-dynamics>0.63</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[2])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[3])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179689555E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[5])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>-3.253090435937911E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[6])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[7])">
+      <attack>-4.8796356539060337E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[22])">
+      <attack>0.0</attack>
+      <release>0.062182741116750775</release>
+      <dynamics>0.67</dynamics>
+      <end-dynamics>0.67</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[19])">
+      <attack>8.881784197001252E-16</attack>
+      <release>0.062182741116750775</release>
+      <dynamics>0.66</dynamics>
+      <end-dynamics>0.66</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[9])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[10])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[11])">
+      <attack>0.0</attack>
+      <release>0.016851980542045453</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[12])">
+      <attack>0.017546907574707005</attack>
+      <release>0.03439888811675251</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[13])">
+      <attack>0.03439888811675251</attack>
+      <release>0.05125086865879791</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='22']/note[14])">
+      <attack>0.05125086865879791</attack>
+      <release>0.062182741116750775</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.1042654028436063</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[16])">
+      <attack>-0.006979695431474031</attack>
+      <release>0.011897307451471658</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[2])">
+      <attack>0.012690355329945113</attack>
+      <release>0.00634517766496856</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[3])">
+      <attack>0.00634517766496856</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[4])">
+      <attack>0.0</attack>
+      <release>0.009986459038590467</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[5])">
+      <attack>0.009986459038590467</attack>
+      <release>0.019972918077180934</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[6])">
+      <attack>0.019972918077180934</attack>
+      <release>0.029959377115771457</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[7])">
+      <attack>0.03063642518618448</attack>
+      <release>0.03757044458359471</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.035087719298256825</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[19])">
+      <attack>0.009862241703196717</attack>
+      <release>0.03532934131736566</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[9])">
+      <attack>0.018472135253607025</attack>
+      <release>0.008922980588613183</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[10])">
+      <attack>0.008922980588613183</attack>
+      <release>-6.261740763807699E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.04585326953748245</release>
+      <dynamics>0.58</dynamics>
+      <end-dynamics>0.58</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[12])">
+      <attack>-0.04585326953748245</attack>
+      <release>-0.0917065390749649</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[13])">
+      <attack>-0.0917065390749649</attack>
+      <release>-0.13755980861244732</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='23']/note[14])">
+      <attack>-0.13755980861244732</attack>
+      <release>0.017365269461078033</release>
+      <dynamics>0.42</dynamics>
+      <end-dynamics>0.42</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.09924146649810772</release>
+      <dynamics>0.44</dynamics>
+      <end-dynamics>0.44</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[16])">
+      <attack>0.021856287425152665</attack>
+      <release>0.1194393662400979</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[2])">
+      <attack>0.02634730538922736</attack>
+      <release>0.18592814371258515</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[3])">
+      <attack>0.013473053892223974</attack>
+      <release>0.08154235145385551</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[4])">
+      <attack>0.0</attack>
+      <release>0.09197218710492894</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[5])">
+      <attack>-0.03697850821744725</attack>
+      <release>0.08407079646017435</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[6])">
+      <attack>-0.018331226295830283</attack>
+      <release>0.020543615676355653</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[7])">
+      <attack>-0.036978508217449524</attack>
+      <release>0.20901889092017134</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.09480968858132044</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[19])">
+      <attack>0.027269957343084406</attack>
+      <release>0.08509316770186287</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[9])">
+      <attack>0.01797684338817973</attack>
+      <release>0.008683729433275</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[10])">
+      <attack>0.009293113954908172</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[11])">
+      <attack>0.0</attack>
+      <release>0.02335640138408135</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[12])">
+      <attack>0.024048442906572653</attack>
+      <release>0.04740484429065395</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[13])">
+      <attack>0.04740484429065395</attack>
+      <release>0.0707612456747353</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='24']/note[14])">
+      <attack>0.03062283737023741</attack>
+      <release>0.04844720496894382</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.11804158283031208</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[16])">
+      <attack>-0.013975155279504436</attack>
+      <release>-0.039570757880613594</release>
+      <dynamics>0.44</dynamics>
+      <end-dynamics>0.44</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[2])">
+      <attack>0.03850931677018332</attack>
+      <release>0.024534161490678885</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[3])">
+      <attack>-0.04130434782609094</attack>
+      <release>0.05298457411133487</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[4])">
+      <attack>0.0</attack>
+      <release>0.07930918846411922</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[5])">
+      <attack>0.04443326626425326</attack>
+      <release>0.04929577464788937</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[6])">
+      <attack>0.00972501676727211</attack>
+      <release>0.01458752515090822</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[7])">
+      <attack>-0.024312541918173114</attack>
+      <release>0.1316455696202547</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.04879635653871639</release>
+      <dynamics>0.67</dynamics>
+      <end-dynamics>0.67</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[19])">
+      <attack>-0.008860759493668102</attack>
+      <release>-0.04814573845153358</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[9])">
+      <attack>-0.018354430379741216</attack>
+      <release>-0.0037974683544217402</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[10])">
+      <attack>-0.027848101265814496</attack>
+      <release>0.06506180871828206</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[11])">
+      <attack>0.0</attack>
+      <release>0.12150292778139049</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[12])">
+      <attack>-0.02163305139883001</attack>
+      <release>-0.024398178269358195</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[13])">
+      <attack>-0.024398178269358195</attack>
+      <release>0.043103448275858214</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='25']/note[14])">
+      <attack>-0.026512687052703487</attack>
+      <release>-0.02927781392323181</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.07885791978245182</release>
+      <dynamics>0.75</dynamics>
+      <end-dynamics>0.75</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[16])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>0.04145408163265253</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[2])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[3])">
+      <attack>-4.8796356539060337E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[4])">
+      <attack>0.0</attack>
+      <release>0.01104690686608012</release>
+      <dynamics>0.68</dynamics>
+      <end-dynamics>0.68</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[5])">
+      <attack>0.01104690686608012</attack>
+      <release>0.02209381373216024</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[6])">
+      <attack>0.02209381373216024</attack>
+      <release>0.03314072059824036</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[7])">
+      <attack>0.03314072059824036</attack>
+      <release>0.04145408163265253</release>
+      <dynamics>0.67</dynamics>
+      <end-dynamics>0.67</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.1014030612244855</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[19])">
+      <attack>-3.164135620181696E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[9])">
+      <attack>-6.328271240363392E-15</attack>
+      <release>-9.43689570931383E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[10])">
+      <attack>-9.43689570931383E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[11])">
+      <attack>0.0</attack>
+      <release>1.2212453270876722E-15</release>
+      <dynamics>0.64</dynamics>
+      <end-dynamics>0.64</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[12])">
+      <attack>1.2212453270876722E-15</attack>
+      <release>2.4424906541753444E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[13])">
+      <attack>2.4424906541753444E-15</attack>
+      <release>3.552713678800501E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='26']/note[14])">
+      <attack>3.552713678800501E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.67</dynamics>
+      <end-dynamics>0.67</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.1294642857142968</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[16])">
+      <attack>1.2212453270876722E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[2])">
+      <attack>2.4424906541753444E-15</attack>
+      <release>3.552713678800501E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[3])">
+      <attack>3.552713678800501E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[4])">
+      <attack>0.0</attack>
+      <release>-3.164135620181696E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[5])">
+      <attack>-3.164135620181696E-15</attack>
+      <release>-6.328271240363392E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[6])">
+      <attack>-6.328271240363392E-15</attack>
+      <release>-9.43689570931383E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[7])">
+      <attack>-9.43689570931383E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.031550068587112845</release>
+      <dynamics>0.71</dynamics>
+      <end-dynamics>0.71</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[19])">
+      <attack>-1.5933715742161292E-4</attack>
+      <release>0.0667074663402698</release>
+      <dynamics>0.64</dynamics>
+      <end-dynamics>0.64</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[9])">
+      <attack>-3.1867431484322584E-4</attack>
+      <release>-4.7801147226489427E-4</release>
+      <dynamics>0.64</dynamics>
+      <end-dynamics>0.64</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[10])">
+      <attack>-4.7801147226489427E-4</attack>
+      <release>-6.373486296864517E-4</release>
+      <dynamics>0.61</dynamics>
+      <end-dynamics>0.61</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[11])">
+      <attack>0.0</attack>
+      <release>0.018861454046637194</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[12])">
+      <attack>0.018861454046637194</attack>
+      <release>0.03772290809327439</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[13])">
+      <attack>0.03772290809327439</attack>
+      <release>0.05658436213991169</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='27']/note[14])">
+      <attack>0.05658436213991169</attack>
+      <release>0.06731946144430896</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.07972972972974102</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[16])">
+      <attack>0.030293757649940967</attack>
+      <release>0.053140096618357655</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[2])">
+      <attack>0.02019583843329653</attack>
+      <release>0.010097919216652151</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[3])">
+      <attack>0.010097919216652151</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[4])">
+      <attack>0.0</attack>
+      <release>0.014864864864861604</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[5])">
+      <attack>0.014864864864861604</attack>
+      <release>0.02972972972972321</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[6])">
+      <attack>0.02972972972972321</attack>
+      <release>0.04459459459458481</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[7])">
+      <attack>0.04459459459458481</attack>
+      <release>0.053140096618357655</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.20314465408805038</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[19])">
+      <attack>0.03985507246376907</attack>
+      <release>-0.01383647798742138</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[9])">
+      <attack>0.026570048309180416</attack>
+      <release>0.013285024154591873</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[10])">
+      <attack>0.013285024154591873</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.003459119496855345</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[12])">
+      <attack>-0.003459119496855345</attack>
+      <release>-0.00691823899371069</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[13])">
+      <attack>-0.00691823899371069</attack>
+      <release>-0.010377358490566091</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='28']/note[14])">
+      <attack>-0.010377358490566091</attack>
+      <release>-0.01383647798742138</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.2202729044834335</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[16])">
+      <attack>0.021646859083193526</attack>
+      <release>-0.05328135152696889</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[2])">
+      <attack>-0.010469722693828343</attack>
+      <release>0.00834748160724863</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[3])">
+      <attack>-0.05899830220712654</attack>
+      <release>0.02469135802469127</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[4])">
+      <attack>0.0</attack>
+      <release>0.00471085120207837</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[5])">
+      <attack>0.00471085120207837</attack>
+      <release>0.00942170240415674</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[6])">
+      <attack>0.00942170240415674</attack>
+      <release>0.01413255360623511</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[7])">
+      <attack>-0.02420402858999604</attack>
+      <release>-0.01949317738791767</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.07819748177601393</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[19])">
+      <attack>-0.023466833541926413</attack>
+      <release>-0.07886017229953945</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[9])">
+      <attack>0.008760951188988453</attack>
+      <release>0.0040675844806040695</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[10])">
+      <attack>0.0040675844806040695</attack>
+      <release>-6.257822277803138E-4</release>
+      <dynamics>0.42</dynamics>
+      <end-dynamics>0.42</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[11])">
+      <attack>0.0</attack>
+      <release>0.009774685222000368</release>
+      <dynamics>0.41000000000000003</dynamics>
+      <end-dynamics>0.41000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[12])">
+      <attack>0.009774685222000368</attack>
+      <release>0.019549370444000735</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[13])">
+      <attack>0.019549370444000735</attack>
+      <release>0.02932405566600116</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='29']/note[14])">
+      <attack>0.02932405566600116</attack>
+      <release>0.038386467143786414</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.07096354166666341</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[16])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[2])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[3])">
+      <attack>-4.8796356539060337E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[4])">
+      <attack>0.0</attack>
+      <release>8.881784197001252E-16</release>
+      <dynamics>0.65</dynamics>
+      <end-dynamics>0.65</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[5])">
+      <attack>8.881784197001252E-16</attack>
+      <release>1.7763568394002505E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[6])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[7])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.63</dynamics>
+      <end-dynamics>0.63</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.14053350683149413</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[19])">
+      <attack>4.8796356538594043E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[9])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[10])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[11])">
+      <attack>0.0</attack>
+      <release>-1.6265452179689555E-4</release>
+      <dynamics>0.65</dynamics>
+      <end-dynamics>0.65</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[12])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>-3.253090435937911E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[13])">
+      <attack>3.253090435889616E-4</attack>
+      <release>1.6265452179220485E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='30']/note[14])">
+      <attack>1.6265452179220485E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.66</dynamics>
+      <end-dynamics>0.66</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.06571242680546963</release>
+      <dynamics>0.5700000000000001</dynamics>
+      <end-dynamics>0.5700000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[16])">
+      <attack>-1.6265452179245465E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[2])">
+      <attack>-3.253090435849093E-4</attack>
+      <release>-4.879635653773917E-4</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[3])">
+      <attack>1.626545218054165E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.48</dynamics>
+      <end-dynamics>0.48</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.6265452179689555E-4</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[5])">
+      <attack>-1.6265452179689555E-4</attack>
+      <release>-3.253090435937911E-4</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[6])">
+      <attack>-3.253090435937911E-4</attack>
+      <release>-4.8796356539060337E-4</release>
+      <dynamics>0.44</dynamics>
+      <end-dynamics>0.44</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[7])">
+      <attack>-4.8796356539060337E-4</attack>
+      <release>-6.506180871875822E-4</release>
+      <dynamics>0.44</dynamics>
+      <end-dynamics>0.44</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.02324263038549046</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[19])">
+      <attack>8.881784197001252E-16</attack>
+      <release>-0.05668934240363099</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[9])">
+      <attack>1.7763568394002505E-15</attack>
+      <release>2.6645352591003757E-15</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[10])">
+      <attack>2.6645352591003757E-15</attack>
+      <release>0.0</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[11])">
+      <attack>0.0</attack>
+      <release>-0.0323129251700687</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[12])">
+      <attack>-0.03174603174603238</attack>
+      <release>-0.06405895691610108</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[13])">
+      <attack>-0.06405895691610108</attack>
+      <release>-0.09637188208616976</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='31']/note[14])">
+      <attack>-0.09637188208616976</attack>
+      <release>-0.07369614512471934</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[21])">
+      <attack>0.0</attack>
+      <release>-0.14880587875076634</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[16])">
+      <attack>0.05470110272779999</attack>
+      <release>-0.02204531537048482</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[2])">
+      <attack>0.036854323853742876</attack>
+      <release>0.01900754497968582</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[3])">
+      <attack>0.018427161926870883</attack>
+      <release>6.123698714023264E-4</release>
+      <dynamics>0.46</dynamics>
+      <end-dynamics>0.46</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[4])">
+      <attack>0.0</attack>
+      <release>-0.005052051439069449</release>
+      <dynamics>0.45</dynamics>
+      <end-dynamics>0.45</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[5])">
+      <attack>-0.005052051439069449</attack>
+      <release>-0.010104102878138899</release>
+      <dynamics>0.42</dynamics>
+      <end-dynamics>0.42</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[6])">
+      <attack>-0.01071647274954124</attack>
+      <release>-0.015768524188610744</release>
+      <dynamics>0.42</dynamics>
+      <end-dynamics>0.42</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[7])">
+      <attack>-0.016380894060012974</attack>
+      <release>-0.02143294549908248</release>
+      <dynamics>0.42</dynamics>
+      <end-dynamics>0.42</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[22])">
+      <attack>0.0</attack>
+      <release>-0.053763440860211786</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[19])">
+      <attack>-0.016965428937259636</attack>
+      <release>0.009913258983890921</release>
+      <dynamics>0.43</dynamics>
+      <end-dynamics>0.43</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[9])">
+      <attack>-0.01088348271446804</attack>
+      <release>-0.0048015364916764725</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[10])">
+      <attack>-0.0054417413572335205</attack>
+      <release>6.325110689437087E-4</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[11])">
+      <attack>0.0</attack>
+      <release>0.0030044275774834817</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[12])">
+      <attack>0.0030044275774834817</attack>
+      <release>0.006008855154966963</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[13])">
+      <attack>0.005376344086023277</attack>
+      <release>0.008380771663506703</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='32']/note[14])">
+      <attack>0.007748260594562906</attack>
+      <release>0.010532837670384102</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[20])">
+      <attack>0.0</attack>
+      <release>-0.07105108631825807</release>
+      <dynamics>0.58</dynamics>
+      <end-dynamics>0.58</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[17])">
+      <attack>0.007744733581163954</attack>
+      <release>-0.06165590135055388</release>
+      <dynamics>0.5700000000000001</dynamics>
+      <end-dynamics>0.5700000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[2])">
+      <attack>0.005576208178436959</attack>
+      <release>0.003407682775710019</release>
+      <dynamics>0.5700000000000001</dynamics>
+      <end-dynamics>0.5700000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[3])">
+      <attack>0.002788104089216814</attack>
+      <release>6.257822277847337E-4</release>
+      <dynamics>0.58</dynamics>
+      <end-dynamics>0.58</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[4])">
+      <attack>0.0</attack>
+      <release>3.1289111389348756E-4</release>
+      <dynamics>0.61</dynamics>
+      <end-dynamics>0.61</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[5])">
+      <attack>3.1289111389348756E-4</attack>
+      <release>6.257822277869751E-4</release>
+      <dynamics>0.66</dynamics>
+      <end-dynamics>0.66</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[6])">
+      <attack>2.220446049250313E-15</attack>
+      <release>3.128911138956525E-4</release>
+      <dynamics>0.7000000000000001</dynamics>
+      <end-dynamics>0.7000000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[7])">
+      <attack>-3.1289111388899116E-4</attack>
+      <release>0.0</release>
+      <dynamics>0.88</dynamics>
+      <end-dynamics>0.88</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[8])">
+      <attack>0.0</attack>
+      <release>4.6963055729376535E-4</release>
+      <dynamics>0.76</dynamics>
+      <end-dynamics>0.76</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[9])">
+      <attack>-1.5654351909946684E-4</attack>
+      <release>3.1308703819432626E-4</release>
+      <dynamics>0.74</dynamics>
+      <end-dynamics>0.74</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[10])">
+      <attack>3.1308703819432626E-4</attack>
+      <release>7.827175954880916E-4</release>
+      <dynamics>0.61</dynamics>
+      <end-dynamics>0.61</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[11])">
+      <attack>1.5654351909488717E-4</attack>
+      <release>5.871990604815057E-4</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[12])">
+      <attack>0.0</attack>
+      <release>-0.015120375807397696</release>
+      <dynamics>0.58</dynamics>
+      <end-dynamics>0.58</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[13])">
+      <attack>-0.015120375807397696</attack>
+      <release>-0.03024075161479539</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[14])">
+      <attack>-0.03082795067527694</attack>
+      <release>-0.04594832648267466</release>
+      <dynamics>0.5</dynamics>
+      <end-dynamics>0.5</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='33']/note[15])">
+      <attack>-0.0465355255431561</attack>
+      <release>-0.06165590135055388</release>
+      <dynamics>0.4</dynamics>
+      <end-dynamics>0.4</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[20])">
+      <attack>0.0</attack>
+      <release>-0.06440406199893278</release>
+      <dynamics>0.47000000000000003</dynamics>
+      <end-dynamics>0.47000000000000003</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[17])">
+      <attack>0.008602711157455423</attack>
+      <release>-0.06413682522715314</release>
+      <dynamics>0.54</dynamics>
+      <end-dynamics>0.54</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[2])">
+      <attack>0.032325338894681366</attack>
+      <release>0.01642335766423275</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[3])">
+      <attack>0.03154327424400338</attack>
+      <release>0.017910447761193833</release>
+      <dynamics>0.52</dynamics>
+      <end-dynamics>0.52</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[4])">
+      <attack>0.0</attack>
+      <release>0.018059701492534386</release>
+      <dynamics>0.5700000000000001</dynamics>
+      <end-dynamics>0.5700000000000001</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[5])">
+      <attack>0.017462686567161267</attack>
+      <release>0.03552238805969565</release>
+      <dynamics>0.68</dynamics>
+      <end-dynamics>0.68</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[6])">
+      <attack>0.03552238805969565</attack>
+      <release>0.05358208955222998</release>
+      <dynamics>0.62</dynamics>
+      <end-dynamics>0.62</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[7])">
+      <attack>4.4776119402156755E-4</attack>
+      <release>0.016471838469713247</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[8])">
+      <attack>0.0</attack>
+      <release>-0.011424017003185544</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[9])">
+      <attack>-0.011424017003185544</attack>
+      <release>-0.022848034006371087</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[10])">
+      <attack>0.007970244420834383</attack>
+      <release>0.04861849096706494</release>
+      <dynamics>0.65</dynamics>
+      <end-dynamics>0.65</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[11])">
+      <attack>0.02736450584485417</attack>
+      <release>0.024853019775521065</release>
+      <dynamics>0.53</dynamics>
+      <end-dynamics>0.53</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[12])">
+      <attack>0.0</attack>
+      <release>-0.012693746659540817</release>
+      <dynamics>0.51</dynamics>
+      <end-dynamics>0.51</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[13])">
+      <attack>-0.055451630144308234</attack>
+      <release>-0.08925708177445296</release>
+      <dynamics>0.55</dynamics>
+      <end-dynamics>0.55</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[14])">
+      <attack>-0.11892036344201035</attack>
+      <release>-0.16876002137894286</release>
+      <dynamics>0.49</dynamics>
+      <end-dynamics>0.49</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='34']/note[15])">
+      <attack>-0.1823890967397125</attack>
+      <release>0.059326563335114796</release>
+      <dynamics>0.44</dynamics>
+      <end-dynamics>0.44</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='35']/note[5])">
+      <attack>0.0</attack>
+      <release>-1.5438268305718876</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='35']/note[4])">
+      <attack>0.0</attack>
+      <release>-1.5595938001068954</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='35']/note[1])">
+      <attack>0.0</attack>
+      <release>-1.5518439337252814</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='35']/note[2])">
+      <attack>0.0</attack>
+      <release>-1.5518439337252814</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+    <note-deviation xlink:href="#xpointer(/score-partwise/part[@id='P1']/measure[@number='35']/note[3])">
+      <attack>0.0</attack>
+      <release>-1.5360769641902734</release>
+      <dynamics>0.56</dynamics>
+      <end-dynamics>0.56</end-dynamics>
+    </note-deviation>
+  </notewise>
+  <extra-notes/>
+</deviation>
