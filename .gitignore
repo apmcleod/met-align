@@ -1,4 +1,8 @@
 .classpath
 .project
 bin/**
-doc/**
+src/**
+anacrusis/**
+corpora/**
+grammars/**
+Makefile

@@ -1,0 +1,16 @@
+metalign
+metalign.beat
+metalign.beat.frombeats
+metalign.beat.fromfile
+metalign.beat.hmm
+metalign.generic
+metalign.hierarchy
+metalign.hierarchy.fromfile
+metalign.hierarchy.lpcfg
+metalign.joint
+metalign.parsing
+metalign.time
+metalign.utils
+metalign.voice
+metalign.voice.fromfile
+metalign.voice.hmm
