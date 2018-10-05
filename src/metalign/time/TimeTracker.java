@@ -308,12 +308,12 @@ public class TimeTracker {
 	}
     
     /**
-     * Get a List of the Beats found by this TimeTracker up until (but not including)
+     * Get a List of the tatums found by this TimeTracker up until (but not including)
      * the {@link #lastTick}.
      * 
-     * @return A List of the 32nd-note Beats of this TimeTracker until the given tick.
+     * @return A List of the tatums of this TimeTracker until the given tick.
      */
-    public List<Beat> getBeats() {
+    public List<Beat> getTatums() {
     	List<Beat> beats = new ArrayList<Beat>();
     	
     	TimeTrackerNode firstNode = getNodeAtTick(0);
@@ -483,7 +483,7 @@ public class TimeTracker {
     public double getQuantizationError(MidiNote note, int divisions) {
     	long onsetTick = note.getOnsetTick();
     	
-		List<Beat> beats = getBeats();
+		List<Beat> beats = getTatums();
 		ListIterator<Beat> beatIterator = beats.listIterator();
 		Beat beat = null;
 		

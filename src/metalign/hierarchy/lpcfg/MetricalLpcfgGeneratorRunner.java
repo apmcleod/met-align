@@ -6,12 +6,19 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.sound.midi.InvalidMidiDataException;
 
 import metalign.Main;
 import metalign.Runner;
+import metalign.beat.Beat;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.joint.JointModel;
@@ -21,6 +28,7 @@ import metalign.parsing.NoteListGenerator;
 import metalign.time.NoteBTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
+import metalign.utils.MidiNote;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
 
 /**
@@ -29,11 +37,13 @@ import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
  * 
  * @author Andrew McLeod - 29 February, 2016
  */
-public class MetricalLpcfgGeneratorRunner {
+public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGenerator> {
 	public static boolean VERBOSE = false;
 	public static boolean TESTING = false;
 	public static boolean LEXICALIZATION = true;
-	
+	public static int NUM_PROCS = 1;
+	public static double QUANTIZATION_THRESHOLD = 0.9;
+
 	/**
 	 * The main method for generating an LPCFG grammar file.
 	 * <p>
@@ -59,8 +69,9 @@ public class MetricalLpcfgGeneratorRunner {
 	 * @param args The args as described above.
 	 * @throws InterruptedException
 	 * @throws IOException
+	 * @throws ExecutionException 
 	 */
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, ExecutionException {
 		boolean useChannel = true;
 		boolean generate = false;
 		File exportModelFile = null;
@@ -119,6 +130,18 @@ public class MetricalLpcfgGeneratorRunner {
 							LEXICALIZATION = false;
 							break;
 							
+						case 'p':
+							i++;
+							if (args.length == i) {
+								argumentError("No process count given for -p option.");
+							}
+							try {
+								NUM_PROCS = Integer.parseInt(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading process count. Must be an integer: " + args[i]);
+							}
+							break;
+							
 						case 'e':
 							Main.EXTEND_NOTES = true;
 							break;
@@ -129,6 +152,18 @@ public class MetricalLpcfgGeneratorRunner {
 								argumentError("No File used with -g");
 							}
 							exportModelFile = new File(args[i]);
+							break;
+							
+						case 'q':
+							i++;
+							if (args.length == i) {
+								argumentError("No quantization threshold given for -q option.");
+							}
+							try {
+								QUANTIZATION_THRESHOLD = Double.parseDouble(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading quantization threshold. Must be a double: " + args[i]);
+							}
 							break;
 							
 						case 'a':
@@ -162,15 +197,48 @@ public class MetricalLpcfgGeneratorRunner {
 			argumentError("No music files given for testing");
 		}
 		
+		MetricalLpcfg grammar;
+		
 		// Generate grammar
 		if (generate) {
 			if (VERBOSE) {
 				System.out.println("Generating grammar into " + exportModelFile);
+				System.out.println("Using " + NUM_PROCS + "processes.");
 			}
 			
-			MetricalLpcfgGenerator generator = generateGrammar(testFiles, anacrusisFiles, useChannel);
+			if (NUM_PROCS > 1) {
+				grammar = new MetricalLpcfg();
+				double filesPerProc = ((double) testFiles.size()) / ((double) NUM_PROCS);
+				
+				// Create callables
+				List<Callable<MetricalLpcfgGenerator>> callables = new ArrayList<Callable<MetricalLpcfgGenerator>>(NUM_PROCS);
+			    for (int i = 0; i < NUM_PROCS; i++) {
+			    	callables.add(new MetricalLpcfgGeneratorRunner(
+			    			testFiles.subList((int) Math.round(i * filesPerProc), (int) Math.round((i + 1) * filesPerProc)),
+			    			anacrusisFiles, useChannel)
+			    	);
+			    }
+	
+			    // Execute the callables
+			    ExecutorService executor = Executors.newFixedThreadPool(NUM_PROCS);
+			    List<Future<MetricalLpcfgGenerator>> results = executor.invokeAll(callables);
+			    
+			    // Grab the results and save the best
+			    for (Future<MetricalLpcfgGenerator> result : results) {
+			    	MetricalLpcfgGenerator generator = result.get();
+			    	
+			    	for (MetricalLpcfgTree tree : generator.getGrammar().getTrees()) {
+			    		grammar.addTree(tree);
+			    	}
+			    }
+			    
+			    executor.shutdown();
+			    
+			} else {
+				grammar = generateGrammar(testFiles, anacrusisFiles, useChannel).getGrammar();
+			}
 			
-			MetricalLpcfg.serialize(generator.getGrammar(), exportModelFile);	
+			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
 
@@ -186,10 +254,12 @@ public class MetricalLpcfgGeneratorRunner {
 	private static MetricalLpcfgGenerator generateGrammar(List<File> midiFiles, List<File> anacrusisFiles, boolean useChannel) throws InterruptedException {
 		// We have files and are ready to run!
 		MetricalLpcfgGenerator generator = new MetricalLpcfgGenerator();
+		int fileNum = 0;
 		
 		for (File file : midiFiles) {
+			fileNum++;
 			if (VERBOSE) {
-				System.out.println("Parsing " + file);
+				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
 			TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
@@ -221,13 +291,26 @@ public class MetricalLpcfgGeneratorRunner {
 				continue;
 			}
 			
-			if (tt.getFirstTimeSignature().getNumerator() == TimeSignature.IRREGULAR_NUMERATOR) {
-				System.err.println("Irregular meter detected. Skipping song " + file);
+			if (tt.getFirstTimeSignature().getNumerator() == TimeSignature.IRREGULAR_NUMERATOR ||
+					(tt.getFirstTimeSignature().getNumerator() != 2 &&
+					tt.getFirstTimeSignature().getNumerator() != 3 &&
+					tt.getFirstTimeSignature().getNumerator() != 4 &&
+					tt.getFirstTimeSignature().getNumerator() != 6 &&
+					tt.getFirstTimeSignature().getNumerator() != 9 &&
+					tt.getFirstTimeSignature().getNumerator() != 12)) {
+				System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getNumerator() +
+						"). Skipping song " + file);
 				continue;
 			}
 			
 			if (tt.getAllTimeSignatures().size() != 1) {
 				System.err.println("Meter change detected. Skipping song " + file);
+				continue;
+			}
+			
+			double alignmentScore = getAlignmentScore(nlg, tt);
+			if (alignmentScore < QUANTIZATION_THRESHOLD) {
+				System.err.println("Poor alignment with beats detected (" + alignmentScore + "). Skipping song " + file);
 				continue;
 			}
 			
@@ -252,12 +335,55 @@ public class MetricalLpcfgGeneratorRunner {
 			Runner.performInference(jm, nlg);
 			
 			// GRAMMARIZE
-			generator.parseSong(jm, tt);
+			try {
+				generator.parseSong(jm, tt);
+			} catch (Exception e) {
+				System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
+				
+				if (VERBOSE) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return generator;
 	}
 	
+	/**
+	 * Get the alignment score of a song given a NoteListGenerator and a TimeTracker. A song's
+	 * alignment score is 1 minus the average distance each note's onset away from the nearest
+	 * tatum location, measured as a percentage of the tatum length at that point.
+	 * 
+	 * @param nlg The NoteListGenerator.
+	 * @param tt The TimeTracker.
+	 * @return The alignment score.
+	 */
+	private static double getAlignmentScore(NoteListGenerator nlg, TimeTracker tt) {
+		List<Beat> tatums = tt.getTatums();
+		if (tatums.size() <= 1) {
+			return 0.0;
+		}
+		
+		Iterator<Beat> tatumIterator = tatums.iterator();
+		Beat prevTatum = tatumIterator.next();
+		Beat currentTatum = tatumIterator.next();
+		
+		double totalError = 0.0;
+		for (MidiNote note : nlg.getNoteList()) {
+			long time = note.getOnsetTime();
+			
+			while (time > currentTatum.getTime() && tatumIterator.hasNext()) {
+				prevTatum = currentTatum;
+				currentTatum = tatumIterator.next();
+			}
+			
+			long diff = Math.min(Math.abs(time - prevTatum.getTime()), Math.abs(currentTatum.getTime() - time));
+			totalError += ((double) diff) / ((double) (currentTatum.getTime() - prevTatum.getTime()));
+		}
+		
+		return 1.0 - totalError / nlg.getNoteList().size();
+	}
+
 	/**
 	 * Get the anacrusis length for the given test file given the anacrusis files.
 	 * 
@@ -307,8 +433,29 @@ public class MetricalLpcfgGeneratorRunner {
 		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended.\n");
 		sb.append("-s INT = Use INT as the sub beat length.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
+		sb.append("-p INT = Run multi-threaded with the given number of processes.\n");
+		sb.append("-q DOUBLE = Skip songs with a quantization score less than the given threshold (default=0.9).\n");
 		
 		System.err.println(sb.toString());
 		System.exit(1);
+	}
+	
+	/*******
+	 * Class objects for multi-threading.
+	 */
+	
+	private List<File> testFiles;
+	private List<File> anacrusisFiles;
+	private boolean useChannel;
+	
+	public MetricalLpcfgGeneratorRunner(List<File> testFiles, List<File> anacrusisFiles, boolean useChannel) {
+		this.testFiles = testFiles;
+		this.anacrusisFiles = anacrusisFiles;
+		this.useChannel = useChannel;
+	}
+	
+	@Override
+	public MetricalLpcfgGenerator call() throws InterruptedException {
+		return MetricalLpcfgGeneratorRunner.generateGrammar(testFiles, anacrusisFiles, useChannel);
 	}
 }

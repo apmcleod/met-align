@@ -207,7 +207,7 @@ public class HmmBeatTrackingModelTrainer {
 				}
 				
 				beats = tt.getBeatsOnly();
-				tatums = tt.getBeats();
+				tatums = tt.getTatums();
 			}
 			
 			if (!beats.isEmpty()) {

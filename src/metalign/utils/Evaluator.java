@@ -114,7 +114,7 @@ public class Evaluator {
 			
 		} else {
 			groundTruthVoices = Runner.parseFile(groundTruth, nep, tt, useChannel).getGoldStandardVoices();
-			tatums = tt.getBeats();
+			tatums = tt.getTatums();
 			
 			TimeSignature timeSig = tt.getNodeAtTime(tatums.get(0).getTime()).getTimeSignature();
 			Measure tmpMeasure = timeSig.getMetricalMeasure();
