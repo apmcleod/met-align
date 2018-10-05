@@ -332,7 +332,12 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				continue;
 			}
 			
-			Runner.performInference(jm, nlg);
+			try {
+				Runner.performInference(jm, nlg);
+			} catch (NullPointerException e) {
+				System.err.println("NPE file " + file);
+				throw e;
+			}
 			
 			// GRAMMARIZE
 			try {
