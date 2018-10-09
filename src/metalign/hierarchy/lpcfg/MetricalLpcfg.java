@@ -9,7 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -241,13 +240,7 @@ public class MetricalLpcfg implements Serializable {
 	 * @return The Set of the Measures which are in this grammar.
 	 */
 	public Set<Measure> getMeasures() {
-		Set<Measure> measures = new HashSet<Measure>();
-		
-		for (MetricalLpcfgTree tree : trees) {
-			measures.add(tree.getMeasure().getMeasure());
-		}
-		
-		return measures;
+		return probabilities.getMeasures();
 	}
 	
 	/**

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import metalign.Main;
 import metalign.hierarchy.Measure;
@@ -650,6 +651,15 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		}
 		
 		return logProbability;
+	}
+	
+	/**
+	 * Get the set of measures contained within this grammar.
+	 * 
+	 * @return The Set of the measure types within this grammar.
+	 */
+	public Set<Measure> getMeasures() {
+		return measureHeadMap.keySet();
 	}
 	
 	/**
