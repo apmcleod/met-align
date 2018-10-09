@@ -32,13 +32,13 @@ public class JointModel extends MidiModel {
 	 */
 	private boolean started;
 	
-	public static Map<VoiceSplittingModelState, List<VoiceSplittingModelState>> newVoiceStates;
+	public Map<VoiceSplittingModelState, List<VoiceSplittingModelState>> newVoiceStates;
 	
-	public static Map<BeatTrackingModelState, Map<List<MidiNote>, TreeSet<BeatTrackingModelState>>> newBeatStates;
+	public Map<BeatTrackingModelState, Map<List<MidiNote>, TreeSet<BeatTrackingModelState>>> newBeatStates;
 	
-	public static TreeSet<JointModelState> startedStates;
+	public TreeSet<JointModelState> startedStates;
 	
-	private static long previousTime = System.currentTimeMillis();
+	private long previousTime = System.currentTimeMillis();
 	
 	/**
 	 * Create a new JointModel based on a state with the given constituent states.
@@ -49,13 +49,13 @@ public class JointModel extends MidiModel {
 	 */
 	public JointModel(VoiceSplittingModelState voice, BeatTrackingModelState beat, HierarchyModelState hierarchy) {
 		hypothesisStates = new TreeSet<JointModelState>();
-		hypothesisStates.add(new JointModelState(voice, beat, hierarchy));
+		hypothesisStates.add(new JointModelState(this, voice, beat, hierarchy));
 		started = false;
 	}
 
 	@Override
 	public void handleIncoming(List<MidiNote> notes) {
-		setGlobalStaticVariables();
+		setGlobalVariables();
 		
 		if (!started) {
 			started = true;
@@ -102,7 +102,7 @@ public class JointModel extends MidiModel {
 	
 	@Override
 	public void close() {
-		setGlobalStaticVariables();
+		setGlobalVariables();
 		
 		if (Main.LOG_STATUS) {
 			printLog(null);
@@ -133,7 +133,7 @@ public class JointModel extends MidiModel {
 	 * Set the global static variables to new blank objects. They are: {@link #newVoiceStates},
 	 * {@link #newBeatStates}, and {@link #startedStates}.
 	 */
-	private static void setGlobalStaticVariables() {
+	private void setGlobalVariables() {
 		newVoiceStates = new TreeMap<VoiceSplittingModelState, List<VoiceSplittingModelState>>();
 		newBeatStates = new TreeMap<BeatTrackingModelState, Map<List<MidiNote>, TreeSet<BeatTrackingModelState>>>();
 		startedStates = new TreeSet<JointModelState>();

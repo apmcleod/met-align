@@ -23,6 +23,8 @@ import metalign.voice.VoiceSplittingModelState;
  */
 public class JointModelState extends MidiModelState {
 	
+	private final JointModel jointModel;
+	
 	/**
 	 * The VoiceSplittingModel to use in our joint model.
 	 */
@@ -45,7 +47,9 @@ public class JointModelState extends MidiModelState {
 	 * @param beat {@link #beatState}
 	 * @param hierarchy {@link #hierarchyState}
 	 */
-	public JointModelState(VoiceSplittingModelState voice, BeatTrackingModelState beat, HierarchyModelState hierarchy) {
+	public JointModelState(JointModel jm, VoiceSplittingModelState voice, BeatTrackingModelState beat, HierarchyModelState hierarchy) {
+		jointModel = jm;
+		
 		voiceState = voice;
 		
 		beatState = beat;
@@ -62,8 +66,8 @@ public class JointModelState extends MidiModelState {
 	 * 
 	 * @param h {@link #hierarchyState}
 	 */
-	private JointModelState(HierarchyModelState h) {
-		this(h.getVoiceState(), h.getBeatState().deepCopy(), h.deepCopy());
+	private JointModelState(JointModel jm, HierarchyModelState h) {
+		this(jm, h.getVoiceState(), h.getBeatState().deepCopy(), h.deepCopy());
 	}
 
 	@Override
@@ -77,14 +81,14 @@ public class JointModelState extends MidiModelState {
 		TreeSet<JointModelState> newStates = new TreeSet<JointModelState>();
 		
 		// Check if we even need to compute anything
-		boolean beamFull = Main.BEAM_SIZE != -1 && JointModel.startedStates.size() >= Main.BEAM_SIZE;
-		if (beamFull && getScore() < JointModel.startedStates.last().getScore()) {
+		boolean beamFull = Main.BEAM_SIZE != -1 && jointModel.startedStates.size() >= Main.BEAM_SIZE;
+		if (beamFull && getScore() < jointModel.startedStates.last().getScore()) {
 			return newStates;
 		}
 		
 		
 		// Voice state branching with check for pre-computed values
-		List<VoiceSplittingModelState> newVoiceStates = JointModel.newVoiceStates.get(voiceState);
+		List<VoiceSplittingModelState> newVoiceStates = jointModel.newVoiceStates.get(voiceState);
 		
 		if (newVoiceStates == null) {
 			newVoiceStates = new ArrayList<VoiceSplittingModelState>(voiceState.handleIncoming(notes));
@@ -93,7 +97,7 @@ public class JointModelState extends MidiModelState {
 				newVoiceStates.subList(Main.VOICE_BEAM_SIZE, newVoiceStates.size()).clear();
 			}
 			
-			JointModel.newVoiceStates.put(voiceState, newVoiceStates);
+			jointModel.newVoiceStates.put(voiceState, newVoiceStates);
 		}
 		
 		
@@ -104,7 +108,7 @@ public class JointModelState extends MidiModelState {
 		for (VoiceSplittingModelState voiceState : newVoiceStates) {
 			
 			// This falls outside the main beam, we can skip it.
-			if (beamFull && JointModel.startedStates.last().getScore() >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+			if (beamFull && jointModel.startedStates.last().getScore() >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 				newNotesLists.add(new ArrayList<MidiNote>());
 				newBeatStates.add(new TreeSet<BeatTrackingModelState>());
 				continue;
@@ -128,10 +132,10 @@ public class JointModelState extends MidiModelState {
 				
 			} else {
 				// Initial step
-				Map<List<MidiNote>, TreeSet<BeatTrackingModelState>> newBeatStatesMap = JointModel.newBeatStates.get(beatStateCopy);
+				Map<List<MidiNote>, TreeSet<BeatTrackingModelState>> newBeatStatesMap = jointModel.newBeatStates.get(beatStateCopy);
 				if (newBeatStatesMap == null) {
 					newBeatStatesMap = new HashMap<List<MidiNote>, TreeSet<BeatTrackingModelState>>();
-					JointModel.newBeatStates.put(beatState, newBeatStatesMap);
+					jointModel.newBeatStates.put(beatState, newBeatStatesMap);
 				}
 				
 				TreeSet<BeatTrackingModelState> branchedStates = newBeatStatesMap.get(newNotes);
@@ -158,7 +162,7 @@ public class JointModelState extends MidiModelState {
 			for (BeatTrackingModelState beatState : beatStateSet) {
 				
 				// Main Beam is full and score is not possibly better than any of them
-				if (beamFull && JointModel.startedStates.last().getScore() >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+				if (beamFull && jointModel.startedStates.last().getScore() >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 					if (Main.SUPER_VERBOSE && Main.TESTING) {
 						System.out.println("ELIMINATING (Joint Beam): " + newVoiceState + beatState + beatState.getHierarchyState());
 					}
@@ -214,26 +218,26 @@ public class JointModelState extends MidiModelState {
 		TreeSet<JointModelState> newStates = new TreeSet<JointModelState>();
 		
 		// Check if we even need to compute anything
-		boolean beamFull = Main.BEAM_SIZE != -1 && JointModel.startedStates.size() >= Main.BEAM_SIZE;
-		if (beamFull && getScore() < JointModel.startedStates.last().getScore()) {
+		boolean beamFull = Main.BEAM_SIZE != -1 && jointModel.startedStates.size() >= Main.BEAM_SIZE;
+		if (beamFull && getScore() < jointModel.startedStates.last().getScore()) {
 			return newStates;
 		}
 		
-		// Voice states
-		List<VoiceSplittingModelState> newVoiceStates = JointModel.newVoiceStates.get(voiceState);
+		// Voice statej
+		List<VoiceSplittingModelState> newVoiceStates = jointModel.newVoiceStates.get(voiceState);
 		if (newVoiceStates == null) {
 			newVoiceStates = new ArrayList<VoiceSplittingModelState>(voiceState.close());
 			if (Main.VOICE_BEAM_SIZE != -1 && newVoiceStates.size() > Main.VOICE_BEAM_SIZE) {
 				newVoiceStates.subList(Main.VOICE_BEAM_SIZE, newVoiceStates.size()).clear();
 			}
-			JointModel.newVoiceStates.put(voiceState, newVoiceStates);
+			jointModel.newVoiceStates.put(voiceState, newVoiceStates);
 		}
 		
 		// Beat states
 		List<TreeSet<BeatTrackingModelState>> newBeatStates = new ArrayList<TreeSet<BeatTrackingModelState>>();
 		for (VoiceSplittingModelState voiceState : newVoiceStates) {
 			// This falls outside the main beam, we can skip it.
-			if (beamFull && JointModel.startedStates.last().getScore() >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+			if (beamFull && jointModel.startedStates.last().getScore() >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 				newBeatStates.add(new TreeSet<BeatTrackingModelState>());
 				continue;
 			}
@@ -253,7 +257,7 @@ public class JointModelState extends MidiModelState {
 			
 			for (BeatTrackingModelState beatState : beatStateSet) {
 				// Main Beam is full and score is not possibly better than any of them
-				if (beamFull && JointModel.startedStates.last().getScore() >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+				if (beamFull && jointModel.startedStates.last().getScore() >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 					if (Main.SUPER_VERBOSE && Main.TESTING) {
 						System.out.println("ELIMINATING (Joint Beam): " + newVoiceState + beatState + beatState.getHierarchyState());
 					}
@@ -284,7 +288,7 @@ public class JointModelState extends MidiModelState {
 	 * @param newStatesTmp The TreeSet to add this to.
 	 */
 	private void addWithDuplicateCheck(HierarchyModelState hms, TreeSet<JointModelState> newStatesTmp) {
-		JointModelState jms = new JointModelState(hms);
+		JointModelState jms = new JointModelState(jointModel, hms);
 		JointModelState duplicate = null;
 		
 		for (JointModelState state : newStatesTmp) {

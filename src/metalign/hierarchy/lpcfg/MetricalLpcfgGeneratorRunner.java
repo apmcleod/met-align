@@ -43,6 +43,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static boolean LEXICALIZATION = true;
 	public static int NUM_PROCS = 1;
 	public static double QUANTIZATION_THRESHOLD = 0.9;
+	public static boolean SAVE_TREES = true;
 
 	/**
 	 * The main method for generating an LPCFG grammar file.
@@ -130,6 +131,10 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 							LEXICALIZATION = false;
 							break;
 							
+						case 'x':
+							SAVE_TREES = false;
+							break;
+							
 						case 'p':
 							i++;
 							if (args.length == i) {
@@ -203,7 +208,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		if (generate) {
 			if (VERBOSE) {
 				System.out.println("Generating grammar into " + exportModelFile);
-				System.out.println("Using " + NUM_PROCS + "processes.");
+				System.out.println("Using " + NUM_PROCS + " process(es).");
 			}
 			
 			if (NUM_PROCS > 1) {
@@ -227,9 +232,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			    for (Future<MetricalLpcfgGenerator> result : results) {
 			    	MetricalLpcfgGenerator generator = result.get();
 			    	
-			    	for (MetricalLpcfgTree tree : generator.getGrammar().getTrees()) {
-			    		grammar.addTree(tree);
-			    	}
+			    	grammar.mergeGrammar(generator.getGrammar());
 			    }
 			    
 			    executor.shutdown();
@@ -259,6 +262,10 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		for (File file : midiFiles) {
 			fileNum++;
 			if (VERBOSE) {
+				if (NUM_PROCS != 1) {
+					System.out.print(Thread.currentThread().getId() + ": ");
+				}
+				
 				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
@@ -332,12 +339,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				continue;
 			}
 			
-			try {
-				Runner.performInference(jm, nlg);
-			} catch (NullPointerException e) {
-				System.err.println("NPE file " + file);
-				throw e;
-			}
+			Runner.performInference(jm, nlg);
 			
 			// GRAMMARIZE
 			try {
@@ -440,6 +442,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-p INT = Run multi-threaded with the given number of processes.\n");
 		sb.append("-q DOUBLE = Skip songs with a quantization score less than the given threshold (default=0.9).\n");
+		sb.append("-x = Do not save trees in the grammar file (saves memory, cannot extract when testing).");
 		
 		System.err.println(sb.toString());
 		System.exit(1);

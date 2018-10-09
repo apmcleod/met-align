@@ -160,7 +160,9 @@ public class MetricalLpcfg implements Serializable {
 	 * @param tree A new tree we want to add to this grammar.
 	 */
 	public void addTree(MetricalLpcfgTree tree) {
-		trees.add(tree);
+		if (MetricalLpcfgGeneratorRunner.SAVE_TREES) {
+			trees.add(tree);
+		}
 		
 		try {
 			updateCounts(tree.getMeasure(), tree.getMeasure().getHead(), tree.getMeasure().getMeasure(), true);
@@ -264,6 +266,21 @@ public class MetricalLpcfg implements Serializable {
 	 */
 	public MetricalLpcfgProbabilityTracker getProbabilityTracker() {
 		return probabilities;
+	}
+	
+	/**
+	 * Merge the given other grammar into this one.
+	 * 
+	 * @param other The grammar to merge into this one.
+	 */
+	public void mergeGrammar(MetricalLpcfg other) {
+		// Don't use addTree() here because that also updates probabilities.
+		// We do it separately in case the other grammar was built with -x (i.e. has no trees).
+		for (MetricalLpcfgTree tree : other.getTrees()) {
+			trees.add(tree);
+		}
+		
+		probabilities.merge(other.getProbabilityTracker());
 	}
 	
 	/**

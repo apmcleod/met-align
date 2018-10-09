@@ -96,6 +96,62 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 			measureHeadMap.put(measure, measureHeadLengthMap);
 		}
 	}
+	
+	/**
+	 * Merge the probabilities and counts from the other tracker into this one.
+	 * 
+	 * @param other The probability tracker to merge into this one.
+	 */
+	public void merge(MetricalLpcfgProbabilityTracker other) {
+		transitionMapSmoothed = null;
+		headMapSmoothed = null;
+		measureHeadMapSmoothed = null;
+		
+		for (String key : other.transitionMap.keySet()) {
+			Map<String, Integer> nestedMap = transitionMap.get(key);
+			if (nestedMap == null) {
+				nestedMap = new HashMap<String, Integer>();
+				transitionMap.put(key, nestedMap);
+			}
+			
+			for (String nestedKey : other.transitionMap.get(key).keySet()) {
+				Integer oldCountObject = nestedMap.get(nestedKey);
+				int oldCount = oldCountObject == null ? 0 : oldCountObject;
+				
+				nestedMap.put(nestedKey, oldCount + other.transitionMap.get(key).get(nestedKey));
+			}
+		}
+		
+		for (String key : other.headMap.keySet()) {
+			Map<Double, Integer> nestedMap = headMap.get(key);
+			if (nestedMap == null) {
+				nestedMap = new HashMap<Double, Integer>();
+				headMap.put(key, nestedMap);
+			}
+			
+			for (Double nestedKey : other.headMap.get(key).keySet()) {
+				Integer oldCountObject = nestedMap.get(nestedKey);
+				int oldCount = oldCountObject == null ? 0 : oldCountObject;
+				
+				nestedMap.put(nestedKey, oldCount + other.headMap.get(key).get(nestedKey));
+			}
+		}
+		
+		for (Measure key : other.measureHeadMap.keySet()) {
+			Map<Double, Integer> nestedMap = measureHeadMap.get(key);
+			if (nestedMap == null) {
+				nestedMap = new HashMap<Double, Integer>();
+				measureHeadMap.put(key, nestedMap);
+			}
+			
+			for (Double nestedKey : other.measureHeadMap.get(key).keySet()) {
+				Integer oldCountObject = nestedMap.get(nestedKey);
+				int oldCount = oldCountObject == null ? 0 : oldCountObject;
+				
+				nestedMap.put(nestedKey, oldCount + other.measureHeadMap.get(key).get(nestedKey));
+			}
+		}
+	}
 
 	/**
 	 * Add a new measure head length mapping. This models p(headLength | measure). It updates
