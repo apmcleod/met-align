@@ -1,6 +1,10 @@
 package metalign.parsing;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import metalign.Main;
 import metalign.beat.Beat;
@@ -103,7 +108,36 @@ public class XMLParser {
 		deviationXml = builder.parse(deviationXmlFile);
 		
 		builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-		musicXml = builder.parse(musicXmlFile);
+		builder.setErrorHandler(null);
+		Document tmpDoc;
+		try {
+			tmpDoc = builder.parse(musicXmlFile);
+			
+		} catch (SAXParseException e) {
+			// Fix CrestMusePEDB XML bug
+			try {
+				BufferedReader br = new BufferedReader(new FileReader(musicXmlFile));
+				BufferedWriter bw = new BufferedWriter(new FileWriter(new File(musicXmlFile.getAbsolutePath() + "fixed")));
+				
+				String line;
+				int lineNum = 0;
+				while ((line = br.readLine()) != null) {
+					if (lineNum == 0 || lineNum > 2) {
+						bw.write(line);
+					}
+					lineNum++;
+				}
+				
+				br.close();
+				bw.close();
+				
+			} catch (IOException e2) {
+				throw e2;
+			}
+			
+			tmpDoc = builder.parse(new File(musicXmlFile.getAbsolutePath() + "fixed"));
+		}
+		musicXml = tmpDoc;
 	}
 
 	/**
