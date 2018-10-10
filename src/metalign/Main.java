@@ -85,7 +85,7 @@ public class Main {
 	 *  <li><code>-VClass</code> = Use the given class for voice separation. (FromFile (default) or Hmm)</li>
 	 *  <li><code>-BClass</code> = Use the given class for beat tracking. (FromFile (default) or Hmm).</li>
 	 *  <li><code>-HClass</code> = Use the given class for hierarchy detection. (FromFile (default) or lpcfg).</li>
-	 *  <li><code>-g FILE</code> = Load a grammar in from the given file. Used only with -Hlpcfg.</li>
+	 *  <li><code>-g FILE</code> = Load a grammar in from the given file. Used only with -Hlpcfg. Can merge multiple grammars with multiple -g.</li>
 	 *  <li><code>-x</code> = Extract the trees of the song for testing from the loaded grammar when testing. Used only with -Hlpcfg.</li>
 	 *  <li><code>-e</code> = Extend each note within each voice to the next note's onset.</li>
 	 *  <li><code>-m INT</code> = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended.</li>
@@ -111,9 +111,9 @@ public class Main {
 		String voiceClass = Runner.DEFAULT_VOICE_SPLITTER;
 		String beatClass = Runner.DEFAULT_BEAT_TRACKER;
 		String hierarchyClass = Runner.DEFAULT_HIERARCHY_MODEL;
-		File grammarFile = null;
+		List<File> grammarFiles = new ArrayList<File>();
 		File groundTruth = null;
-		MetricalLpcfg grammar = null;
+		MetricalLpcfg grammar = new MetricalLpcfg();
 		boolean extract = false;
 		boolean incrementalJoint = false;
 		
@@ -244,11 +244,11 @@ public class Main {
 							if (args.length == i) {
 								argumentError("No grammar file given with -g option.");
 							}
-							grammarFile = new File(args[i]);
+							grammarFiles.add(new File(args[i]));
 							try {
-								grammar = MetricalLpcfg.deserialize(grammarFile);
+								grammar.mergeGrammar(MetricalLpcfg.deserialize(grammarFiles.get(grammarFiles.size() - 1)));
 							} catch (Exception e) {
-								argumentError("Exception loading grammar file " + grammarFile + ": " + e.getLocalizedMessage());
+								argumentError("Exception loading grammar file " + grammarFiles.get(grammarFiles.size() - 1) + ": " + e.getLocalizedMessage());
 							}
 							break;
 							
@@ -305,7 +305,7 @@ public class Main {
 		// Set up testing models
 		validateModelClasses(voiceClass, beatClass, hierarchyClass);
 		
-		if ("lpcfg".equalsIgnoreCase(hierarchyClass) && grammar == null) {
+		if ("lpcfg".equalsIgnoreCase(hierarchyClass) && grammarFiles.size() == 0) {
 			argumentError("No grammar given with -Hlpcfg option. Use -g FILE to specify a grammar.");
 		}
 		
@@ -326,7 +326,7 @@ public class Main {
 			System.out.println("Using hierarchy class " + hierarchyClass);
 			
 			if ("lpcfg".equalsIgnoreCase(hierarchyClass)) {
-				System.out.println("Using grammar file " + grammarFile);
+				System.out.println("Using grammar files " + grammarFiles);
 				
 				if (SUPER_VERBOSE) {
 					System.out.println(grammar.toStringPretty(" "));

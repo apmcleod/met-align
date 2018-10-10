@@ -82,7 +82,7 @@ public class ArgumentException extends Exception {
 		sb.append("-VClass = Use the given class for voice separation. (FromFile (default) or Hmm)\n");
 		sb.append("-BClass = Use the given class for beat tracking. (FromFile (default) or Hmm).\n");
 		sb.append("-HClass = Use the given class for hierarchy detection. (FromFile (default) or lpcfg).\n");
-		sb.append("-g FILE = Load a grammar in from the given file. Used only with -Hlpcfg.\n");
+		sb.append("-g FILE = Load a grammar in from the given file. Used only with -Hlpcfg. Can merge multiple grammars with multiple -g.\n");
 		sb.append("-x = Extract the trees of the song for testing from the loaded grammar when testing. Used only with -Hlpcfg.\n");
 		sb.append("-e = Extend each note within each voice to the next note's onset.\n");
 		sb.append("-m INT = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended.\n");
