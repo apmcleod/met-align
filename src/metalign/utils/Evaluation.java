@@ -14,9 +14,20 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import metalign.Main;
+import metalign.Runner;
 import metalign.beat.Beat;
+import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.Measure;
+import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
+import metalign.joint.JointModel;
+import metalign.parsing.EventParser;
+import metalign.parsing.NoteEventParser;
+import metalign.parsing.NoteListGenerator;
+import metalign.time.FromOutputTimeTracker;
+import metalign.time.TimeSignature;
+import metalign.time.TimeTracker;
 import metalign.voice.Voice;
+import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
 
 /**
  * The <code>Evaluation</code> can be used to perform global evaluation on some output file.
@@ -122,12 +133,27 @@ public class Evaluation {
 							}
 							break;
 							
+							// Generate Temperley
+						case 'G':
+							i++;
+							if (args.length <= i) {
+								argumentError("No file given for -t option.");
+							}
+							
+							File file = new File(args[i]);
+							if (!file.exists()) {
+								argumentError("File " + args[i] + " not found");
+							}
+							
+							generateFromTemperley(file);
+							break;
+							
 						// Anacrusis files
 						case 'a':
 							if (args.length <= ++i) {
 								argumentError("No Anacrusis Files given after -a");
 							}
-							File file = new File(args[i]);
+							file = new File(args[i]);
 							if (!file.exists()) {
 								argumentError("Anacrusis File " + args[i] + " not found");
 							}
@@ -149,6 +175,153 @@ public class Evaluation {
 		if (groundTruth != null) {
 			evaluateGroundTruth(groundTruth, anacrusisFiles, useChannel);
 		}
+	}
+	
+	/**
+	 * Generate an output file with Voices (blank), beats, and hierarchy in our format from a Temperley polyph output
+	 * (from standard in). The input file is given to find the onset time of the first note in order
+	 * to convert times.
+	 * 
+	 * @param inputFile The file which was fed into polyph to create Temperley's output.
+	 * @throws IOException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws InterruptedException 
+	 * @throws InvalidMidiDataException 
+	 */
+	private static void generateFromTemperley(File inputFile) throws IOException, InvalidMidiDataException, InterruptedException {
+		long firstNoteTime = -1L;
+		
+		TimeTracker tt = new TimeTracker();
+		NoteEventParser nep = new NoteListGenerator(tt);
+		EventParser ep = Runner.parseFile(inputFile, nep, tt, true);
+		firstNoteTime = ep.getFirstNoteTime();
+		
+		tt = getTimeTrackerFromTemperleyOutput(new Scanner(System.in), firstNoteTime);
+		JointModel jm = new JointModel(new FromFileVoiceSplittingModelState(ep),
+									new FromFileBeatTrackingModelState(tt),
+									new FromFileHierarchyModelState(tt));
+		
+		jm.close();
+		
+		// Print results
+		System.out.println("Voices: " + jm.getHypotheses().first().getVoiceState());
+		System.out.println("Beats: " + jm.getHypotheses().first().getBeatState());
+		System.out.println("Hierarchy: " + jm.getHypotheses().first().getHierarchyState());
+	}
+	
+	private static TimeTracker getTimeTrackerFromTemperleyOutput(Scanner in, long firstNoteTime) {
+		// Parsing variables
+		Pattern linePattern = Pattern.compile(" *([0-9]+) \\( *[0-9]+\\)(.+)");
+		
+		// Time variable
+		List<Integer> times = new ArrayList<Integer>();
+		int subtractiveFactor = 1150;
+		int multiplicativeFactor = 1000;
+		int additiveFactor = (int) firstNoteTime;
+		
+		// Bar structure variables
+		int barCount = 0;
+		int tatumsPerBar = 0;
+		int beatsPerBar = 0;
+		int subBeatsPerBeat = 0;
+		
+		int anacrusisLengthTatums = 0;
+		
+		int lineNum = -1;
+		
+		while (in.hasNextLine()) {
+			String line = in.nextLine();
+			
+			Matcher lineMatcher = linePattern.matcher(line);
+			
+			if (!lineMatcher.matches()) {
+				continue;
+			}
+			
+			// Found a matching line. Get its time
+			int time = Integer.parseInt(lineMatcher.group(1));
+			int convertedTime = (time - subtractiveFactor) * multiplicativeFactor + additiveFactor;
+			times.add(convertedTime);
+				
+			lineNum++;
+			
+			// Bar structure
+			int level = getNumLevels(line);
+			if (level == 4) {
+				// bar found
+				barCount++;
+				
+				if (barCount == 1) {
+					anacrusisLengthTatums = lineNum;
+					
+				} else if (barCount == 2) {
+					tatumsPerBar = lineNum - anacrusisLengthTatums;
+				}
+			}
+			
+			if (barCount == 1 && level >= 3) {
+				// Tactus found
+				beatsPerBar++;
+			}
+			
+			if (barCount == 1 && beatsPerBar == 1 && level >= 2) {
+				// sub beat found
+				subBeatsPerBeat++;
+			}
+		}
+		in.close();
+		
+		if (anacrusisLengthTatums == tatumsPerBar) {
+			anacrusisLengthTatums = 0;
+		}
+		
+		int tatumsPerSubBeat = tatumsPerBar / beatsPerBar / subBeatsPerBeat;
+		int anacrusisLengthSubBeats = anacrusisLengthTatums / tatumsPerSubBeat;
+		
+		FromOutputTimeTracker tt = new FromOutputTimeTracker(Main.SUB_BEAT_LENGTH);
+		int numerator = beatsPerBar;
+		int denominator = 4;
+		
+		if (subBeatsPerBeat == 3) {
+			numerator *= 3;
+			denominator = 8; 
+		}
+		tt.setTimeSignature(new TimeSignature(numerator, denominator));
+		tt.setAnacrusisSubBeats(anacrusisLengthSubBeats);
+		
+		for (int i = 0; i < times.size(); i++) {
+			if (i % tatumsPerSubBeat != 0) {
+				continue;
+			}
+			
+			tt.addBeat(times.get(i));
+		}
+		
+		return tt;
+	}
+	
+	/**
+	 * Return the number of levels on the given line of Temperley output. That is,
+	 * the number of occurrences of "x " on that line.
+	 * 
+	 * @param line The line we are searching.
+	 * @return The number of levels on the given line.
+	 */
+	private static int getNumLevels(String line) {
+		int lastIndex = 0;
+		int count = 0;
+		
+		while (lastIndex != -1) {
+			lastIndex = line.indexOf("x ", lastIndex);
+			
+			if (lastIndex != -1) {
+				count++;
+				lastIndex += 2;
+			}
+		}
+		
+		return count;
 	}
 	
 	/**
