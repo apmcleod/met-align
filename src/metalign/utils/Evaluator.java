@@ -71,6 +71,11 @@ public class Evaluator {
 	private int subBeatsPerBeat;
 	
 	/**
+	 * Whether the given piece has a time signature change or not.
+	 */
+	private boolean hasTimeChange;
+	
+	/**
 	 * Create a new Evaluator from the given ground truth file. This performs all of the
 	 * parsing necessary to get the ground truth times, groupings, etc.
 	 * 
@@ -90,6 +95,7 @@ public class Evaluator {
 		
 		beatsPerBar = 1;
 		subBeatsPerBeat = 1;
+		hasTimeChange = false;
 
 		// Parse ground truth file
 		TimeTracker tt = new TimeTracker();
@@ -115,6 +121,10 @@ public class Evaluator {
 		} else {
 			groundTruthVoices = Runner.parseFile(groundTruth, nep, tt, useChannel).getGoldStandardVoices();
 			tatums = tt.getTatums();
+			
+			if (tt.getAllTimeSignatures().size() != 1) {
+				hasTimeChange = true;
+			}
 			
 			TimeSignature timeSig = tt.getNodeAtTime(tatums.get(0).getTime()).getTimeSignature();
 			Measure tmpMeasure = timeSig.getMetricalMeasure();
@@ -146,6 +156,10 @@ public class Evaluator {
 				notes32PerBeat = notes32PerBar / beatsPerBar;
 				notes32PerSubBeat = notes32PerBeat / tmpMeasure.getSubBeatsPerBeat();
 				
+				if (subBeatsPerBeat != this.subBeatsPerBeat || beatsPerBar != this.beatsPerBar) {
+					hasTimeChange = true;
+				}
+				
 			} else {
 				int tatumsPerBar = xml.getBeatsPerBar(beat.getBar());
 				int numerator = xml.getNumerators(beat.getBar());
@@ -159,6 +173,10 @@ public class Evaluator {
 	
 				notes32PerBeat = tatumsPerBar / beatsPerBar;
 				notes32PerSubBeat = notes32PerBeat / subBeatsPerBeat;
+				
+				if (subBeatsPerBeat != this.subBeatsPerBeat || beatsPerBar != this.beatsPerBar) {
+					hasTimeChange = true;
+				}
 			}
 			
 			// Found a sub-beat
@@ -374,5 +392,9 @@ public class Evaluator {
 	
 	public Measure getHierarchy() {
 		return new Measure(beatsPerBar, subBeatsPerBeat);
+	}
+	
+	public boolean getHasTimeChange() {
+		return hasTimeChange;
 	}
 }

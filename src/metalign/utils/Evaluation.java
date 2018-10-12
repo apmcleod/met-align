@@ -418,6 +418,18 @@ public class Evaluation {
 	private static void evaluateGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel) throws IOException, InvalidMidiDataException, InterruptedException, ParserConfigurationException, SAXException {
 		Evaluator evaluator = new Evaluator(groundTruth, anacrusisFiles, useChannel);
 		
+		if (evaluator.getHasTimeChange()) {
+			System.err.println("Meter change detected. Skipping song " + groundTruth);
+			return;
+		}
+		
+		if (evaluator.getHierarchy().getBeatsPerMeasure() < 2 || evaluator.getHierarchy().getBeatsPerMeasure() > 4 ||
+				evaluator.getHierarchy().getSubBeatsPerBeat() < 2 || evaluator.getHierarchy().getSubBeatsPerBeat() > 3) {
+			System.err.println("Irregular meter detected (" + evaluator.getHierarchy().getBeatsPerMeasure() + "," +
+				evaluator.getHierarchy().getSubBeatsPerBeat() + "). Skipping song " + groundTruth);
+			return;
+		}
+		
 		// Parse input
 		String voices = null;
 		String beats = null;
