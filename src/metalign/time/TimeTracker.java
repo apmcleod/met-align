@@ -10,7 +10,6 @@ import javax.sound.midi.MidiEvent;
 
 import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
-import metalign.utils.MidiNote;
 
 /**
  * A <code>TimeTracker</code> is able to interpret MIDI tempo, key, and time signature change events and keep track
@@ -44,6 +43,11 @@ public class TimeTracker {
 	 * The last tick for any event in this song, initially 0.
 	 */
 	private long lastTick = 0;
+	
+	/**
+	 * The onset time of the first note in this piece.
+	 */
+	private long firstNoteTime = 0;
     
     /**
 	 * Create a new TimeTracker.
@@ -281,21 +285,21 @@ public class TimeTracker {
     public List<TimeSignature> getAllTimeSignatures() {
 		List<TimeSignature> meters = new ArrayList<TimeSignature>();
 		
+		int skipped = 0;
 		for (TimeTrackerNode node : nodes) {
-			if (!node.isTimeSignatureDummy()) {
+			if (!node.isTimeSignatureDummy() && node.getStartTime() >= firstNoteTime) {
 				TimeSignature meter = node.getTimeSignature();
 				
-				if (meters.isEmpty()) {
-					if (node.getStartTime() != 0L) {
-						// Need to add the dummy if this first one doesn't start at the beginning
-						meters.add(nodes.get(0).getTimeSignature());
-					}
+				if (meters.isEmpty() && node.getStartTime() > firstNoteTime) {
+					meters.add(nodes.get(skipped - 1).getTimeSignature());
 				}
 				
 				// First meter or new meter
 				if (meters.isEmpty() || !meter.equals(meters.get(meters.size() - 1))) {
 					meters.add(meter);
 				}
+			} else {
+				skipped++;
 			}
 		}
 		
@@ -472,86 +476,23 @@ public class TimeTracker {
 	}
     
     /**
-     * Get the quantization error of the given note, with the given number of divisions
-     * per quarter note.
-     * 
-     * @param note The note whose quantization error we want.
-     * @param divisions The number of divisions per quarter note.
-     * 
-     * @return The quantization error of the given note's onset, as a percentage of the quarter note length.
-     */
-    public double getQuantizationError(MidiNote note, int divisions) {
-    	long onsetTick = note.getOnsetTick();
-    	
-		List<Beat> beats = getTatums();
-		ListIterator<Beat> beatIterator = beats.listIterator();
-		Beat beat = null;
-		
-		while (beatIterator.hasNext()) {
-			beat = beatIterator.next();
-			
-			if (beat.getTatum() == 0) {
-				// Beginning of a bar
-				if (beat.getTick() > onsetTick) {
-					// We're past the note
-					break;
-				}
-				
-			} else {
-				// Remove non-bar beginnings
-				beatIterator.remove();
-			}
-		}
-		
-		long previousBarTick;
-		long ticksPerBar;
-		
-		if (beat.getTick() > onsetTick) {
-			// We've gone past the bar beginning
-			beatIterator.previous();
-			
-			if (beatIterator.hasPrevious()) {
-				// There is a bar prior to this one
-				beat = beatIterator.previous();
-				previousBarTick = beat.getTick();
-				ticksPerBar = getNodeAtTick(previousBarTick).getTimeSignature().getNotes32PerBar() * ((int) PPQ / 8);
-				
-			} else {
-				// There is no bar prior to this one (because this one is the first)
-				ticksPerBar = getNodeAtTick(0L).getTimeSignature().getNotes32PerBar() * ((int) PPQ / 8);
-				previousBarTick = beat.getTick() - ticksPerBar;
-			}
-			
-		} else {
-			// We're not past the bar beginning. That is, we're AT the bar beginning, and it's the last one.
-			previousBarTick = beat.getTick();
-			ticksPerBar = getNodeAtTick(previousBarTick).getTimeSignature().getNotes32PerBar() * ((int) PPQ / 8);
-		}
-		
-		int quarterNotesPerBar = getNodeAtTick(previousBarTick).getTimeSignature().getNotes32PerBar() / 8;
-		
-		double divisionLength = ((double) ticksPerBar) / quarterNotesPerBar / divisions;
-		double quantizationError = (onsetTick - previousBarTick) % divisionLength;
-		quantizationError = Math.min(quantizationError, divisionLength - quantizationError);
-		
-		return quantizationError / divisionLength;
-	}
-    
-    /**
      * Get the first non-dummy time signature in this song.
      * 
      * @return The TimeSignature of the first node which isn't a dummy, or the initial
      * dummy TimeSignature if there is none.
      */
     public TimeSignature getFirstTimeSignature() {
-    	for (TimeTrackerNode node : nodes) {
-    		if (!node.isTimeSignatureDummy()) {
-    			return node.getTimeSignature();
-    		}
-    	}
-    	
-    	return nodes.get(0).getTimeSignature();
+    	return getNodeAtTime(firstNoteTime).getTimeSignature();
     }
+    
+    /**
+     * Set the onset time of the first note in this piece.
+     * 
+     * @param onsetTime
+     */
+    public void setFirstNoteTime(long onsetTime) {
+		firstNoteTime = onsetTime;
+	}
     
     /**
      * Get the anacrusis length of this TimeTracker, in sub beats.

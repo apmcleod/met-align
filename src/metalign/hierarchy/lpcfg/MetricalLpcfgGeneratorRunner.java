@@ -298,6 +298,8 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				continue;
 			}
 			
+			tt.setFirstNoteTime(nlg.getNoteList().get(0).getOnsetTime());
+			
 			if (tt.getFirstTimeSignature().getNumerator() == TimeSignature.IRREGULAR_NUMERATOR ||
 					(tt.getFirstTimeSignature().getNumerator() != 2 &&
 					tt.getFirstTimeSignature().getNumerator() != 3 &&
