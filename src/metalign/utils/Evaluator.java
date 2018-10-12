@@ -120,13 +120,16 @@ public class Evaluator {
 			
 		} else {
 			groundTruthVoices = Runner.parseFile(groundTruth, nep, tt, useChannel).getGoldStandardVoices();
+			
+			tt.setFirstNoteTime(((NoteListGenerator) nep).getNoteList().get(0).getOnsetTime());
+			
 			tatums = tt.getTatums();
 			
 			if (tt.getAllTimeSignatures().size() != 1) {
 				hasTimeChange = true;
 			}
 			
-			TimeSignature timeSig = tt.getNodeAtTime(tatums.get(0).getTime()).getTimeSignature();
+			TimeSignature timeSig = tt.getFirstTimeSignature();
 			Measure tmpMeasure = timeSig.getMetricalMeasure();
 			beatsPerBar = tmpMeasure.getBeatsPerMeasure();
 			subBeatsPerBeat = tmpMeasure.getSubBeatsPerBeat();
@@ -155,10 +158,6 @@ public class Evaluator {
 				subBeatsPerBeat = tmpMeasure.getSubBeatsPerBeat();
 				notes32PerBeat = notes32PerBar / beatsPerBar;
 				notes32PerSubBeat = notes32PerBeat / tmpMeasure.getSubBeatsPerBeat();
-				
-				if (subBeatsPerBeat != this.subBeatsPerBeat || beatsPerBar != this.beatsPerBar) {
-					hasTimeChange = true;
-				}
 				
 			} else {
 				int tatumsPerBar = xml.getBeatsPerBar(beat.getBar());

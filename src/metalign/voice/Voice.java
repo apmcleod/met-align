@@ -31,6 +31,11 @@ public class Voice implements Comparable<Voice> {
 	private final MidiNote mostRecentNote;
 	
 	/**
+	 * The onset time of the first note in this voice.
+	 */
+	private final long firstNoteTime;
+	
+	/**
 	 * A List of the MidiNotes in this voice.
 	 */
 	private List<MidiNote> notes;
@@ -44,6 +49,8 @@ public class Voice implements Comparable<Voice> {
 	public Voice(MidiNote note, Voice prev) {
 		previous = prev;
 		mostRecentNote = note;
+		
+		firstNoteTime = prev == null ? note.getOnsetTime() : prev.firstNoteTime;
 		
 		notes = new ArrayList<MidiNote>(prev == null ? 1 : prev.getNumNotes() + 1);
 		if (prev != null) {
@@ -239,6 +246,15 @@ public class Voice implements Comparable<Voice> {
 	}
 	
 	/**
+	 * Return true if this voice has been newly added this step and false otherwise.
+	 * 
+	 * @return
+	 */
+	public boolean isNew(long time) {
+		return firstNoteTime == time;
+	}
+	
+	/**
 	 * Get the gap lengths for the notes in this Voice. That is, the difference between the first note's
 	 * offset and the second note's onset for each pair of consecutive notes.
 	 * 
@@ -386,3 +402,4 @@ public class Voice implements Comparable<Voice> {
 		return 0;
 	}
 }
+

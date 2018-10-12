@@ -481,7 +481,9 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			
 			if (notes.contains(note)) {
 				
-				if (voice.getNumNotes() == 1) {
+				notes.remove(note);
+				
+				if (voice.isNew(note.getOnsetTime())) {
 					// This was a new voice
 					List<MidiNote> newNote = new ArrayList<MidiNote>();
 					newNote.add(note);
@@ -507,6 +509,46 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					
 					if (!isFullyMatched()) {
 						notesToCheck.get(voiceIndex).add(note);
+					}
+				}
+			}
+		}
+		
+		// PROBLEM!!
+		if (!notes.isEmpty()) {
+			for (MidiNote note : notes) {
+				for (int voiceIndex = 0; voiceIndex < voiceState.getVoices().size(); voiceIndex++) {
+					Voice voice = voiceState.getVoices().get(voiceIndex);
+					
+					if (voice.getNotes().contains(note)) {
+						if (voice.isNew(note.getOnsetTime())) {
+							// This was a new voice
+							List<MidiNote> newNote = new ArrayList<MidiNote>();
+							newNote.add(note);
+							unfinishedNotes.add(voiceIndex, newNote);
+							hasBegun.add(voiceIndex, Boolean.FALSE);
+							
+							if (!matches(MetricalLpcfgMatch.BEAT)) {
+								notesToCheckBeats.add(voiceIndex, new ArrayList<MidiNote>(newNote));
+							}
+							
+							if (!isFullyMatched()) {
+								newNote = new ArrayList<MidiNote>();
+								newNote.add(note);
+								notesToCheck.add(voiceIndex, newNote);
+							}
+							
+						} else {
+							unfinishedNotes.get(voiceIndex).add(note);
+							
+							if (!matches(MetricalLpcfgMatch.BEAT)) {
+								notesToCheckBeats.get(voiceIndex).add(note);
+							}
+							
+							if (!isFullyMatched()) {
+								notesToCheck.get(voiceIndex).add(note);
+							}
+						}
 					}
 				}
 			}
