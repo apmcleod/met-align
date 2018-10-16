@@ -430,16 +430,19 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				}
 				logProbability += logProb;
 				
-				if (tree == null) {
-					tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
-				}
 				
-				if (!localGrammar.getTrees().isEmpty()) {
-					double localLogProb = localGrammar.getTreeLogProbability(tree);
-					localLogProbability += localLogProb;
+				if (Main.LOCAL_GRAMMAR) {
+					if (tree == null) {
+						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
+					}
+					
+					if (!localGrammar.getTrees().isEmpty()) {
+						double localLogProb = localGrammar.getTreeLogProbability(tree);
+						localLogProbability += localLogProb;
+					}
+					
+					localGrammar.addTree(tree);
 				}
-				
-				localGrammar.addTree(tree);
 			}
 		}
 		

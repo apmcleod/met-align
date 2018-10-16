@@ -45,6 +45,8 @@ import metalign.voice.hmm.HmmVoiceSplittingModelState;
 public class Main {
 	
 	public static boolean EXTEND_NOTES = false;
+	
+	public static boolean LOCAL_GRAMMAR = true;
 
 	public static boolean VERBOSE = false;
 	
@@ -176,6 +178,11 @@ public class Main {
 						// Extend notes
 						case 'e':
 							EXTEND_NOTES = true;
+							break;
+							
+						// No local grammar
+						case 'L':
+							LOCAL_GRAMMAR = false;
 							break;
 							
 						// Anacrusis files
@@ -329,7 +336,7 @@ public class Main {
 				System.out.println("Using grammar files " + grammarFiles);
 				
 				if (SUPER_VERBOSE) {
-					System.out.println(grammar.toStringPretty(" "));
+					System.out.println(grammar.getProbabilityTracker());
 				}
 				
 				System.out.println((extract ? "Extracting" : "Not extracting") + " trees from grammar");

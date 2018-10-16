@@ -40,6 +40,8 @@ public class Evaluation {
 	 * The accepted error for a beat location to be considered correct
 	 */
 	public static long BEAT_EPSILON = 70000;
+	
+	public static boolean VERBOSE = false;
 
 	/**
 	 * The main method for evaluating results.
@@ -146,6 +148,10 @@ public class Evaluation {
 							}
 							
 							generateFromTemperley(file);
+							break;
+							
+						case 'v':
+							VERBOSE = true;
 							break;
 							
 						// Anacrusis files
@@ -483,6 +489,28 @@ public class Evaluation {
 		
 		// Get scores
 		System.out.println(evaluator.evaluate(voiceList, beatList, measure));
+		
+		if (VERBOSE) {
+			System.out.println("Average tatum length transcribed: " +
+					((beatList.get(beatList.size() - 1).getTime() - beatList.get(0).getTime()) / (beatList.size() / 1)));
+			System.out.println("Average beat length gt: " +
+					((evaluator.getTatums().get(evaluator.getTatums().size() - 1).getTime() -
+							evaluator.getTatums().get(0).getTime()) / (evaluator.getTatums().size() / 1)));
+			System.out.println("First downbeat time transcribed: " + getFirstDownbeatTime(beatList));
+			System.out.println("First downbeat time gt: " + getFirstDownbeatTime(evaluator.getTatums()));
+			System.out.println("Hierarchy transcribed: " + measure);
+			System.out.println("Hierarchy gt: " + evaluator.getHierarchy());
+		}
+	}
+
+	private static long getFirstDownbeatTime(List<Beat> beatList) {
+		for (Beat beat : beatList) {
+			if (beat.getTatum() == 0) {
+				return beat.getTime();
+			}
+		}
+		
+		return -1L;
 	}
 
 	/**
