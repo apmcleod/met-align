@@ -512,7 +512,7 @@ public class Main {
 				if (tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() < 2 || tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() > 4 ||
 						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() > 3) {
 					System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() + "," +
-						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() + "). Skipping song " + groundTruth);
+						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() + "). Skipping song " + file);
 					continue;
 				}
 				
