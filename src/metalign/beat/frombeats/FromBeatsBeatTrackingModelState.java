@@ -99,7 +99,9 @@ public class FromBeatsBeatTrackingModelState extends BeatTrackingModelState {
 	public TreeSet<? extends BeatTrackingModelState> handleIncoming(List<MidiNote> notes) {
 		TreeSet<FromBeatsBeatTrackingModelState> newState = new TreeSet<FromBeatsBeatTrackingModelState>();
 		
-		mostRecentTime = notes.get(0).getOnsetTime();
+		if (!notes.isEmpty()) {
+			mostRecentTime = notes.get(0).getOnsetTime();
+		}
 		newState.add(this);
 		
 		return newState;

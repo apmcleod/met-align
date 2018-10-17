@@ -108,10 +108,10 @@ public class MetricalLpcfg implements Serializable {
 			
 			// p(head(nonterminal) | nonterminal, parentHeadLength)
 			// Only need for WEAK, all others equal to their parent head length always
-			if (nonterminal.getTypeString().startsWith("WEAK")) {
+			if (!(nonterminal instanceof MetricalLpcfgMeasure)) {
 				logProbability += probabilities.getHeadProbability(measure, typeString, parentHead, head, level);
 				
-			} else if (nonterminal instanceof MetricalLpcfgMeasure) {
+			} else {
 				// p(head(measure) | measure)
 				logProbability += probabilities.getMeasureHeadProbability(measure, head);
 			}
@@ -202,8 +202,8 @@ public class MetricalLpcfg implements Serializable {
 			}
 			
 			// p(head(nonterminal) | nonterminal, parentHeadLength)
-			// Only need for weak, all others are equal to their parent head length always
-			if (nonterminal.getTypeString().startsWith("WEAK")) {
+			// Only need for non measures
+			if (!(nonterminal instanceof MetricalLpcfgMeasure)) {
 				if (adding) {
 					probabilities.addHead(measure, typeString, parentHead, head, level);
 				} else {
@@ -214,7 +214,7 @@ public class MetricalLpcfg implements Serializable {
 					}
 				}
 				
-			} else if (nonterminal instanceof MetricalLpcfgMeasure) {
+			} else {
 				// p(head(measure) | measure)
 				if (adding) {
 					probabilities.addMeasureHead(measure, head);

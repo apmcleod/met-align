@@ -503,6 +503,19 @@ public class Main {
 					continue;
 				}
 				
+				tt.setFirstNoteTime(nlg.getNoteList().get(0).getOnsetTime());
+				if (tt.getAllTimeSignatures().size() != 1) {
+					System.err.println("Time change detected. Skipping song " + file);
+					continue;
+				}
+				
+				if (tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() < 2 || tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() > 4 ||
+						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() > 3) {
+					System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() + "," +
+						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() + "). Skipping song " + groundTruth);
+					continue;
+				}
+				
 				JointModel jm = null;
 				
 				if (grammar != null && extract) {

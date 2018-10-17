@@ -116,6 +116,7 @@ public class Evaluator {
 				beatsPerBar /= 3;
 				subBeatsPerBeat = 3;
 			}
+			
 			tatums = FromOutputTimeTracker.fixBeatsGivenSubBeatLength(tatums, Main.SUB_BEAT_LENGTH * subBeatsPerBeat);
 			
 		} else {
@@ -233,7 +234,7 @@ public class Evaluator {
 			groundTruthGroupings.add(new MetricalGrouping(downbeatTimes.get(i - 1), downbeatTimes.get(i)));
 		}
 	}
-	
+
 	/**
 	 * Evaluate the given JointModelState and return its evaluation String.
 	 * 
