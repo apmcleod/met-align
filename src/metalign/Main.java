@@ -62,7 +62,7 @@ public class Main {
 	
 	public static int VOICE_BEAM_SIZE = -1;
 	
-	public static int SUB_BEAT_LENGTH = -1;
+	public static int SUB_BEAT_LENGTH = 4;
 	
 	public static int MIN_NOTE_LENGTH = -1;
 	

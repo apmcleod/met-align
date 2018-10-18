@@ -20,6 +20,7 @@ import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
 import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.joint.JointModelState;
+import metalign.parsing.MatchParser;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.parsing.XMLParser;
@@ -118,6 +119,15 @@ public class Evaluator {
 			}
 			
 			tatums = FromOutputTimeTracker.fixBeatsGivenSubBeatLength(tatums, Main.SUB_BEAT_LENGTH * subBeatsPerBeat);
+			
+		} else if (groundTruth.toString().endsWith(".match")) {
+			MatchParser match = new MatchParser(groundTruth);
+			match.run();
+			
+			tatums = match.getTatums();
+			
+			beatsPerBar = match.getMeasure().getBeatsPerMeasure();
+			subBeatsPerBeat = match.getMeasure().getSubBeatsPerBeat();
 			
 		} else {
 			groundTruthVoices = Runner.parseFile(groundTruth, nep, tt, useChannel).getGoldStandardVoices();

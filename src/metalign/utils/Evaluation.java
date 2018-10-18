@@ -300,6 +300,14 @@ public class Evaluation {
 			groundTruthGrammar = ((MetricalLpcfgHierarchyModelState) jm.getHypotheses().first().getHierarchyState()).getLocalGrammar();
 			System.out.println("Tatums = " + jm.getHypotheses().first().getBeatState().getBeats());
 			
+		} else if (groundTruth.toString().endsWith(".match")) {
+			System.err.println("Tree printing unsupoorted from match file.");
+			
+			
+			System.out.println("Measure = " + evaluator.getHierarchy());
+			System.out.println("Tatums = " + evaluator.getTatums());
+			return;
+			
 		} else {
 			ep = Runner.parseFile(groundTruth, nlg, tt, useChannel);
 			
