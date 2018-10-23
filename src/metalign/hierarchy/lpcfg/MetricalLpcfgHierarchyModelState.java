@@ -363,6 +363,9 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 			
 		if (!isWrong() && isFullyMatched()) {
+			for (MetricalLpcfgTree tree : localGrammar.getTrees()) {
+				localLogProbability += localGrammar.getTreeLogProbability(tree);
+			}
 			newStates.add(this);
 				
 		} else if (Main.SUPER_VERBOSE) {
@@ -436,10 +439,10 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
 					}
 					
-					if (!localGrammar.getTrees().isEmpty()) {
+					/*if (!localGrammar.getTrees().isEmpty()) {
 						double localLogProb = localGrammar.getTreeLogProbability(tree);
 						localLogProbability += localLogProb;
-					}
+					}*/
 					
 					localGrammar.addTree(tree);
 				}
