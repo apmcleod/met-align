@@ -46,6 +46,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		WRONG;
 	}
 	
+	public static double GLOBAL_WEIGHT = 2.0 / 3.0;
+	
 	/**
 	 * Object to save tree log probabilities so as not to regenerate every time.
 	 */
@@ -85,7 +87,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	/**
 	 * The log probability of this hypothesis from its local grammar.
 	 */
-	private double localLogProbability;
+	private double localLogProb;
 	
 	/**
 	 * The measure number of the next subbeat to be shifted onto the stack.
@@ -158,7 +160,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		localGrammar = new MetricalLpcfg();
 		
 		logProbability = 0.0;
-		localLogProbability = 0.0;
+		localLogProb = 0.0;
 		
 		measureNum = 0;
 		nextMeasureIndex = 0;
@@ -191,7 +193,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		wrongMatches = state.wrongMatches;
 		
 		logProbability = state.logProbability;
-		localLogProbability = state.localLogProbability;
+		localLogProb = state.localLogProb;
 		
 		measureNum = state.measureNum;
 		measuresUsed = state.measuresUsed;
@@ -363,9 +365,10 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 			
 		if (!isWrong() && isFullyMatched()) {
-			for (MetricalLpcfgTree tree : localGrammar.getTrees()) {
-				localLogProbability += localGrammar.getTreeLogProbability(tree);
-			}
+			/*for (MetricalLpcfgTree tree : localGrammar.getTrees()) {
+				double logProb = localGrammar.getTreeLogProbability(tree);
+				localEntropy -= logProb * Math.exp(logProb);
+			}*/
 			newStates.add(this);
 				
 		} else if (Main.SUPER_VERBOSE) {
@@ -384,7 +387,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		if (measuresUsed == 0) {
 			logProbability = 0.0;
-			localLogProbability = 0.0;
+			localLogProb = 0.0;
 		}
 		
 		for (int voiceIndex = 0; voiceIndex < unfinishedNotes.size(); voiceIndex++) {
@@ -434,15 +437,14 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				logProbability += logProb;
 				
 				
-				if (Main.LOCAL_GRAMMAR) {
+				if (GLOBAL_WEIGHT != 1.0) {
 					if (tree == null) {
 						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
 					}
 					
-					/*if (!localGrammar.getTrees().isEmpty()) {
-						double localLogProb = localGrammar.getTreeLogProbability(tree);
-						localLogProbability += localLogProb;
-					}*/
+					if (!localGrammar.getTrees().isEmpty()) {
+						localLogProb += localGrammar.getTreeLogProbability(tree);
+					}
 					
 					localGrammar.addTree(tree);
 				}
@@ -1081,7 +1083,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 
 	@Override
 	public double getScore() {
-		return logProbability + localLogProbability;
+		return GLOBAL_WEIGHT * logProbability + (1.0 - GLOBAL_WEIGHT) * localLogProb;
 	}
 	
 	@Override
@@ -1170,7 +1172,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(measure).append(" length=").append(subBeatLength).append(" anacrusis=").append(anacrusisLength);
-		sb.append(" Score=").append(logProbability).append(" + ").append(localLogProbability).append(" = ").append(getScore());
+		sb.append(" Score=").append(logProbability).append(" + ").append(localLogProb).append(" = ").append(getScore());
 		
 		return sb.toString();
 	}

@@ -45,8 +45,6 @@ import metalign.voice.hmm.HmmVoiceSplittingModelState;
 public class Main {
 	
 	public static boolean EXTEND_NOTES = false;
-	
-	public static boolean LOCAL_GRAMMAR = true;
 
 	public static boolean VERBOSE = false;
 	
@@ -58,7 +56,7 @@ public class Main {
 	
 	public static Evaluator EVALUATOR = null;
 	
-	public static int BEAM_SIZE = 50;
+	public static int BEAM_SIZE = 200;
 	
 	public static int VOICE_BEAM_SIZE = -1;
 	
@@ -180,9 +178,16 @@ public class Main {
 							EXTEND_NOTES = true;
 							break;
 							
-						// No local grammar
-						case 'L':
-							LOCAL_GRAMMAR = false;
+						case 'G':
+							i++;
+							if (args.length == i) {
+								argumentError("No global weight given with -G option.");
+							}
+							try {
+								MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT = Double.parseDouble(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading global weight. Must be a double: " + args[i]);
+							}
 							break;
 							
 						// Anacrusis files

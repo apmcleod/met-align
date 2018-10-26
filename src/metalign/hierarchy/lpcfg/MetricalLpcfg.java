@@ -233,7 +233,6 @@ public class MetricalLpcfg implements Serializable {
 			}
 		}
 	}
-
 	/**
 	 * Get a Set of the Measures which are contained in any tree from within this lpcfg.
 	 * 
