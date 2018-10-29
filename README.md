@@ -1,5 +1,17 @@
 # Metrical Alignment
 
+This is the code and data from my 2018 ISMIR paper. If you use it, please cite it:
+
+```
+@inproceedings{McLeod:18b,
+  title={Meter detection and alignment of {MIDI} performance},
+  author={McLeod, Andrew and Steedman, Mark},
+  booktitle={{ISMIR}},
+  year={2018},
+  pages={113--119}
+}
+```
+
 ## Project Overview
 This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and pre-trained grammars are found in the `grammars` directory.
 
@@ -16,7 +28,9 @@ included with the project with the following command: `$ make`.
 Once the class files are installed in the bin directory, the project can be run.
 Run the project from the command line as follows:
 
-`$ java -cp bin metalign.Main ARGS Files`  
+`$ java -cp bin metalign.Main ARGS Files` 
+
+ Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid`
 
 Files should be a list of 1 or more music files (MIDI/krn) or directories containing only music
 files. Any directory entered will be searched recursively for files.
