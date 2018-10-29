@@ -1,19 +1,6 @@
 # Metrical Alignment
-
-This is the code and data from my 2018 ISMIR paper. If you use it, please cite it:
-
-```
-@inproceedings{McLeod:18b,
-  title={Meter detection and alignment of {MIDI} performance},
-  author={McLeod, Andrew and Steedman, Mark},
-  booktitle={{ISMIR}},
-  year={2018},
-  pages={113--119}
-}
-```
-
 ## Project Overview
-This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and pre-trained grammars are found in the `grammars` directory.
+This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and a pre-trained grammar can be found in the `grammars` directory.
 
 ## Documentation
 This document contains some basic examples and a general overview of how to use
@@ -30,7 +17,7 @@ Run the project from the command line as follows:
 
 `$ java -cp bin metalign.Main ARGS Files` 
 
- Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid`
+ Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/misc.lpcfg -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid`
 
 Files should be a list of 1 or more music files (MIDI/krn) or directories containing only music
 files. Any directory entered will be searched recursively for files.
@@ -53,6 +40,7 @@ ARGS:
  * `-v INT` = Use INT as the voice beam size.
  * `-E FILE` = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
+ * `-G DOUBLE` = Set the global grammar weight alpha (default = 2/3).
  
  Usage examples:
  
