@@ -94,7 +94,7 @@ public class Evaluation {
 						// Check Full
 						case 'F':
 							OutputParser.checkFull();
-							break;
+							return;
 							
 						case 's':
 							i++;
@@ -152,7 +152,7 @@ public class Evaluation {
 							}
 							
 							Temperley.generateFromTemperley(file);
-							break;
+							return;
 							
 						// Notefile generation
 						case 'n':
@@ -167,7 +167,7 @@ public class Evaluation {
 							}
 							
 							System.out.println(Temperley.getNoteFileString(file));
-							break;
+							return;
 							
 						// Error
 						default:
