@@ -571,15 +571,20 @@ public class Main {
 					}
 				}
 				
-				if (VERBOSE) {
+				if (VERBOSE || EVALUATOR != null) {
 					// Print all choices
 					for (JointModelState jms : jm.getHypotheses()) {
-						System.out.println(jms.getVoiceState());
-						System.out.println(jms.getBeatState());
-						System.out.println(jms.getHierarchyState());
+						if (VERBOSE) {
+							System.out.println(jms.getVoiceState());
+							System.out.println(jms.getBeatState());
+							System.out.println(jms.getHierarchyState());
+						}
 						
 						// Also print score for each
 						if (EVALUATOR != null) {
+							System.out.println("Voice prob: " + jms.getVoiceState().getScore());
+							System.out.println("Beats prob: " + jms.getBeatState().getScore());
+							System.out.println("Hierarchy: " + jms.getHierarchyState());
 							System.out.println(EVALUATOR.evaluate(jms));
 						}
 					}

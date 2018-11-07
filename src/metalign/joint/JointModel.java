@@ -83,7 +83,7 @@ public class JointModel extends MidiModel {
 		
 		fixForVoiceBeam(newStates);
 		
-		if (((Main.VERBOSE && Main.TESTING) || (MetricalLpcfgGeneratorRunner.VERBOSE && MetricalLpcfgGeneratorRunner.TESTING))) {
+		if (((Main.SUPER_VERBOSE && Main.TESTING) || (MetricalLpcfgGeneratorRunner.VERBOSE && MetricalLpcfgGeneratorRunner.TESTING))) {
 			System.out.println(notes + ": ");
 			for (JointModelState jms : newStates) {
 				System.out.println(jms.getVoiceState());

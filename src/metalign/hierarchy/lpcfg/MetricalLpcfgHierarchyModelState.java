@@ -1172,7 +1172,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(measure).append(" length=").append(subBeatLength).append(" anacrusis=").append(anacrusisLength);
-		sb.append(" Score=").append(logProbability).append(" + ").append(localLogProb).append(" = ").append(getScore());
+		sb.append(" Score=").append(GLOBAL_WEIGHT * logProbability).append(" + ").append((1.0 - GLOBAL_WEIGHT) * localLogProb).append(" = ").append(getScore());
 		
 		return sb.toString();
 	}
