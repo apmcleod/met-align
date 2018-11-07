@@ -310,7 +310,7 @@ public class TimeTracker {
     	int beatsPerBar = firstNode.getTimeSignature().getMeasure().getBeatsPerBar();
     	int subBeatsPerBeat = firstNode.getTimeSignature().getMeasure().getSubBeatsPerBeat();
     	
-    	int measureNum = 0;
+    	int measureNum = 1;
     	int note32Num = 0;
     	long tick = anacrusisLength;
     	
@@ -329,7 +329,7 @@ public class TimeTracker {
     	int subBeatNum = (note32Num / (notes32PerBar / beatsPerBar / subBeatsPerBeat)) % subBeatsPerBeat;
     	int tatumNum = note32Num % (notes32PerBar / beatsPerBar / subBeatsPerBeat);
     	
-    	if (tatumNum != 0) {
+    	if (tatumNum == 0) {
     		beats.add(new Beat(measureNum, beatNum, subBeatNum, tatumNum, getTimeAtTick(tick), tick));
     	}
     	
@@ -353,7 +353,7 @@ public class TimeTracker {
     	    	subBeatNum = (note32Num / (notes32PerBar / beatsPerBar / subBeatsPerBeat)) % subBeatsPerBeat;
     	    	tatumNum = note32Num % (notes32PerBar / beatsPerBar / subBeatsPerBeat);
     	    	
-    	    	if (tatumNum != 0) {
+    	    	if (tatumNum == 0) {
     	    		beats.add(new Beat(measureNum, beatNum, subBeatNum, tatumNum, getTimeAtTick(tick), tick));
     	    	}
     			
@@ -377,7 +377,7 @@ public class TimeTracker {
     	    	subBeatNum = (note32Num / (notes32PerBar / beatsPerBar / subBeatsPerBeat)) % subBeatsPerBeat;
     	    	tatumNum = note32Num % (notes32PerBar / beatsPerBar / subBeatsPerBeat);
     	    	
-    	    	if (tatumNum != 0) {
+    	    	if (tatumNum == 0) {
     	    		beats.add(new Beat(measureNum, beatNum, subBeatNum, tatumNum, getTimeAtTick(tick), tick));
     	    	}
     			

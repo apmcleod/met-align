@@ -19,6 +19,7 @@ import metalign.hierarchy.HierarchyModelState;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.hierarchy.lpcfg.MetricalLpcfg;
 import metalign.hierarchy.lpcfg.MetricalLpcfgElementNotFoundException;
+import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.hierarchy.lpcfg.MetricalLpcfgHierarchyModelState;
 import metalign.joint.JointModel;
 import metalign.joint.JointModelState;
@@ -477,6 +478,7 @@ public class Main {
 				System.out.println("File: " + file);
 				
 				TimeTracker tt = new TimeTracker();
+				tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
 				NoteListGenerator nlg = new NoteListGenerator(tt);
 				EventParser ep;
 				
