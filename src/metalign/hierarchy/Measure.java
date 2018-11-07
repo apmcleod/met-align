@@ -25,10 +25,6 @@ public class Measure implements Comparable<Measure>, Serializable {
 	 */
 	private final int subBeatsPerBeat;
 	
-	private final int anacrusis;
-	
-	private final int length;
-	
 	/**
 	 * Create a new Measure with the given fields.
 	 * 
@@ -36,14 +32,8 @@ public class Measure implements Comparable<Measure>, Serializable {
 	 * @param subBeatsPerBeat {@link #subBeatsPerBeat}
 	 */
 	public Measure(int beatsPerMeasure, int subBeatsPerBeat) {
-		this(beatsPerMeasure, subBeatsPerBeat, 0, 0);
-	}
-	
-	public Measure(int beatsPerMeasure, int subBeatsPerBeat, int length, int anacrusis) {
 		this.beatsPerMeasure = beatsPerMeasure;
 		this.subBeatsPerBeat = subBeatsPerBeat;
-		this.length = length;
-		this.anacrusis = anacrusis;
 	}
 	
 	/**
@@ -51,7 +41,7 @@ public class Measure implements Comparable<Measure>, Serializable {
 	 * 
 	 * @return {@link #beatsPerMeasure}
 	 */
-	public int getBeatsPerMeasure() {
+	public int getBeatsPerBar() {
 		return beatsPerMeasure;
 	}
 	
@@ -63,14 +53,6 @@ public class Measure implements Comparable<Measure>, Serializable {
 	 */
 	public int getSubBeatsPerBeat() {
 		return subBeatsPerBeat;
-	}
-	
-	public int getLength() {
-		return length;
-	}
-	
-	public int getAnacrusis() {
-		return anacrusis;
 	}
 	
 	@Override

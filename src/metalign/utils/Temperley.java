@@ -13,8 +13,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import metalign.Main;
 import metalign.Runner;
+import metalign.beat.Beat;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.joint.JointModel;
@@ -79,7 +79,7 @@ public class Temperley {
 			System.err.println(e.getLocalizedMessage());
 		}
 			
-		return new NoteFileWriter(tt, nlg).toString();
+		return new NoteFileWriter(nlg).toString();
 	}
 	
 	private static TimeTracker getTimeTrackerFromTemperleyOutput(Scanner in, long firstNoteTime) {
@@ -102,6 +102,7 @@ public class Temperley {
 		
 		int lineNum = -1;
 		
+		List<Integer> levels = new ArrayList<Integer>();
 		while (in.hasNextLine()) {
 			String line = in.nextLine();
 			
@@ -114,12 +115,14 @@ public class Temperley {
 			// Found a matching line. Get its time
 			int time = Integer.parseInt(lineMatcher.group(1));
 			int convertedTime = (time - subtractiveFactor) * multiplicativeFactor + additiveFactor;
+			
 			times.add(convertedTime);
 				
 			lineNum++;
 			
 			// Bar structure
 			int level = getNumLevels(line);
+			levels.add(level);
 			if (level == 4) {
 				// bar found
 				barCount++;
@@ -133,7 +136,7 @@ public class Temperley {
 			}
 			
 			if (barCount == 1 && level >= 3) {
-				// Tactus found
+				// Beat found
 				beatsPerBar++;
 			}
 			
@@ -151,7 +154,7 @@ public class Temperley {
 		int tatumsPerSubBeat = tatumsPerBar / beatsPerBar / subBeatsPerBeat;
 		int anacrusisLengthSubBeats = anacrusisLengthTatums / tatumsPerSubBeat;
 		
-		FromOutputTimeTracker tt = new FromOutputTimeTracker(Main.SUB_BEAT_LENGTH);
+		FromOutputTimeTracker tt = new FromOutputTimeTracker();
 		int numerator = beatsPerBar;
 		int denominator = 4;
 		
@@ -162,12 +165,31 @@ public class Temperley {
 		tt.setTimeSignature(new TimeSignature(numerator, denominator));
 		tt.setAnacrusisSubBeats(anacrusisLengthSubBeats);
 		
+		// -1 is needed here because we increment subBeat in the level == 2 case
+		int subBeat = (-anacrusisLengthSubBeats + subBeatsPerBeat * beatsPerBar) % subBeatsPerBeat - 1;
+		int beat = (-anacrusisLengthSubBeats + subBeatsPerBeat * beatsPerBar) % beatsPerBar;
+		int bar = 0;
+		
 		for (int i = 0; i < times.size(); i++) {
-			if (i % tatumsPerSubBeat != 0) {
-				continue;
+			long time = times.get(i);
+			int level = levels.get(i);
+			
+			if (level == 4) {
+				bar++;
+				beat = 0;
+				subBeat = 0;
 			}
 			
-			tt.addBeat(times.get(i));
+			if (level == 3) {
+				beat++;
+				subBeat = 0;
+			}
+			
+			if (level == 2) {
+				subBeat++;
+			}
+			
+			tt.addBeat(new Beat(bar, beat, subBeat, 0, time , time));
 		}
 		
 		return tt;
@@ -219,11 +241,7 @@ public class Temperley {
  * @author Andrew McLeod - 10 September, 2016
  */
 class NoteFileWriter {
-	/**
-	 * The offset to add to each note, in milliseconds, to adjust for the anacrusis.
-	 */
-	private int offsetLength;
-	
+	// TODO: Why offset was here?
 	/**
 	 * The NoteListGenerator which contains the notes we want to write out.
 	 */
@@ -235,16 +253,7 @@ class NoteFileWriter {
 	 * @param tt The TimeTracker to use to get the correct anacrusis {@link #offsetLength}.
 	 * @param nlg The NoteListGenerator containing the notes we want to write out.
 	 */
-	public NoteFileWriter(TimeTracker tt, NoteListGenerator nlg) {
-		offsetLength = 0;
-		if (tt.getAnacrusisTicks() != 0 && tt.getFirstTimeSignature().getNumerator() != TimeSignature.IRREGULAR_NUMERATOR) {
-			offsetLength = tt.getFirstTimeSignature().getNotes32PerBar() * tt.getFirstTimeSignature().getNotes32PerBar() * ((int) tt.getPPQ() / 8);
-			offsetLength -= tt.getAnacrusisTicks();
-			
-			// Convert to time and milliseconds
-			offsetLength *= tt.getNodeAtTime(0L).getTimePerTick(tt.getPPQ()) / 1000;
-		}
-		
+	public NoteFileWriter(NoteListGenerator nlg) {
 		this.nlg = nlg;
 	}
 	
@@ -253,8 +262,8 @@ class NoteFileWriter {
 		StringBuilder sb = new StringBuilder();
 		
 		for (MidiNote note : nlg.getNoteList()) {
-			long onTime = note.getOnsetTime() / 1000 + offsetLength;
-			long offTime = note.getOffsetTime() / 1000 + offsetLength;
+			long onTime = note.getOnsetTime() / 1000;
+			long offTime = note.getOffsetTime() / 1000;
 			
 			sb.append("Note ");
 			sb.append(onTime).append(' ');

@@ -42,7 +42,7 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 	private MetricalLpcfgMeasure(MetricalLpcfgMeasure measure) {
 		super(measure);
 		
-		this.measure = new Measure(measure.measure.getBeatsPerMeasure(), measure.measure.getSubBeatsPerBeat());
+		this.measure = new Measure(measure.measure.getBeatsPerBar(), measure.measure.getSubBeatsPerBeat());
 	}
 	
 	/**

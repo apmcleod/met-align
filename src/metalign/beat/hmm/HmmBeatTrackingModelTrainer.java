@@ -74,18 +74,6 @@ public class HmmBeatTrackingModelTrainer {
 							useChannel = false;
 							break;
 							
-						case 's':
-							i++;
-							if (args.length == i) {
-								argumentError("No sub beat length given with -s option.");
-							}
-							try {
-								Main.SUB_BEAT_LENGTH = Integer.parseInt(args[i]);
-							} catch (NumberFormatException e) {
-								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
-							}
-							break;
-							
 						// XML files as input
 						case 'X':
 							xml = true;
@@ -186,13 +174,13 @@ public class HmmBeatTrackingModelTrainer {
 				beats = parser.getBeats();
 				
 			} else {
-				TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
+				TimeTracker tt = new TimeTracker();
 				nlg = new NoteListGenerator(tt);
 				
 				try {
 					if (file.toString().endsWith(".nb")) {
 						// NoteB
-						tt = new NoteBTimeTracker(Main.SUB_BEAT_LENGTH);
+						tt = new NoteBTimeTracker();
 						nlg = new NoteListGenerator(tt);
 						new NoteBParser(file, nlg, (NoteBTimeTracker) tt).run();
 						

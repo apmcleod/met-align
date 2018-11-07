@@ -20,7 +20,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
-import metalign.Main;
 import metalign.beat.Beat;
 
 public class XMLParser {
@@ -167,7 +166,7 @@ public class XMLParser {
 			numerators.add(numerator);
 		}
 		
-		int multiplier = Main.SUB_BEAT_LENGTH;
+		int multiplier = 1;
 		if (numerators.get(0) < 6 || numerators.get(0) % 3 != 0) {
 			multiplier *= 2;
 		}
@@ -225,7 +224,7 @@ public class XMLParser {
 				}
 				
 				beatNum = beatNumTmp;
-				beats.add(new Beat(measureNumber, beatNum, Math.round(nextBeatTime), 0L));
+				beats.add(new Beat(measureNumber, beatNum, 0, 0, Math.round(nextBeatTime), 0L));
 				beatTimes.add(nextBeatTime);
 				tempoDeviation = 1.0;
 			}
@@ -250,9 +249,11 @@ public class XMLParser {
 			
 			for (int i = pickupCount - 1; i >= 0; i--) {
 				Beat oldBeat = beats.get(i);
-				beats.set(i, new Beat(oldBeat.getBar(), maxBeatNum--, oldBeat.getTime(), oldBeat.getTick()));
+				beats.set(i, new Beat(oldBeat.getBar(), maxBeatNum--, oldBeat.getSubBeat(), oldBeat.getTatum(), oldBeat.getTime(), oldBeat.getTick()));
 			}
 		}
+		
+		// TODO: reshuffle towards sub beats in case of compound bar 
 	}
 
 	/**

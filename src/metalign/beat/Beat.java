@@ -9,14 +9,24 @@ package metalign.beat;
  */
 public class Beat implements Comparable<Beat> {
 	/**
-	 * The beat number on which this Beat lies (measured in 32nd notes)
+	 * The beat number on which this Beat lies in its bar. 0-indexed.
 	 */
 	private final int beat;
 	
 	/**
 	 * The measure number on which this Beat lies.
 	 */
-	private final int measure;
+	private final int bar;
+	
+	/**
+	 * The sub beat on which this Beat lies in its beat. 0-indexed.
+	 */
+	private final int subBeat;
+	
+	/**
+	 * The tatum on which this Beat lies in its sub beats. 0-indexed.
+	 */
+	private final int tatum;
 	
 	/**
 	 * The time in microseconds at which this Beat lies.
@@ -32,31 +42,61 @@ public class Beat implements Comparable<Beat> {
 	 * Create a new default Beat, at time, tick, and measure 0 and beat 0.
 	 */
 	public Beat() {
-		this(0, 0, 0, 0);
+		this(0, 0, 0, 0, 0, 0);
 	}
 	
 	/**
 	 * Standard constructor for all fields.
 	 * 
-	 * @param measure {@link #measure}
+	 * @param bar {@link #bar}
 	 * @param beat {@link #beat}
+	 * @param tatum {@link #tatum}
 	 * @param time {@link #time}
 	 * @param tick {@link #tick}
 	 */
-	public Beat(int measure, int beat, long time, long tick) {
-		this.measure = measure;
+	public Beat(int bar, int beat, int subBeat, int tatum, long time, long tick) {
+		this.bar = bar;
 		this.beat = beat;
+		this.subBeat = subBeat;
+		this.tatum = tatum;
 		this.time = time;
 		this.tick = tick;
 	}
 	
 	/**
-	 * Get this Beat's measure number.
+	 * Return whether this beat is a downbeat or not.
 	 * 
-	 * @return {@link #measure}
+	 * @return True if this Beat is a downbeat.
+	 */
+	public boolean isDownbeat() {
+		return beat == 0 && subBeat == 0 && tatum == 0;
+	}
+	
+	/**
+	 * Return whether this beat is a beat or not.
+	 * 
+	 * @return True if this Beat is a beat.
+	 */
+	public boolean isBeat() {
+		return subBeat == 0 && tatum == 0;
+	}
+	
+	/**
+	 * Return whether this beat is a sub beat or not.
+	 * 
+	 * @return True if this Beat is a sub beat.
+	 */
+	public boolean isSubBeat() {
+		return tatum == 0;
+	}
+	
+	/**
+	 * Get this Beat's bar number.
+	 * 
+	 * @return {@link #bar}
 	 */
 	public int getBar() {
-		return measure;
+		return bar;
 	}
 	
 	/**
@@ -64,8 +104,26 @@ public class Beat implements Comparable<Beat> {
 	 * 
 	 * @return {@link #beat}
 	 */
-	public int getTatum() {
+	public int getBeat() {
 		return beat;
+	}
+	
+	/**
+	 * Get this Beat's sub beat number.
+	 * 
+	 * @return {@link #subBeat}
+	 */
+	public int getSubBeat() {
+		return subBeat;
+	}
+	
+	/**
+	 * Get this Beat's tatum number.
+	 * 
+	 * @return {@link #tatum}
+	 */
+	public int getTatum() {
+		return tatum;
 	}
 	
 	/**
@@ -90,8 +148,10 @@ public class Beat implements Comparable<Beat> {
 	public String toString() {
 		StringBuilder sb = new StringBuilder("(");
 		
-		sb.append(measure).append('.');
-		sb.append(beat).append(',');
+		sb.append(bar).append('.');
+		sb.append(beat).append('.');
+		sb.append(subBeat).append('.');
+		sb.append(tatum).append(',');
 		sb.append(time).append(')');
 		
 		return sb.toString();
@@ -105,12 +165,12 @@ public class Beat implements Comparable<Beat> {
 		
 		Beat beat = (Beat) other;
 		
-		return beat.beat == this.beat && beat.measure == measure && beat.time == time;
+		return beat.tatum == this.tatum && beat.subBeat == this.subBeat && beat.beat == this.beat && beat.bar == bar && beat.time == time;
 	}
 	
 	@Override
 	public int hashCode() {
-		return Integer.valueOf(getTatum() * 50 + getBar()).hashCode();
+		return Integer.valueOf(tatum * 5000 + beat * 500 + subBeat * 50 + bar).hashCode();
 	}
 
 	@Override
@@ -119,11 +179,21 @@ public class Beat implements Comparable<Beat> {
 			return -1;
 		}
 		
-		int value = Integer.compare(measure, o.measure);
+		int value = Integer.compare(bar, o.bar);
 		if (value != 0) {
 			return value;
 		}
 		
-		return Integer.compare(beat, o.beat);
+		value = Integer.compare(beat, o.beat);
+		if (value != 0) {
+			return value;
+		}
+		
+		value = Integer.compare(subBeat, o.subBeat);
+		if (value != 0) {
+			return value;
+		}
+		
+		return Integer.compare(tatum, o.tatum);
 	}
 }

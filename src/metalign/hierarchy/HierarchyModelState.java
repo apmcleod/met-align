@@ -30,14 +30,7 @@ public abstract class HierarchyModelState extends MidiModelState {
 	 * 
 	 * @return The measure contained by this state.
 	 */
-	public abstract Measure getMetricalMeasure();
-	
-	/**
-	 * Get the number of tatums per sub beat.
-	 * 
-	 * @return The number of tatums per sub beat of this hierarchy.
-	 */
-	public abstract int getSubBeatLength();
+	public abstract Measure getMeasure();
 	
 	/**
 	 * Get the length of the anacrusis, measured in sub beats.

@@ -53,12 +53,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 */
 	public static List<List<Map<List<MetricalLpcfgQuantum>, Double>>> treeMap = new ArrayList<List<Map<List<MetricalLpcfgQuantum>, Double>>>();
 	
-
-	/**
-	 * The length of the terminals which we are looking for.
-	 */
-	private final int subBeatLength;
-	
 	/**
 	 * The length of the anacrusis in this state, measured in quantums.
 	 */
@@ -148,7 +142,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 * @param grammar {@link #grammar}
 	 */
 	public MetricalLpcfgHierarchyModelState(MetricalLpcfg grammar) {
-		subBeatLength = 0;
 		anacrusisLength = 0;
 		measure = null;
 		this.grammar = grammar;
@@ -182,8 +175,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 * @param terminalLength {@link #subBeatLength}
 	 * @param anacrusisLength {@link #anacrusisLength}
 	 */
-	public MetricalLpcfgHierarchyModelState(MetricalLpcfgHierarchyModelState state, MetricalLpcfg grammar, Measure measure, int terminalLength, int anacrusisLength) {
-		this.subBeatLength = terminalLength;
+	public MetricalLpcfgHierarchyModelState(MetricalLpcfgHierarchyModelState state, MetricalLpcfg grammar, Measure measure, int anacrusisLength) {
 		this.anacrusisLength = anacrusisLength;
 		this.measure = measure;
 		this.grammar = grammar;
@@ -200,11 +192,11 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		nextMeasureIndex = state.nextMeasureIndex;
 		if (measure != null && nextMeasureIndex == 0) {
 			if (anacrusisLength != 0) {
-				nextMeasureIndex = anacrusisLength * subBeatLength;
+				nextMeasureIndex = anacrusisLength;
 				measureNum = -1;
 				
 			} else {
-				nextMeasureIndex = subBeatLength * measure.getBeatsPerMeasure() * measure.getSubBeatsPerBeat();
+				nextMeasureIndex = measure.getBeatsPerBar() * measure.getSubBeatsPerBeat();
 			}
 		}
 		
@@ -238,7 +230,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 * @param state The state whose deep copy we want.
 	 */
 	private MetricalLpcfgHierarchyModelState(MetricalLpcfgHierarchyModelState state) {
-		this(state, state.grammar, state.measure, state.subBeatLength, state.anacrusisLength);
+		this(state, state.grammar, state.measure, state.anacrusisLength);
 	}
 	
 	/**
@@ -309,39 +301,33 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		List<MetricalLpcfgHierarchyModelState> newStates = new ArrayList<MetricalLpcfgHierarchyModelState>();
 		
 		// Add measure hypotheses
-		for (int subBeatLength = 1; subBeatLength <= 8; subBeatLength++) {
-			if (Main.SUB_BEAT_LENGTH != -1 && Main.SUB_BEAT_LENGTH != subBeatLength) {
-				continue;
-			}
+		for (Measure measure : grammar.getMeasures()) {
 			
-			for (Measure measure : grammar.getMeasures()) {
+			int subBeatsPerMeasure = measure.getBeatsPerBar() * measure.getSubBeatsPerBeat();
+			for (int anacrusisLength = 0; anacrusisLength < subBeatsPerMeasure; anacrusisLength++) {
 				
-				int subBeatsPerMeasure = measure.getBeatsPerMeasure() * measure.getSubBeatsPerBeat();
-				for (int anacrusisLength = 0; anacrusisLength < subBeatsPerMeasure; anacrusisLength++) {
+				measure = new Measure(measure.getBeatsPerBar(), measure.getSubBeatsPerBeat(), anacrusisLength);
+				MetricalLpcfgHierarchyModelState newState =
+						new MetricalLpcfgHierarchyModelState(this, grammar, measure, anacrusisLength);
+				newState.updateMatchType();
+				
+				// This hypothesis could match the first note, and is ready to parse
+				if (!newState.isWrong()) {
 					
-					measure = new Measure(measure.getBeatsPerMeasure(), measure.getSubBeatsPerBeat(), subBeatLength, anacrusisLength);
-					MetricalLpcfgHierarchyModelState newState =
-							new MetricalLpcfgHierarchyModelState(this, grammar, measure, subBeatLength, anacrusisLength);
-					newState.updateMatchType();
+					// Parse
+					while (newState.beatState.getNumTatums() > newState.nextMeasureIndex) {
+						newState.parseStep();
+					}
 					
-					// This hypothesis could match the first note, and is ready to parse
+					if (!newState.isFullyMatched()) {
+						newState.updateMatchType();
+					}
+					
 					if (!newState.isWrong()) {
+						newStates.add(newState);
 						
-						// Parse
-						while (newState.beatState.getNumTatums() > newState.nextMeasureIndex) {
-							newState.parseStep();
-						}
-						
-						if (!newState.isFullyMatched()) {
-							newState.updateMatchType();
-						}
-						
-						if (!newState.isWrong()) {
-							newStates.add(newState);
-							
-							if (Main.SUPER_VERBOSE) {
-								System.out.println("Adding " + newState);
-							}
+						if (Main.SUPER_VERBOSE) {
+							System.out.println("Adding " + newState);
 						}
 					}
 				}
@@ -415,7 +401,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				}
 				
 				measureUsed = true;
-				int beatsPerMeasure = measure.getBeatsPerMeasure();
+				int beatsPerMeasure = measure.getBeatsPerBar();
 				int subBeatsPerBeat = measure.getSubBeatsPerBeat();
 				while (treeMap.size() <= beatsPerMeasure) {
 					treeMap.add(new ArrayList<Map<List<MetricalLpcfgQuantum>, Double>>());
@@ -452,7 +438,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 		
 		removeFinishedNotes();
-		nextMeasureIndex += subBeatLength * measure.getBeatsPerMeasure() * measure.getSubBeatsPerBeat();
+		nextMeasureIndex += measure.getBeatsPerBar() * measure.getSubBeatsPerBeat();
 		measureNum++;
 		
 		if (measureUsed) {
@@ -875,7 +861,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 */
 	private void updateMatchType(int startTactus, int noteLengthTacti) {
 		int beatLength = subBeatLength * measure.getSubBeatsPerBeat();
-		int measureLength = beatLength * measure.getBeatsPerMeasure();
+		int measureLength = beatLength * measure.getBeatsPerBar();
 		
 		int subBeatOffset = startTactus % subBeatLength;
 		int beatOffset = startTactus % beatLength;
@@ -1046,11 +1032,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		return false;
 	}
-	
-	@Override
-	public int getSubBeatLength() {
-		return subBeatLength;
-	}
 
 	@Override
 	public int getAnacrusis() {
@@ -1072,7 +1053,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	}
 	
 	@Override
-	public Measure getMetricalMeasure() {
+	public Measure getMeasure() {
 		return measure;
 	}
 
@@ -1094,7 +1075,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		MetricalLpcfgHierarchyModelState lpcfg = (MetricalLpcfgHierarchyModelState) state;
 		
-		return measure.equals(lpcfg.measure) && subBeatLength == lpcfg.subBeatLength && anacrusisLength == lpcfg.anacrusisLength;
+		return measure.equals(lpcfg.measure) && anacrusisLength == lpcfg.anacrusisLength;
 	}
 
 	@Override
@@ -1106,11 +1087,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		MetricalLpcfgHierarchyModelState o = (MetricalLpcfgHierarchyModelState) other;
 		
 		int result = Double.compare(o.getScore(), getScore());
-		if (result != 0) {
-			return result;
-		}
-		
-		result = Integer.compare(subBeatLength, o.subBeatLength);
 		if (result != 0) {
 			return result;
 		}
@@ -1147,11 +1123,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			return result;
 		}
 		
-		result = Integer.compare(subBeatLength, o.subBeatLength);
-		if (result != 0) {
-			return result;
-		}
-		
 		result = Integer.compare(anacrusisLength, o.anacrusisLength);
 		if (result != 0) {
 			return result;
@@ -1171,7 +1142,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(measure).append(" length=").append(subBeatLength).append(" anacrusis=").append(anacrusisLength);
+		sb.append(measure).append(" anacrusis=").append(anacrusisLength);
 		sb.append(" Score=").append(GLOBAL_WEIGHT * logProbability).append(" + ").append((1.0 - GLOBAL_WEIGHT) * localLogProb).append(" = ").append(getScore());
 		
 		return sb.toString();

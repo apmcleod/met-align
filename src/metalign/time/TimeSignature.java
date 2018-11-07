@@ -110,7 +110,7 @@ public class TimeSignature {
 	 * 
 	 * @return The BeatHierarchy of this time signature.
 	 */
-	public Measure getMetricalMeasure() {
+	public Measure getMeasure() {
 		int beatsPerMeasure = numerator;
 		int subBeatsPerBeat = 2;
 		
@@ -120,8 +120,7 @@ public class TimeSignature {
 			subBeatsPerBeat = 3;	
 		}
 		
-		int length = getNotes32PerBar() / beatsPerMeasure / subBeatsPerBeat;
-		Measure measure = new Measure(beatsPerMeasure, subBeatsPerBeat, length, 0);
+		Measure measure = new Measure(beatsPerMeasure, subBeatsPerBeat);
 		
 		return measure;
 	}

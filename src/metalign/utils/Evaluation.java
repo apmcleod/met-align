@@ -111,18 +111,6 @@ public class Evaluation {
 						case 'F':
 							OutputParser.checkFull();
 							return;
-							
-						case 's':
-							i++;
-							if (args.length == i) {
-								argumentError("No sub beat length given for -s option.");
-							}
-							try {
-								Main.SUB_BEAT_LENGTH = Integer.parseInt(args[i]);
-							} catch (NumberFormatException e) {
-								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
-							}
-							break;
 						
 						// Evaluate!
 						case 'E':
@@ -258,7 +246,7 @@ public class Evaluation {
 	private static void calculateJointGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel, MetricalLpcfg grammar) throws IOException, ParserConfigurationException, SAXException, InvalidMidiDataException, InterruptedException {
 		MetricalLpcfg groundTruthGrammar = null;
 		
-		TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
+		TimeTracker tt = new TimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
 		NoteListGenerator nlg = new NoteListGenerator(tt);
 		
@@ -329,9 +317,9 @@ public class Evaluation {
 			return;
 		}
 		
-		if (evaluator.getHierarchy().getBeatsPerMeasure() < 2 || evaluator.getHierarchy().getBeatsPerMeasure() > 4 ||
+		if (evaluator.getHierarchy().getBeatsPerBar() < 2 || evaluator.getHierarchy().getBeatsPerBar() > 4 ||
 				evaluator.getHierarchy().getSubBeatsPerBeat() < 2 || evaluator.getHierarchy().getSubBeatsPerBeat() > 3) {
-			System.err.println("Irregular meter detected (" + evaluator.getHierarchy().getBeatsPerMeasure() + "," +
+			System.err.println("Irregular meter detected (" + evaluator.getHierarchy().getBeatsPerBar() + "," +
 				evaluator.getHierarchy().getSubBeatsPerBeat() + "). Skipping song " + groundTruth);
 			return;
 		}
@@ -360,7 +348,7 @@ public class Evaluation {
 
 	private static long getFirstDownbeatTime(List<Beat> beatList) {
 		for (Beat beat : beatList) {
-			if (beat.getTatum() == 0) {
+			if (beat.isDownbeat()) {
 				return beat.getTime();
 			}
 		}

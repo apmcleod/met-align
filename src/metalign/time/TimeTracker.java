@@ -9,7 +9,6 @@ import javax.sound.midi.MetaMessage;
 import javax.sound.midi.MidiEvent;
 
 import metalign.beat.Beat;
-import metalign.hierarchy.Measure;
 
 /**
  * A <code>TimeTracker</code> is able to interpret MIDI tempo, key, and time signature change events and keep track
@@ -30,11 +29,6 @@ public class TimeTracker {
 	private final LinkedList<TimeTrackerNode> nodes;
 	
 	/**
-	 * The number of tatums per sub beat. A negative value or 0 defaults to using 32nd notes.
-	 */
-	protected int subBeatLength;
-	
-	/**
 	 * The number of ticks which lie before the first full measure in this song.
 	 */
 	private int anacrusisLength;
@@ -53,17 +47,7 @@ public class TimeTracker {
 	 * Create a new TimeTracker.
 	 */
     public TimeTracker() {
-    	this(-1);
-    }
-    
-    /**
-	 * Create a new TimeTracker with the given sub beat length.
-	 * 
-	 * @param subBeatLength {@link #subBeatLength}
-	 */
-    public TimeTracker(int subBeatLength) {
     	anacrusisLength = 0;
-    	this.subBeatLength = subBeatLength == 0 ? -1 : subBeatLength;
     	nodes = new LinkedList<TimeTrackerNode>();
     	nodes.add(new TimeTrackerNode(PPQ));
     }
@@ -315,14 +299,16 @@ public class TimeTracker {
      * Get a List of the tatums found by this TimeTracker up until (but not including)
      * the {@link #lastTick}.
      * 
-     * @return A List of the tatums of this TimeTracker until the given tick.
+     * @return A List of the tatums of this TimeTracker, down to the sub beat level.
      */
     public List<Beat> getTatums() {
     	List<Beat> beats = new ArrayList<Beat>();
     	
     	TimeTrackerNode firstNode = getNodeAtTick(0);
     	int ticksPerNote32 = (int) (PPQ / 8);
-    	int notes32PerMeasure = firstNode.getTimeSignature().getNotes32PerBar();
+    	int notes32PerBar = firstNode.getTimeSignature().getNotes32PerBar();
+    	int beatsPerBar = firstNode.getTimeSignature().getMeasure().getBeatsPerBar();
+    	int subBeatsPerBeat = firstNode.getTimeSignature().getMeasure().getSubBeatsPerBeat();
     	
     	int measureNum = 0;
     	int note32Num = 0;
@@ -334,18 +320,24 @@ public class TimeTracker {
     		
     		note32Num--;
     		if (note32Num < 0) {
-    			note32Num += notes32PerMeasure;
+    			note32Num += notes32PerBar;
     			measureNum--;
     		}
     	}
     	
-    	beats.add(new Beat(measureNum, note32Num, getTimeAtTick(tick), tick));
+    	int beatNum = note32Num / (notes32PerBar / beatsPerBar);
+    	int subBeatNum = (note32Num / (notes32PerBar / beatsPerBar / subBeatsPerBeat)) % subBeatsPerBeat;
+    	int tatumNum = note32Num % (notes32PerBar / beatsPerBar / subBeatsPerBeat);
+    	
+    	if (tatumNum != 0) {
+    		beats.add(new Beat(measureNum, beatNum, subBeatNum, tatumNum, getTimeAtTick(tick), tick));
+    	}
     	
     	tick += ticksPerNote32;
     	note32Num++;
-    	if (note32Num >= notes32PerMeasure) {
+    	if (note32Num >= notes32PerBar) {
     		measureNum++;
-    		note32Num -= notes32PerMeasure;
+    		note32Num -= notes32PerBar;
     	}
     	
     	ListIterator<TimeTrackerNode> iterator = nodes.listIterator();
@@ -354,16 +346,22 @@ public class TimeTracker {
     	while (iterator.hasNext() && node.getStartTick() <= lastTick) {
     		TimeTrackerNode next = iterator.next();
     		
-        	notes32PerMeasure = node.getTimeSignature().getNotes32PerBar();
+        	notes32PerBar = node.getTimeSignature().getNotes32PerBar();
     		
     		while (tick <= lastTick && tick < next.getStartTick()) {
-    			beats.add(new Beat(measureNum, note32Num, getTimeAtTick(tick), tick));
+    			beatNum = note32Num / (notes32PerBar / beatsPerBar);
+    	    	subBeatNum = (note32Num / (notes32PerBar / beatsPerBar / subBeatsPerBeat)) % subBeatsPerBeat;
+    	    	tatumNum = note32Num % (notes32PerBar / beatsPerBar / subBeatsPerBeat);
+    	    	
+    	    	if (tatumNum != 0) {
+    	    		beats.add(new Beat(measureNum, beatNum, subBeatNum, tatumNum, getTimeAtTick(tick), tick));
+    	    	}
     			
     			tick += ticksPerNote32;
     	    	note32Num++;
-    	    	if (note32Num >= notes32PerMeasure) {
+    	    	if (note32Num >= notes32PerBar) {
     	    		measureNum++;
-    	    		note32Num -= notes32PerMeasure;
+    	    		note32Num -= notes32PerBar;
     	    	}
     		}
     		
@@ -372,23 +370,25 @@ public class TimeTracker {
     	
     	// Add remainder beats from the last node
     	if (node.getStartTick() <= lastTick) {
-        	notes32PerMeasure = node.getTimeSignature().getNotes32PerBar();
+        	notes32PerBar = node.getTimeSignature().getNotes32PerBar();
         	
     		while (tick <= lastTick) {
-    			beats.add(new Beat(measureNum, note32Num, getTimeAtTick(tick), tick));
+    			beatNum = note32Num / (notes32PerBar / beatsPerBar);
+    	    	subBeatNum = (note32Num / (notes32PerBar / beatsPerBar / subBeatsPerBeat)) % subBeatsPerBeat;
+    	    	tatumNum = note32Num % (notes32PerBar / beatsPerBar / subBeatsPerBeat);
+    	    	
+    	    	if (tatumNum != 0) {
+    	    		beats.add(new Beat(measureNum, beatNum, subBeatNum, tatumNum, getTimeAtTick(tick), tick));
+    	    	}
     			
     			tick += ticksPerNote32;
     	    	note32Num++;
-    	    	if (note32Num >= notes32PerMeasure) {
+    	    	if (note32Num >= notes32PerBar) {
     	    		measureNum++;
-    	    		note32Num -= notes32PerMeasure;
+    	    		note32Num -= notes32PerBar;
     	    	}
     		}
     	}
-    	
-    	if (subBeatLength >= 0) {
-			beats = fixBeatsGivenSubBeatLength(beats);
-		}
     	
     	return beats;
     }
@@ -396,84 +396,6 @@ public class TimeTracker {
     public List<Beat> getBeatsOnly() {
     	return new ArrayList<Beat>();
     }
-    
-    /**
-	 * Fix the given Beats List based on the set {@link #subBeatLength}. That is, remove or add
-	 * tacti as needed to get the desired number of tacti per sub beat.
-	 * 
-	 * @param oldBeats The old Beat List.
-	 * 
-	 * @return The new, fixed Beat List.
-	 */
-	private List<Beat> fixBeatsGivenSubBeatLength(List<Beat> oldBeats) {
-		if (subBeatLength < 0) {
-			return oldBeats;
-		}
-		
-		List<Beat> tatums = oldBeats;
-		List<Beat> beats = new ArrayList<Beat>();
-		
-		double tickDiff = 0.0;
-		double timeDiff = 0.0;
-			
-		for (Beat beat : tatums) {
-			long time = beat.getTime();
-			long tick = beat.getTick();
-			
-			int notes32PerSubBeat = 0;
-			int notes32PerBeat = 0;
-			
-			TimeSignature timeSig = getNodeAtTime(time).getTimeSignature();
-			int notes32PerBar = timeSig.getNotes32PerBar();
-			Measure tmpMeasure = timeSig.getMetricalMeasure();
-			int beatsPerBar = tmpMeasure.getBeatsPerMeasure();
-			notes32PerBeat = notes32PerBar / beatsPerBar;
-			notes32PerSubBeat = notes32PerBeat / tmpMeasure.getSubBeatsPerBeat();
-			
-			// Found a sub-beat
-			if (notes32PerSubBeat != 0 && beat.getTatum() % notes32PerSubBeat == 0) {
-				int bar = beat.getBar();
-				int subBeatNum = beat.getTatum() / notes32PerSubBeat;
-				int tatumNum = subBeatNum * subBeatLength;
-				
-				// Add beats up to this one
-				if (beats.size() != 0) {
-					Beat previousTatum = beats.get(beats.size() - 1);
-					int previousBar = previousTatum.getBar();
-					int previousTatumNum = previousTatum.getTatum();
-					long previousTime = previousTatum.getTime();
-					long previousTick = previousTatum.getTick();
-					
-					tickDiff = ((double) tick - previousTick) / subBeatLength;
-					timeDiff = ((double) time - previousTime) / subBeatLength;
-					
-					// Add tatums up to the current one (but not including it)
-					for (int i = 1; i < subBeatLength; i++) {
-						beats.add(new Beat(previousBar, previousTatumNum + i, (long) (previousTime + timeDiff * i), (long) (previousTick + tickDiff * i)));
-					}
-				}
-				
-				// Add the current beat
-				beats.add(new Beat(bar, tatumNum, time, tick));
-			}
-		}
-		
-		// Add remainder tatums
-		if (beats.size() != 0) {
-			Beat previousTatum = beats.get(beats.size() - 1);
-			int previousBar = previousTatum.getBar();
-			int previousTatumNum = previousTatum.getTatum();
-			long previousTime = previousTatum.getTime();
-			long previousTick = previousTatum.getTick();
-			
-			// Add tatums up to the current one (but not including it)
-			for (int i = 1; i < subBeatLength; i++) {
-				beats.add(new Beat(previousBar, previousTatumNum + i, (long) (previousTime + timeDiff * i), (long) (previousTick + tickDiff * i)));
-			}
-		}
-		
-		return beats;
-	}
     
     /**
      * Get the first non-dummy time signature in this song.
@@ -506,7 +428,7 @@ public class TimeTracker {
     	int notes32PerBar = timeSig.getNotes32PerBar();
     	int ticksPerBar = ticksPerNote32 * notes32PerBar;
     	
-    	int subBeatsPerBar = timeSig.getMetricalMeasure().getBeatsPerMeasure() * timeSig.getMetricalMeasure().getSubBeatsPerBeat();
+    	int subBeatsPerBar = timeSig.getMeasure().getBeatsPerBar() * timeSig.getMeasure().getSubBeatsPerBeat();
     	int ticksPerSubBeat = ticksPerBar / subBeatsPerBar;
     	
 		return anacrusisLength / ticksPerSubBeat;
@@ -573,15 +495,6 @@ public class TimeTracker {
      */
     public double getPPQ() {
     	return PPQ;
-    }
-    
-    /**
-     * Get the sub beat length.
-     * 
-     * @return {@link #subBeatLength}
-     */
-    public int getSubBeatLength() {
-    	return subBeatLength;
     }
 	
 	@Override

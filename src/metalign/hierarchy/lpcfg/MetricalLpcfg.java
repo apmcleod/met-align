@@ -17,7 +17,6 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.sound.midi.InvalidMidiDataException;
 
-import metalign.Main;
 import metalign.Runner;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.Measure;
@@ -329,7 +328,7 @@ public class MetricalLpcfg implements Serializable {
 	 * @throws MetricalLpcfgElementNotFoundException 
 	 */
 	public void extract(File file, List<File> anacrusisFiles, boolean useChannel) throws IOException, InvalidMidiDataException, InterruptedException, MetricalLpcfgElementNotFoundException {
-		TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
+		TimeTracker tt = new TimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
 		NoteListGenerator nlg = new NoteListGenerator(tt);
 		

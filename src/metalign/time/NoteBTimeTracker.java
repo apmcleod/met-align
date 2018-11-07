@@ -9,32 +9,28 @@ import metalign.hierarchy.Measure;
 public class NoteBTimeTracker extends TimeTracker {
 	
 	private final List<Beat> beats;
-	private final List<Beat> beatsOnly;
 	private TimeSignature timeSig;
 	private int anacrusisSubBeats;
-	private int firstDownBeatTime;
-	private int downBeatLevel;
-	private int tatumsPerBar;
+	
 	private int barNum;
-	private int tatumNum;
+	private int beatNum;
+	private int subBeatNum;
+	
+	private int downBeatLevel;
 	private int minimumForBeat;
+	private int minimumForSubBeat;
 	
 	public NoteBTimeTracker() {
-		this(-1);
-	}
-	
-	public NoteBTimeTracker(int subBeatLength) {
 		beats = new ArrayList<Beat>();
-		beatsOnly = new ArrayList<Beat>();
-		super.subBeatLength = subBeatLength;
 		
 		anacrusisSubBeats = 0;
-		firstDownBeatTime = -1;
 		barNum = 0;
+		beatNum = 0;
+		subBeatNum = 0;
+		
 		downBeatLevel = 0;
-		tatumsPerBar = 0;
-		tatumNum = 0;
 		minimumForBeat = 0;
+		minimumForSubBeat = 0;
 	}
 
 	public void addBeat(long time, int level) {
@@ -43,46 +39,43 @@ public class NoteBTimeTracker extends TimeTracker {
 			return;
 		}
 		
-		if (level >= minimumForBeat) {
-			int tatumsPerBeat = tatumsPerBar / timeSig.getMetricalMeasure().getBeatsPerMeasure();
-			beatsOnly.add(new Beat(barNum, tatumNum / tatumsPerBeat, time, time));
-		}
-		
-		if (firstDownBeatTime == -1 && level == downBeatLevel) {
-			firstDownBeatTime = (int) time;
-		}
-		
-		beats.add(new Beat(barNum, tatumNum, time, time));
-		
-		tatumNum++;
-		if (tatumNum == tatumsPerBar) {
-			tatumNum = 0;
+		if (level == downBeatLevel) {
 			barNum++;
+			beatNum = 0;
+			subBeatNum = 0;
+			
+		} else if (level >= minimumForBeat) {
+			beatNum++;
+			subBeatNum = 0;
+			
+		} else if (level >= minimumForSubBeat) {
+			subBeatNum++;
+		}
+		
+		if (level >= minimumForSubBeat) {
+			Beat beat = new Beat(barNum, beatNum, subBeatNum, 0, time , time);
+			beats.add(beat);
 		}
 	}
 	
 	public void setTimeSignature(TimeSignature ts) {
 		timeSig = ts;
-		Measure measure = ts.getMetricalMeasure();
+		Measure measure = ts.getMeasure();
 		
-		if ((measure.getBeatsPerMeasure() == 4) || (measure.getBeatsPerMeasure() == 2 && measure.getSubBeatsPerBeat() == 3)) {
+		if ((measure.getBeatsPerBar() == 4) || (measure.getBeatsPerBar() == 2 && measure.getSubBeatsPerBeat() == 3)) {
 			downBeatLevel = 4;
 			
 		} else {
 			downBeatLevel = 3;
 		}
 		
-		if (measure.getBeatsPerMeasure() == 2 && measure.getSubBeatsPerBeat() == 3) {
+		if (measure.getBeatsPerBar() == 2 && measure.getSubBeatsPerBeat() == 3) {
 			minimumForBeat = 3;
+			minimumForSubBeat = 2;
 			
 		} else {
 			minimumForBeat = 2;
-		}
-		
-		tatumsPerBar = measure.getBeatsPerMeasure() * measure.getSubBeatsPerBeat();
-		
-		if (subBeatLength == -1) {
-			subBeatLength = ts.getNotes32PerBar() / tatumsPerBar;
+			minimumForSubBeat = 1;
 		}
 	}
     
@@ -123,53 +116,11 @@ public class NoteBTimeTracker extends TimeTracker {
      * Get a List of the Beats found by this TimeTracker up until (but not including)
      * the {@link #lastTick}.
      * 
-     * @return A List of the 32nd-note Beats of this TimeTracker until the given tick.
+     * @return A List of the tatums found by this TimeTracker down to the sub beat level.
      */
     public List<Beat> getTatums() {
-    	return fixBeatsGivenSubBeatLength(beats);
+    	return beats;
     }
-    
-    public List<Beat> getBeatsOnly() {
-    	return beatsOnly;
-    }
-    
-    /**
-	 * Fix the given Beats List based on the set {@link #subBeatLength}. That is, remove or add
-	 * tacti as needed to get the desired number of tacti per sub beat.
-	 * 
-	 * @param oldBeats The old Beat List.
-	 * 
-	 * @return The new, fixed Beat List.
-	 */
-	private List<Beat> fixBeatsGivenSubBeatLength(List<Beat> oldBeats) {
-		if (subBeatLength < 0) {
-			return oldBeats;
-		}
-		
-		List<Beat> tatums = oldBeats;
-		List<Beat> beats = new ArrayList<Beat>();
-		
-		for (int i = 1; i < tatums.size(); i++) {
-			Beat initialBeat = tatums.get(i - 1);
-			Beat finalBeat = tatums.get(i);
-			long initialTime = initialBeat.getTime();
-			long finalTime = finalBeat.getTime();
-			
-			beats.add(new Beat(initialBeat.getBar(), initialBeat.getTatum() * subBeatLength, initialTime, initialTime));
-			
-			double timeDiff = ((double) (finalTime - initialTime)) / subBeatLength;
-			for (int j = 1; j < subBeatLength; j++) {
-				beats.add(new Beat(initialBeat.getBar(), initialBeat.getTatum() * subBeatLength + j, Math.round(initialTime + timeDiff * j), Math.round(initialTime + timeDiff * j))); 
-			}
-		}
-		
-		if (tatums.size() > 0) {
-			Beat lastBeat = tatums.get(tatums.size() - 1);
-			beats.add(new Beat(lastBeat.getBar(), lastBeat.getTatum() * subBeatLength, lastBeat.getTime(), lastBeat.getTime()));
-		}
-		
-		return beats;
-	}
     
     /**
      * Get the first non-dummy time signature in this song.
@@ -196,7 +147,13 @@ public class NoteBTimeTracker extends TimeTracker {
      * @return {@link #anacrusisLength}
      */
     public int getAnacrusisTicks() {
-		return firstDownBeatTime;
+		for (Beat beat : beats) {
+			if (beat.isDownbeat()) {
+				return (int) beat.getTime();
+			}
+		}
+		
+		return -1;
 	}
     
     /**
@@ -206,9 +163,10 @@ public class NoteBTimeTracker extends TimeTracker {
      */
     public void setAnacrusisSubBeats(int length) {
 		anacrusisSubBeats = length;
+		
 		if (anacrusisSubBeats != 0) {
-			barNum = -1;
-			tatumNum = tatumsPerBar - anacrusisSubBeats;
+			subBeatNum = (-anacrusisSubBeats + timeSig.getMeasure().getSubBeatsPerBeat() * timeSig.getMeasure().getBeatsPerBar()) % timeSig.getMeasure().getSubBeatsPerBeat() - 1 - 1;
+			beatNum = (-anacrusisSubBeats + timeSig.getMeasure().getSubBeatsPerBeat() * timeSig.getMeasure().getBeatsPerBar()) % timeSig.getMeasure().getBeatsPerBar();
 		}
 	}
 	

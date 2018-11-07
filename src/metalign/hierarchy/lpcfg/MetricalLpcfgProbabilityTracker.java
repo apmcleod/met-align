@@ -1,13 +1,10 @@
 package metalign.hierarchy.lpcfg;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import metalign.Main;
 import metalign.hierarchy.Measure;
 import metalign.hierarchy.lpcfg.MetricalLpcfgNonterminal.MetricalLpcfgLevel;
 import metalign.utils.SmoothingUtils;
@@ -591,69 +588,6 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 	}
 	
 	/**
-	 * Estimates the probability p(headLength | measure, type, parentHeadLength).
-	 * (Here we do not know parentHeadLength).
-	 * 
-	 * @param measure The measure.
-	 * @param typeString The type.
-	 * @param head The head.
-	 * @param level The level to use in case we need to back off.
-	 * @return The estimate of p(headLength | measure, type, parentHeadLength)
-	 */
-	public double getHeadProbabilityEstimate(Measure measure, String typeString, MetricalLpcfgHead head,
-			MetricalLpcfgLevel level) {
-		String keyBase = encode(measure, typeString, new MetricalLpcfgHead());
-		keyBase = keyBase.substring(0, keyBase.length() - 3);
-		double headLength = head.getLength();
-		
-		List<String> possibleParentHeads = new ArrayList<String>();
-		
-		double maxHead = 1.0;
-		if (level == MetricalLpcfgLevel.SUB_BEAT) {
-			maxHead = measure.getSubBeatsPerBeat();
-			maxHead -= 1.0 - headLength;
-			
-		} else if (level == MetricalLpcfgLevel.BEAT) {
-			maxHead = measure.getSubBeatsPerBeat() * measure.getBeatsPerMeasure();
-			maxHead -= measure.getSubBeatsPerBeat() - headLength;
-		}
-		double headStep = Main.SUB_BEAT_LENGTH <= 0 ? 0.25 : 1.0 / Main.SUB_BEAT_LENGTH;
-		for (double length = headLength; length <= maxHead; length += headStep) {
-			possibleParentHeads.add(Double.toString(length));
-		}
-		
-		List<Map<Double, Integer>> headMapConditioneds = new ArrayList<Map<Double, Integer>>();
-		for (String parentHead : possibleParentHeads) {
-			Map<Double, Integer> map = headMap.get(keyBase + parentHead);
-			
-			if (map != null) {
-				headMapConditioneds.add(map);
-			}
-		}
-		
-		double logProbability = 0.0;
-		
-		// Get main probability
-		for (Map<Double, Integer> headMapConditioned : headMapConditioneds) {
-			Integer count = 0;
-			if (headMapConditioned != null) {
-				count = headMapConditioned.get(headLength);
-				if (count == null) {
-					count = 0;
-				}
-				
-				Map<Integer, Double> smoothed = SmoothingUtils.getGoodTuringSmoothing(
-						SmoothingUtils.getFrequencyMap(headMapConditioned.values()),
-						SmoothingUtils.getTotalCount(headMapConditioned.values()));
-				
-				logProbability = Math.log(smoothed.get(count)); 
-			}
-		}
-		
-		return logProbability;
-	}
-	
-	/**
 	 * Get the set of measures contained within this grammar.
 	 * 
 	 * @return The Set of the measure types within this grammar.
@@ -753,7 +687,7 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 				break;
 				
 			case MEASURE:
-				measureKey = measure.getBeatsPerMeasure() + "B";
+				measureKey = measure.getBeatsPerBar() + "B";
 				break;
 		}
 		

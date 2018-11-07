@@ -35,7 +35,7 @@ public class MetricalLpcfgTreeFactory {
 	 * @return A tree of the given measure type, containing the given notes.
 	 */
 	public static MetricalLpcfgTree makeTree(List<MidiNote> notes, List<Integer> list, Measure measure, int subBeatLength, int anacrusisLengthSubBeats, int measureNum, boolean hasBegun) {
-		int beatsPerMeasure = measure.getBeatsPerMeasure();
+		int beatsPerMeasure = measure.getBeatsPerBar();
 		int subBeatsPerBeat = measure.getSubBeatsPerBeat();
 		
 		return makeTree(makeQuantumList(notes, list, measure, subBeatLength, anacrusisLengthSubBeats, measureNum, hasBegun), beatsPerMeasure, subBeatsPerBeat);
@@ -56,7 +56,7 @@ public class MetricalLpcfgTreeFactory {
 	 * @return A tree of the given measure type, containing the given notes.
 	 */
 	public static List<MetricalLpcfgQuantum> makeQuantumList(List<MidiNote> notes, List<Integer> list, Measure measure, int subBeatLength, int anacrusisLengthSubBeats, int measureNum, boolean hasBegun) {
-		int beatsPerMeasure = measure.getBeatsPerMeasure();
+		int beatsPerMeasure = measure.getBeatsPerBar();
 		int subBeatsPerBeat = measure.getSubBeatsPerBeat();
 		
 		int measureLength = subBeatLength * beatsPerMeasure * subBeatsPerBeat;

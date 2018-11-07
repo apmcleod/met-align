@@ -14,7 +14,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import metalign.Main;
 import metalign.Runner;
 import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
@@ -24,7 +23,6 @@ import metalign.parsing.MatchParser;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.parsing.XMLParser;
-import metalign.time.FromOutputTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.voice.Voice;
@@ -45,16 +43,6 @@ public class Evaluator {
 	 * The ground truth tatums.
 	 */
 	private List<Beat> tatums;
-	
-	/**
-	 * The ground truth beat times.
-	 */
-	private List<Long> beatTimes;
-	
-	/**
-	 * The ground truth downbeat times.
-	 */
-	private List<Long> downbeatTimes;
 	
 	/**
 	 * The ground truth metrical groupings.
@@ -118,15 +106,13 @@ public class Evaluator {
 				subBeatsPerBeat = 3;
 			}
 			
-			tatums = FromOutputTimeTracker.fixBeatsGivenSubBeatLength(tatums, Main.SUB_BEAT_LENGTH * subBeatsPerBeat);
-			
 		} else if (groundTruth.toString().endsWith(".match")) {
 			MatchParser match = new MatchParser(groundTruth);
 			match.run();
 			
 			tatums = match.getTatums();
 			
-			beatsPerBar = match.getMeasure().getBeatsPerMeasure();
+			beatsPerBar = match.getMeasure().getBeatsPerBar();
 			subBeatsPerBeat = match.getMeasure().getSubBeatsPerBeat();
 			
 		} else {
@@ -141,37 +127,29 @@ public class Evaluator {
 			}
 			
 			TimeSignature timeSig = tt.getFirstTimeSignature();
-			Measure tmpMeasure = timeSig.getMetricalMeasure();
-			beatsPerBar = tmpMeasure.getBeatsPerMeasure();
+			Measure tmpMeasure = timeSig.getMeasure();
+			beatsPerBar = tmpMeasure.getBeatsPerBar();
 			subBeatsPerBeat = tmpMeasure.getSubBeatsPerBeat();
 		}
 		
 		// Get ground truth sub-beat, beat, and downbeat times
 		List<Long> subBeatTimes = new ArrayList<Long>();
-		beatTimes = new ArrayList<Long>();
-		downbeatTimes = new ArrayList<Long>();
+		List<Long> beatTimes = new ArrayList<Long>();
+		List<Long> downbeatTimes = new ArrayList<Long>();
 		
-		List<Integer> notes32PerSubBeatList = new ArrayList<Integer>();
 		List<Integer> subBeatsPerBeatList = new ArrayList<Integer>();
 		
 		for (Beat beat : tatums) {
 			long time = beat.getTime();
 			
-			int notes32PerSubBeat = 0;
-			int notes32PerBeat = 0;
 			int subBeatsPerBeat = 2;
 			
 			if (xml == null) {
 				TimeSignature timeSig = tt.getNodeAtTime(time).getTimeSignature();
-				int notes32PerBar = timeSig.getNotes32PerBar();
-				Measure tmpMeasure = timeSig.getMetricalMeasure();
-				int beatsPerBar = tmpMeasure.getBeatsPerMeasure();
+				Measure tmpMeasure = timeSig.getMeasure();
 				subBeatsPerBeat = tmpMeasure.getSubBeatsPerBeat();
-				notes32PerBeat = notes32PerBar / beatsPerBar;
-				notes32PerSubBeat = notes32PerBeat / tmpMeasure.getSubBeatsPerBeat();
 				
 			} else {
-				int tatumsPerBar = xml.getBeatsPerBar(beat.getBar());
 				int numerator = xml.getNumerators(beat.getBar());
 				
 				int beatsPerBar = numerator;
@@ -180,50 +158,25 @@ public class Evaluator {
 					beatsPerBar /= 3;
 					subBeatsPerBeat = 3;
 				}
-	
-				notes32PerBeat = tatumsPerBar / beatsPerBar;
-				notes32PerSubBeat = notes32PerBeat / subBeatsPerBeat;
 				
 				if (subBeatsPerBeat != this.subBeatsPerBeat || beatsPerBar != this.beatsPerBar) {
 					hasTimeChange = true;
 				}
 			}
 			
-			// Found a sub-beat
-			if (notes32PerSubBeat != 0 && beat.getTatum() % notes32PerSubBeat == 0) {
+			if (beat.isSubBeat()) {
 				subBeatTimes.add(time);
 			}
 			
 			// Found a beat
-			if (beat.getTatum() % notes32PerBeat == 0) {
+			if (beat.isBeat()) {
 				beatTimes.add(time);
-				notes32PerSubBeatList.add(notes32PerSubBeat);
 				subBeatsPerBeatList.add(subBeatsPerBeat);
 			}
 			
 			// Found a downbeat
-			if (beat.getTatum() == 0) {
+			if (beat.isDownbeat()) {
 				downbeatTimes.add(time);
-			}
-		}
-		
-		// Fix in case xml and subbeats weren't listed
-		for (int i = 0; i < beatTimes.size(); i++) {
-			int notes32PerSubBeat = notes32PerSubBeatList.get(i);
-			int subBeatsPerBeat = subBeatsPerBeatList.get(i);
-			
-			if (notes32PerSubBeat == 0) {
-				double thisTime = beatTimes.get(i);
-				subBeatTimes.add((long) thisTime);
-				
-				if (beatTimes.size() > i + 1) {
-					double nextTime = beatTimes.get(i + 1);
-					double diff = nextTime - thisTime;
-					
-					for (int division = 1; division < subBeatsPerBeat; division++) {
-						subBeatTimes.add(Math.round(thisTime + diff * division / subBeatsPerBeat));
-					}
-				}
 			}
 		}
 		
@@ -254,7 +207,7 @@ public class Evaluator {
 	public String evaluate(JointModelState jms) {
 		return evaluate(jms.getVoiceState().getVoices(),
 						jms.getBeatState().getBeats(),
-						jms.getHierarchyState().getMetricalMeasure());
+						jms.getHierarchyState().getMeasure());
 	}
 	
 	/**
@@ -335,30 +288,19 @@ public class Evaluator {
 		List<Long> guessedBeatTimes = new ArrayList<Long>();
 		List<Long> guessedDownbeatTimes = new ArrayList<Long>();
 		
-		int subBeatIncrement = measure.getLength();
-		int subBeatStartIndex = 0;
-		
-		int beatIncrement = measure.getSubBeatsPerBeat() * measure.getLength();
-		int beatStartIndex = (measure.getAnacrusis() * measure.getLength()) % beatIncrement;
-		
-		int downbeatIncrement = measure.getSubBeatsPerBeat() * measure.getLength();
-		int downbeatStartIndex = measure.getAnacrusis() * measure.getLength();
-		downbeatIncrement *= measure.getBeatsPerMeasure();
-		
 		// Go through each detected beat
-		for (int beatIndex = 0; beatIndex < beatList.size(); beatIndex++) {
-			Beat beat = beatList.get(beatIndex);
+		for (Beat beat : beatList) {
 			long time = beat.getTime();
 			
-			if ((beatIndex - subBeatStartIndex) % subBeatIncrement == 0) {
+			if (beat.isSubBeat()) {
 				guessedSubBeatTimes.add(time);
 			}
 			
-			if ((beatIndex - beatStartIndex) % beatIncrement == 0) {
+			if (beat.isBeat()) {
 				guessedBeatTimes.add(time);
 			}
 			
-			if ((beatIndex - downbeatStartIndex) % downbeatIncrement == 0) {
+			if (beat.isDownbeat()) {
 				guessedDownbeatTimes.add(time);
 			}
 		}

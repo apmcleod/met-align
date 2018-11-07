@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import metalign.beat.Beat;
-import metalign.hierarchy.Measure;
 
 public class FromOutputTimeTracker extends TimeTracker {
 	
@@ -13,54 +12,29 @@ public class FromOutputTimeTracker extends TimeTracker {
 	private TimeSignature timeSig;
 	private int anacrusisSubBeats;
 	private int firstDownBeatTime;
-	private int tatumsPerBar;
-	private int barNum;
-	private int tatumNum;
 	
 	public FromOutputTimeTracker() {
-		this(-1);
-	}
-	
-	public FromOutputTimeTracker(int subBeatLength) {
 		beats = new ArrayList<Beat>();
 		beatsOnly = new ArrayList<Beat>();
-		super.subBeatLength = subBeatLength;
 		
 		anacrusisSubBeats = 0;
 		firstDownBeatTime = -1;
-		barNum = 0;
-		tatumsPerBar = 0;
-		tatumNum = 0;
 	}
 
-	public void addBeat(long time) {
-		int tatumsPerBeat = tatumsPerBar / timeSig.getMetricalMeasure().getBeatsPerMeasure();
-		if (tatumNum % tatumsPerBeat == 0) {
-			beatsOnly.add(new Beat(barNum, tatumNum / tatumsPerBeat, time, time));
+	public void addBeat(Beat beat) {
+		if (beat.isDownbeat()) {
+			beatsOnly.add(beat);
+			
+			if (firstDownBeatTime == -1) {
+				firstDownBeatTime = (int) beat.getTime();
+			}
 		}
 		
-		if (firstDownBeatTime == -1 && tatumNum == 0) {
-			firstDownBeatTime = (int) time;
-		}
-		
-		beats.add(new Beat(barNum, tatumNum, time, time));
-		
-		tatumNum++;
-		if (tatumNum == tatumsPerBar) {
-			tatumNum = 0;
-			barNum++;
-		}
+		beats.add(beat);
 	}
 	
 	public void setTimeSignature(TimeSignature ts) {
 		timeSig = ts;
-		Measure measure = ts.getMetricalMeasure();
-		
-		tatumsPerBar = measure.getBeatsPerMeasure() * measure.getSubBeatsPerBeat();
-		
-		if (subBeatLength == -1) {
-			subBeatLength = ts.getNotes32PerBar() / tatumsPerBar;
-		}
 	}
     
     /**
@@ -103,50 +77,12 @@ public class FromOutputTimeTracker extends TimeTracker {
      * @return A List of the 32nd-note Beats of this TimeTracker until the given tick.
      */
     public List<Beat> getTatums() {
-    	return fixBeatsGivenSubBeatLength(beats, subBeatLength);
+    	return beats;
     }
     
     public List<Beat> getBeatsOnly() {
     	return beatsOnly;
     }
-    
-    /**
-	 * Fix the given Beats List based on the set {@link #subBeatLength}. That is, remove or add
-	 * tacti as needed to get the desired number of tacti per sub beat.
-	 * 
-	 * @param oldBeats The old Beat List.
-	 * 
-	 * @return The new, fixed Beat List.
-	 */
-	public static List<Beat> fixBeatsGivenSubBeatLength(List<Beat> oldBeats, int subBeatLength) {
-		if (subBeatLength < 0) {
-			return oldBeats;
-		}
-		
-		List<Beat> tatums = oldBeats;
-		List<Beat> beats = new ArrayList<Beat>();
-		
-		for (int i = 1; i < tatums.size(); i++) {
-			Beat initialBeat = tatums.get(i - 1);
-			Beat finalBeat = tatums.get(i);
-			long initialTime = initialBeat.getTime();
-			long finalTime = finalBeat.getTime();
-			
-			beats.add(new Beat(initialBeat.getBar(), initialBeat.getTatum() * subBeatLength, initialTime, initialTime));
-			
-			double timeDiff = ((double) (finalTime - initialTime)) / subBeatLength;
-			for (int j = 1; j < subBeatLength; j++) {
-				beats.add(new Beat(initialBeat.getBar(), initialBeat.getTatum() * subBeatLength + j, Math.round(initialTime + timeDiff * j), Math.round(initialTime + timeDiff * j))); 
-			}
-		}
-		
-		if (tatums.size() > 0) {
-			Beat lastBeat = tatums.get(tatums.size() - 1);
-			beats.add(new Beat(lastBeat.getBar(), lastBeat.getTatum() * subBeatLength, lastBeat.getTime(), lastBeat.getTime()));
-		}
-		
-		return beats;
-	}
     
     /**
      * Get the first non-dummy time signature in this song.
@@ -158,6 +94,7 @@ public class FromOutputTimeTracker extends TimeTracker {
     	return timeSig;
     }
     
+    // TODO: is this necessary?
     /**
      * Get the anacrusis length of this TimeTracker, in sub beats.
      * 
@@ -183,10 +120,6 @@ public class FromOutputTimeTracker extends TimeTracker {
      */
     public void setAnacrusisSubBeats(int length) {
 		anacrusisSubBeats = length;
-		if (anacrusisSubBeats != 0) {
-			barNum = -1;
-			tatumNum = tatumsPerBar - anacrusisSubBeats;
-		}
 	}
 	
 	@Override

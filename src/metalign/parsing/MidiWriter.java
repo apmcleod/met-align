@@ -65,7 +65,7 @@ public class MidiWriter {
 		
 		offsetLength = 0;
 		if (tt.getAnacrusisTicks() != 0) {
-			offsetLength = tt.getFirstTimeSignature().getNotes32PerBar() * tt.getFirstTimeSignature().getNotes32PerBar() * ((int) tt.getPPQ() / 8);
+			offsetLength = tt.getFirstTimeSignature().getNotes32PerBar() * ((int) tt.getPPQ() / 8);
 			offsetLength -= tt.getAnacrusisTicks();
 		}
 		

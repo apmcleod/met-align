@@ -150,7 +150,7 @@ public class OutputParser {
 		if (beats.length() <= 1) {
 			return new ArrayList<Beat>(0);
 		}
-		Pattern beatPattern = Pattern.compile("(-?[0-9]+)\\.([0-9]+),(-?[0-9]+)");
+		Pattern beatPattern = Pattern.compile("(-?[0-9]+)\\.([0-9]+)\\.([0-9]+)\\.([0-9]+),(-?[0-9]+)");
 		String[] splitBeats = beats.split("\\),\\(");
 		splitBeats[0] = splitBeats[0].replace("[(", "");
 		splitBeats[splitBeats.length - 1] = splitBeats[splitBeats.length - 1].substring(0, splitBeats[splitBeats.length - 1].indexOf(')'));
@@ -162,10 +162,12 @@ public class OutputParser {
 			
 			if (beatMatcher.matches()) {
 				int bar = Integer.parseInt(beatMatcher.group(1));
-				int tatum = Integer.parseInt(beatMatcher.group(2));
-				int time = Integer.parseInt(beatMatcher.group(3));
+				int beatNum = Integer.parseInt(beatMatcher.group(2));
+				int subBeat = Integer.parseInt(beatMatcher.group(3));
+				int tatum = Integer.parseInt(beatMatcher.group(4));
+				int time = Integer.parseInt(beatMatcher.group(5));
 				
-				Beat beat = new Beat(bar, tatum, time, time);
+				Beat beat = new Beat(bar, beatNum, subBeat, tatum, time, time);
 				beatsList.add(beat);
 				
 			} else {
@@ -184,17 +186,15 @@ public class OutputParser {
 	 * @throws IOException
 	 */
 	private static Measure parseHierarchy(String hierarchy) throws IOException {
-		Pattern hierarchyPattern = Pattern.compile("M_([0-9]+),([0-9]+) length=([0-9]+) anacrusis=([0-9]+).*");
+		Pattern hierarchyPattern = Pattern.compile("M_([0-9]+),([0-9]+).*");
 
 		Matcher hierarchyMatcher = hierarchyPattern.matcher(hierarchy);
 		Measure measure = null;
 		if (hierarchyMatcher.matches()) {
 			int beatsPerBar = Integer.parseInt(hierarchyMatcher.group(1));
 			int subBeatsPerBeat = Integer.parseInt(hierarchyMatcher.group(2));
-			int length = Integer.parseInt(hierarchyMatcher.group(3));
-			int anacrusis = Integer.parseInt(hierarchyMatcher.group(4));
 			
-			measure = new Measure(beatsPerBar, subBeatsPerBeat, length, anacrusis);
+			measure = new Measure(beatsPerBar, subBeatsPerBeat);
 			
 		} else {
 			throw new IOException("Hierarchy results malformed");

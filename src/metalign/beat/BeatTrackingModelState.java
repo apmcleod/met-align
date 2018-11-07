@@ -78,30 +78,11 @@ public abstract class BeatTrackingModelState extends MidiModelState {
 	public abstract int getNumTatums();
 	
 	/**
-	 * Gets the Beats which are contained by this state currently.
-	 * 
-	 * @return A List of the Beats contained by this State.
-	 */
-	//public abstract List<Beat> getBeats();
-	
-	/**
 	 * Get the number of full bars we have gone through so far.
 	 * 
 	 * @return The number of full bars we have gone through so far.
 	 */
 	public abstract int getBarCount();
-	
-	/**
-	 * Get the number of tacti which are present in each measure of the Beats of this state.
-	 * This is needed because for a {@link metalign.beat.fromfile.FromFileBeatTrackingModelState},
-	 * the measures are incremented correctly, but for any other BeatTrackingModelState, this is not the case.
-	 * 
-	 * @return The number of tacti per measure for a {@link metalign.beat.fromfile.FromFileBeatTrackingModelState},
-	 * or 0 for any other model.
-	 */
-	public int getTatumsPerMeasure() {
-		return 0;
-	}
 	
 	/**
 	 * Decide whether the given state is a duplicate of this one.

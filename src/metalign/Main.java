@@ -60,8 +60,6 @@ public class Main {
 	
 	public static int VOICE_BEAM_SIZE = -1;
 	
-	public static int SUB_BEAT_LENGTH = 4;
-	
 	public static int MIN_NOTE_LENGTH = -1;
 	
 	public static int NUM_FROM_FILE = 0;
@@ -142,18 +140,6 @@ public class Main {
 							
 						case 'l':
 							LOG_STATUS = true;
-							break;
-							
-						case 's':
-							i++;
-							if (args.length == i) {
-								argumentError("No sub beat length given with -s option.");
-							}
-							try {
-								SUB_BEAT_LENGTH = Integer.parseInt(args[i]);
-							} catch (NumberFormatException e) {
-								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
-							}
 							break;
 							
 						case 'm':
@@ -347,7 +333,6 @@ public class Main {
 				System.out.println((extract ? "Extracting" : "Not extracting") + " trees from grammar");
 			}
 			
-			System.out.println("Using sub beat length " + SUB_BEAT_LENGTH);
 			System.out.println("Using beam size " + BEAM_SIZE);
 			System.out.println("Using voice beam size " + VOICE_BEAM_SIZE);
 			
@@ -361,7 +346,7 @@ public class Main {
 			for (File file : files) {
 				System.out.println("File: " + file);
 				
-				TimeTracker tt = new TimeTracker(SUB_BEAT_LENGTH);
+				TimeTracker tt = new TimeTracker();
 				NoteListGenerator nlg = new NoteListGenerator(tt);
 				EventParser ep;
 				
@@ -425,7 +410,7 @@ public class Main {
 						
 					voiceWriter.write();
 					
-					TimeTracker newTt = new TimeTracker(SUB_BEAT_LENGTH);
+					TimeTracker newTt = new TimeTracker();
 					NoteListGenerator newNlg = new NoteListGenerator(newTt);
 					EventParser newEp;
 					
@@ -491,7 +476,7 @@ public class Main {
 			for (File file : files) {
 				System.out.println("File: " + file);
 				
-				TimeTracker tt = new TimeTracker(SUB_BEAT_LENGTH);
+				TimeTracker tt = new TimeTracker();
 				NoteListGenerator nlg = new NoteListGenerator(tt);
 				EventParser ep;
 				
@@ -514,10 +499,10 @@ public class Main {
 					continue;
 				}
 				
-				if (tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() < 2 || tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() > 4 ||
-						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() > 3) {
-					System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMetricalMeasure().getBeatsPerMeasure() + "," +
-						tt.getFirstTimeSignature().getMetricalMeasure().getSubBeatsPerBeat() + "). Skipping song " + file);
+				if (tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() < 2 || tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() > 4 ||
+						tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() > 3) {
+					System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() + "," +
+						tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() + "). Skipping song " + file);
 					continue;
 				}
 				

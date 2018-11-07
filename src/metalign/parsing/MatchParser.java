@@ -5,11 +5,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import metalign.Main;
 import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
 
@@ -68,7 +68,7 @@ public class MatchParser {
 					
 					measure = new Measure(beatsPerBar, subBeatsPerBeat);
 					
-					tatumsPerBeat = subBeatsPerBeat * (Main.SUB_BEAT_LENGTH < 0 ? 1 : Main.SUB_BEAT_LENGTH);
+					tatumsPerBeat = subBeatsPerBeat * 12;
 					tatumsPerBar = tatumsPerBeat * beatsPerBar;
 				}
 				
@@ -103,7 +103,7 @@ public class MatchParser {
 					double tick = Double.parseDouble(note[4]);
 					long time = versionFive ? Math.round(tick * 1000) : Math.round(tick * tickToTimeMultiplier);
 					
-					Beat beat = new Beat(bar, tatum, time, Math.round(tick));
+					Beat beat = new Beat(bar, 0, 0, tatum, time, Math.round(tick));
 					tatums.add(beat);
 				}
 			}
@@ -111,6 +111,7 @@ public class MatchParser {
 		
 		br.close();
 		
+		Collections.sort(tatums);
 		fixTatums();
 	}
 
@@ -126,7 +127,7 @@ public class MatchParser {
 			Beat beat = tatums.get(i);
 			if (beat.getBar() != bar || beat.getTatum() != tatum) {
 				long time = Math.round(((double) sumTimes) / numMatches);
-				deduplicated.add(new Beat(bar, tatum, time, (long) (((double) sumTimes) / numMatches / tickToTimeMultiplier)));
+				deduplicated.add(new Beat(bar, 0, 0, tatum, time, (long) (((double) sumTimes) / numMatches / tickToTimeMultiplier)));
 				
 				bar = beat.getBar();
 				tatum = beat.getTatum();
@@ -140,11 +141,11 @@ public class MatchParser {
 		}
 		
 		long time = Math.round(((double) sumTimes) / numMatches);
-		deduplicated.add(new Beat(bar, tatum, time, (long) (((double) sumTimes) / numMatches / tickToTimeMultiplier)));
+		deduplicated.add(new Beat(bar, 0, 0, tatum, time, (long) (((double) sumTimes) / numMatches / tickToTimeMultiplier)));
 		
 		// Interpolate between tatums
-		int tatumsPerBeat = measure.getSubBeatsPerBeat() * (Main.SUB_BEAT_LENGTH < 0 ? 1 : Main.SUB_BEAT_LENGTH);
-		int tatumsPerBar = tatumsPerBeat * measure.getBeatsPerMeasure();
+		int tatumsPerBeat = measure.getSubBeatsPerBeat() * 12;
+		int tatumsPerBar = tatumsPerBeat * measure.getBeatsPerBar();
 		
 		tatums.clear();
 		tatums.add(deduplicated.get(0));
@@ -168,7 +169,13 @@ public class MatchParser {
 					bar++;
 				}
 				
-				tatums.add(new Beat(bar, tatum, (long) (time + tatumNum * timeDelta), (long) (tick + tatumNum * tickDelta)));
+				int beatNum = tatum / tatumsPerBeat;
+				int subBeatNum = (tatum % tatumsPerBeat) / 12;
+				int tatumNumber = (tatum % tatumsPerBeat) % 12;
+				
+				if (tatumNumber == 0) {
+					tatums.add(new Beat(bar, beatNum, subBeatNum, tatumNumber, (long) (time + tatumNum * timeDelta), (long) (tick + tatumNum * tickDelta)));
+				}
 			}
 			
 			tatums.add(beat);

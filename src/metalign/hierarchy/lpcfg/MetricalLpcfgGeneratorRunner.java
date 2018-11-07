@@ -93,18 +93,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 					}
 					
 					switch (args[i].charAt(1)) {
-						case 's':
-							i++;
-							if (args.length == i) {
-								argumentError("No sub beat length given for -s option.");
-							}
-							try {
-								Main.SUB_BEAT_LENGTH = Integer.parseInt(args[i]);
-							} catch (NumberFormatException e) {
-								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
-							}
-							break;
-							
 						case 'm':
 							i++;
 							if (args.length == i) {
@@ -269,7 +257,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
-			TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
+			TimeTracker tt = new TimeTracker();
 			tt.setAnacrusis(getAnacrusisLength(file, anacrusisFiles));
 			NoteListGenerator nlg = new NoteListGenerator(tt);
 			
@@ -278,7 +266,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			try {
 				if (file.toString().endsWith(".nb")) {
 					// NoteB
-					tt = new NoteBTimeTracker(Main.SUB_BEAT_LENGTH);
+					tt = new NoteBTimeTracker();
 					nlg = new NoteListGenerator(tt);
 					ep = new NoteBParser(file, nlg, (NoteBTimeTracker) tt);
 					ep.run();

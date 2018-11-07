@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import metalign.Main;
 import metalign.utils.MathUtils;
 
 /**
@@ -95,11 +94,6 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	 * @return The given pattern in fully reduced form.
 	 */
 	private static List<MetricalLpcfgQuantum> generateReducedPattern(List<MetricalLpcfgQuantum> beatQuantum) {
-		if (Main.SUB_BEAT_LENGTH != -1) {
-			// Sub beat length is set, avoid this computation
-			return beatQuantum;
-		}
-		
 		int gcf = getGCF(beatQuantum);
 		
 		List<MetricalLpcfgQuantum> reducedPattern = new ArrayList<MetricalLpcfgQuantum>(beatQuantum.size() / gcf);
@@ -358,11 +352,6 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	 * @return True if this pattern could be reduced to one. False otherwise.
 	 */
 	public boolean reducesToOne() {
-		// Infinite sub beat length, we already know this one
-		if (Main.SUB_BEAT_LENGTH == -1) {
-			return reducedPattern.size() == 1;
-		}
-		
 		// Length 1 anyways
 		if (reducedPattern.size() == 1) {
 			return true;

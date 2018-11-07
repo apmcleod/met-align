@@ -7,7 +7,6 @@ import java.util.TreeSet;
 import metalign.beat.Beat;
 import metalign.beat.BeatTrackingModelState;
 import metalign.generic.MidiModelState;
-import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.utils.MidiNote;
 
@@ -76,15 +75,6 @@ public class FromFileBeatTrackingModelState extends BeatTrackingModelState {
 		timeTracker = state.timeTracker;
 		mostRecentTime = state.mostRecentTime;
 		mostRecentIndex = state.mostRecentIndex;
-	}
-	
-	@Override
-	public int getTatumsPerMeasure() {
-		TimeSignature timeSignature = mostRecentTime == 0 ? timeTracker.getFirstTimeSignature()
-				: timeTracker.getNodeAtTime(mostRecentTime).getTimeSignature();
-		
-		return timeTracker.getSubBeatLength() < 0 ? timeSignature.getNotes32PerBar()
-				: timeTracker.getSubBeatLength() * timeSignature.getMetricalMeasure().getBeatsPerMeasure() * timeSignature.getMetricalMeasure().getSubBeatsPerBeat();
 	}
 	
 	@Override

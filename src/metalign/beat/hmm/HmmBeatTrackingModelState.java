@@ -121,13 +121,13 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 		TreeSet<HmmBeatTrackingModelState> newStates = new TreeSet<HmmBeatTrackingModelState>();
 		
 		// Calculate variables
-		Measure bar = hierarchyState.getMetricalMeasure();
+		Measure bar = hierarchyState.getMeasure();
 		if (bar == null) {
 			newStates.add(this);
 			return newStates;
 		}
 		
-		int beatsPerBar = bar.getBeatsPerMeasure();
+		int beatsPerBar = bar.getBeatsPerBar();
 		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
 		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();
 		int tatumsPerBeat = tatumsPerSubBeat * subBeatsPerBeat;
@@ -437,7 +437,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 	 * @return True if we are ready. False otherwise.
 	 */
 	private boolean readyForNewBar() {
-		int beatsPerBar = hierarchyState.getMetricalMeasure().getBeatsPerMeasure();
+		int beatsPerBar = hierarchyState.getMeasure().getBeatsPerBar();
 		
 		double nextBarTime = getLastTatumTime() + previousTempo * beatsPerBar;
 		
@@ -454,8 +454,8 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 	private TreeSet<HmmBeatTrackingModelState> addBar() {
 		TreeSet<HmmBeatTrackingModelState> newStates = new TreeSet<HmmBeatTrackingModelState>();
 		
-		Measure bar = hierarchyState.getMetricalMeasure();
-		int beatsPerBar = bar.getBeatsPerMeasure();
+		Measure bar = hierarchyState.getMeasure();
+		int beatsPerBar = bar.getBeatsPerBar();
 		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
 		int subBeatsPerBar = subBeatsPerBeat * beatsPerBar;
 		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();

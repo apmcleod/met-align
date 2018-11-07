@@ -39,9 +39,8 @@ public class FromFileHierarchyModelState extends HierarchyModelState {
 	public FromFileHierarchyModelState(TimeTracker tt) {
 		mostRecentTime = 0;
 		this.tt = tt;
-		measure = tt.getFirstTimeSignature().getMetricalMeasure();
-		int anacrusisLengthSubBeats = tt.getAnacrusisSubBeats();
-		measure = new Measure(measure.getBeatsPerMeasure(), measure.getSubBeatsPerBeat(), tt.getSubBeatLength() <= 0 ? measure.getLength() : tt.getSubBeatLength(), anacrusisLengthSubBeats);
+		measure = tt.getFirstTimeSignature().getMeasure();
+		measure = new Measure(measure.getBeatsPerBar(), measure.getSubBeatsPerBeat());
 	}
 	
 	/**
@@ -59,13 +58,8 @@ public class FromFileHierarchyModelState extends HierarchyModelState {
 	}
 
 	@Override
-	public Measure getMetricalMeasure() {
+	public Measure getMeasure() {
 		return measure;
-	}
-	
-	@Override
-	public int getSubBeatLength() {
-		return tt.getSubBeatLength();
 	}
 	
 	@Override
@@ -164,7 +158,7 @@ public class FromFileHierarchyModelState extends HierarchyModelState {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		
-		sb.append(measure).append(" length=").append(measure.getLength()).append(" anacrusis=").append(measure.getAnacrusis());
+		sb.append(measure);
 		sb.append(" Score=").append(getScore());
 		
 		return sb.toString();
