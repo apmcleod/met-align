@@ -1,5 +1,6 @@
 package metalign.hierarchy.lpcfg;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -27,21 +28,6 @@ public class MetricalLpcfgGenerator {
 	private final MetricalLpcfg grammar;
 	
 	/**
-	 * The number of beats per measure, used in the {@link #parseSong(JointModel, TimeTracker)} method.
-	 */
-	private int beatsPerMeasure;
-	
-	/**
-	 * The number of subBeats per beat, used in the {@link #parseSong(JointModel, TimeTracker)} method.
-	 */
-	private int subBeatsPerBeat;
-	
-	/**
-	 * The number of 32nd notes per measure, used in the {@link #parseSong(JointModel, TimeTracker)} method.
-	 */
-	private int notes32PerMeasure;
-	
-	/**
 	 * Create a new default MetricalGrammarGenerator.
 	 */
 	public MetricalLpcfgGenerator() {
@@ -63,42 +49,35 @@ public class MetricalLpcfgGenerator {
 		// Grab beats from the JointModel
 		List<Beat> beats = jm.getBeatHypotheses().get(0).getBeats();
 		
-		int measureOffset = beats.get(0).getBar();
-		int numMeasures = beats.get(beats.size() - 1).getBar() - measureOffset + 1;
-		
-		// Generate beats per measure and sub beats per beat arrays
-		int[] beatsPerMeasure = new int[numMeasures];
-		int[] subBeatsPerBeat = new int[numMeasures];
-		int[] notes32PerMeasure = new int[numMeasures];
-		
-		for (int i = 0; i < beats.size(); i += this.notes32PerMeasure - beats.get(i).getTatum()) {
-			Beat beat = beats.get(i);
-			
-			updateTimeSignature(tt instanceof NoteBTimeTracker ? tt.getFirstTimeSignature() : tt.getNodeAtTime(beat.getTime()).getTimeSignature());
-			if (tt.getSubBeatLength() >= 0) {
-				this.notes32PerMeasure = tt.getSubBeatLength() * this.beatsPerMeasure * this.subBeatsPerBeat;
-			}
-			
-			int measure = beat.getBar() - measureOffset;
-			beatsPerMeasure[measure] = this.beatsPerMeasure;
-			subBeatsPerBeat[measure] = this.subBeatsPerBeat;
-			notes32PerMeasure[measure] = this.notes32PerMeasure;
-		}
-		
 		// Go through actual voices and notes
 		for (Voice voice : jm.getVoiceHypotheses().get(0).getVoices()) {
-			MetricalLpcfgQuantum[][] quantums = new MetricalLpcfgQuantum[numMeasures][];
+			MetricalLpcfgQuantum[][] quantums = new MetricalLpcfgQuantum[beats.size()][];
 			
-			// Handle notes
+			List<List<MidiNote>> notesBySubBeat = new ArrayList<List<MidiNote>>(beats.size());
+			for (int i = 0; i < beats.size(); i++) {
+				notesBySubBeat.add(new ArrayList<MidiNote>());
+			}
+			
+			// Add notes to sub beats
 			List<MidiNote> notes = voice.getNotes();
 			for (int i = 0; i < notes.size(); i++) {
 				MidiNote note = notes.get(i);
 				MidiNote previous = i == 0 ? null : notes.get(i - 1);
 				
 				if (previous == null || Main.MIN_NOTE_LENGTH == -1 || note.getOnsetTime() - previous.getOnsetTime() >= Main.MIN_NOTE_LENGTH) {
-					addNote(note, beats, quantums, notes32PerMeasure);
+					addNote(note, beats, notesBySubBeat);
 				}
 			}
+			
+			// Make quantums for each sub beat
+			List<Beat> previous = new ArrayList<Beat>(1);
+			previous.add(new Beat(0, 0, 0, 0, Long.MIN_VALUE, Long.MIN_VALUE));
+			for (int i = 0; i < quantums.length - 1; i++) {
+				quantums[i] = makeQuantum(previous, beats.subList(i, i + 2), notesBySubBeat.get(i));
+			}
+			
+			// TODO: Combine sub beats into bars
+			
 			
 			// Save valid measures
 			boolean hasBegun = false;
@@ -135,97 +114,116 @@ public class MetricalLpcfgGenerator {
 		}
 	}
 	
+	private MetricalLpcfgQuantum[] makeQuantum(List<Beat> previous, List<Beat> edges, List<MidiNote> notes) {
+		List<Beat> tatums3 = addTatums(edges, 3);
+		List<Beat> tatums4 = addTatums(edges, 4);
+		
+		double distance3 = getDistance(previous, tatums3, notes);
+		double distance4 = getDistance(previous, tatums4, notes);
+		
+		List<Beat> tatums = distance3 < distance4 ? tatums3 : tatums4;
+		tatums.add(0, previous.get(0));
+		
+		previous.set(0, tatums.get(tatums.size() - 2));
+		
+		MetricalLpcfgQuantum[] quantums = new MetricalLpcfgQuantum[tatums.size() - 1];
+		Arrays.fill(quantums, MetricalLpcfgQuantum.REST);
+		
+		for (MidiNote note : notes) {
+			Beat onsetTatum = note.getOnsetTatum(tatums);
+			Beat offsetTatum = note.getOffsetTatum(tatums);
+			
+			boolean started = onsetTatum.equals(tatums.get(0));
+			
+			for (int i = 1; i < tatums.size() - 1; i++) {
+				if (!started) {
+					if (onsetTatum.equals(tatums.get(i))) {
+						quantums[i] = MetricalLpcfgQuantum.ONSET;
+						started = true;
+					}
+					
+				} else {
+					if (offsetTatum.equals(tatums.get(i))) {
+						break;
+					}
+					
+					if (quantums[i] == MetricalLpcfgQuantum.REST) {
+						quantums[i] = MetricalLpcfgQuantum.TIE;
+					}
+				}
+			}
+		}
+		
+		return quantums;
+	}
+
+	private double getDistance(List<Beat> previous, List<Beat> tatums, List<MidiNote> notes) {
+		double distancePerNote = 0.0;
+		int noteCount = 0;
+		
+		for (MidiNote note : notes) {
+			double minDistance = Double.POSITIVE_INFINITY;
+			
+			for (int i = 1; i < tatums.size(); i++) {
+				double distance = Math.abs(tatums.get(i).getTime() - note.getOnsetTime());
+				
+				minDistance = Math.min(distance, minDistance);
+			}
+			
+			if (minDistance < Math.abs(previous.get(0).getTime() - note.getOnsetTime())) {
+				distancePerNote += minDistance;
+				noteCount++;
+			}
+		}
+		
+		return distancePerNote / noteCount;
+	}
+	
+	private List<Beat> addTatums(List<Beat> edges, int divisions) {
+		List<Beat> tatums = new ArrayList<Beat>(divisions + 1);
+		tatums.add(edges.get(0));
+		
+		double timePerTatum = ((double) (edges.get(1).getTime() - edges.get(0).getTime())) / divisions;
+		double ticksPerTatum = ((double) (edges.get(1).getTick() - edges.get(0).getTick())) / divisions;
+		
+		for (int i = 1; i < divisions; i++) {
+			tatums.add(new Beat(edges.get(0).getBar(), edges.get(0).getBeat(), edges.get(0).getSubBeat(), i,
+					Math.round(edges.get(0).getTime() + divisions * timePerTatum),
+					Math.round(edges.get(0).getTick() + divisions * ticksPerTatum)));
+		}
+		
+		tatums.add(edges.get(1));
+		
+		return tatums;
+	}
+
 	/**
-	 * Add the given note into our tracking arrays.
+	 * Add the given note into the correct sub beat list.
 	 * 
 	 * @param note The note we want to add into the tracking arrays.
 	 * @param beats The beats of the song we are parsing.
-	 * @param quantums The quantums tracking array, indexed first by measure and then by quantum.
-	 * @param notes32PerMeasure The number of quantums per measure for each measure.
+	 * @param notesBySubBeat The note tracking list, divided by sub beat.
 	 */
-	private void addNote(MidiNote note, List<Beat> beats, MetricalLpcfgQuantum[][] quantums,
-			int[] notes32PerMeasure) {
-		
-		int measureOffset = beats.get(0).getBar();
-		
-		Beat onsetBeat = note.getOnsetBeat(beats);
-		Beat offsetBeat = note.getOffsetBeat(beats);
+	private void addNote(MidiNote note, List<Beat> beats, List<List<MidiNote>> notesBySubBeat) {
+		Beat onsetBeat = note.getOnsetSubBeatIndex(beats);
+		Beat offsetBeat = note.getOffsetSubBeat(beats);
 		
 		// Iterate to onset beat
-		Iterator<Beat> beatIterator = beats.iterator();
-		Beat beat = beatIterator.next();
-		while (!beat.equals(onsetBeat)) {
-			beat = beatIterator.next();
-		}
-		
-		// Add onset
-		int measure = beat.getBar() - measureOffset;
-		addQuantum(MetricalLpcfgQuantum.ONSET, quantums, measure, beat.getTatum(), notes32PerMeasure[measure]);
-		
-		// Add ties
-		while (!beat.equals(offsetBeat)) {
-			addQuantum(MetricalLpcfgQuantum.TIE, quantums, measure, beat.getTatum(), notes32PerMeasure[measure]);
+		int i;
+		boolean started = false;
+		for (i = 0; i < beats.size(); i++) {
+			if (beats.get(i).equals(onsetBeat)) {
+				started = true;
+			}
 			
-			beat = beatIterator.next();
-			if (beat.getTatum() == 0) {
-				measure++;
+			if (started) {
+				if (beats.get(i).equals(offsetBeat)) {
+					break;
+				}
+				
+				notesBySubBeat.get(i).add(note);
 			}
 		}
-	}
-
-	/**
-	 * Add the given quantum into the quantums array.
-	 * 
-	 * @param quantum The quantum we want to add into the array. Should be either ONSET or TIE.
-	 * @param quantums The quantums tracking array, indexed first by measure and then by quantum.
-	 * @param measure The measure at which we want to add the given quantum.
-	 * @param beat The beat at which we want to add the given quantum.
-	 * @param notes32PerMeasure The number of quantums in the given measure of the song.
-	 */
-	private void addQuantum(MetricalLpcfgQuantum quantum, MetricalLpcfgQuantum[][] quantums, int measure, int beat,
-			int notes32PerMeasure) {
-		
-		// Create new quantum list if needed
-		if (quantums[measure] == null) {
-			quantums[measure] = new MetricalLpcfgQuantum[notes32PerMeasure];
-			Arrays.fill(quantums[measure], MetricalLpcfgQuantum.REST);
-		}
-		
-		// Update value if not ONSET. (We don't want a TIE to overwrite an ONSET)
-		if (quantums[measure][beat] != MetricalLpcfgQuantum.ONSET) {
-			quantums[measure][beat] = quantum;
-		}
-	}
-
-	/**
-	 * Update the time signature tracking fields based on the given TimeSignature. The fields updated
-	 * are {@link #beatsPerMeasure}, {@link #subBeatsPerBeat}, and {@link #notes32PerMeasure}.
-	 * 
-	 * @param timeSig The new TimeSignature we will use.
-	 */
-	private void updateTimeSignature(TimeSignature timeSig) {
-		int numerator = timeSig.getNumerator();
-		
-		// Assume simple
-		beatsPerMeasure = numerator;
-		subBeatsPerBeat = 2;
-		
-		// Check for compound
-		if (numerator > 3 && numerator % 3 == 0) {
-			beatsPerMeasure = numerator / 3;
-			subBeatsPerBeat = 3;	
-		}
-		
-		notes32PerMeasure = timeSig.getNotes32PerBar();
-	}
-	
-	/**
-	 * Get the current terminal length.
-	 * 
-	 * @return The current terminal length.
-	 */
-	public int getTerminalLength() {
-		return notes32PerMeasure / beatsPerMeasure / subBeatsPerBeat;
 	}
 	
 	/**

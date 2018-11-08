@@ -239,8 +239,26 @@ public class MidiNote implements Comparable<MidiNote> {
 	public int getGuessedVoice() {
 		return guessedVoice;
 	}
+	
+	public Beat getOnsetSubBeatIndex(List<Beat> beats) {
+		if (beats.isEmpty()) {
+			return null;
+		}
+		
+		return MathUtils.getBeatsAroundTime(onsetTime, beats).get(0);
+	}
 
-	public Beat getOnsetBeat(List<Beat> beats) {
+	public Beat getOffsetSubBeat(List<Beat> beats) {
+		if (beats.isEmpty()) {
+			return null;
+		}
+		
+		List<Beat> beatList = MathUtils.getBeatsAroundTime(offsetTime, beats);
+		
+		return beatList.get(beatList.size() - 1);
+	}
+
+	public Beat getOnsetTatum(List<Beat> beats) {
 		List<Beat> beatList = MathUtils.getBeatsAroundTime(onsetTime, beats);
 		
 		long minDiff = Long.MAX_VALUE;
@@ -257,7 +275,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		return closestBeat;
 	}
 
-	public Beat getOffsetBeat(List<Beat> beats) {
+	public Beat getOffsetTatum(List<Beat> beats) {
 		List<Beat> beatList = MathUtils.getBeatsAroundTime(offsetTime, beats);
 		
 		long minDiff = Long.MAX_VALUE;
@@ -274,7 +292,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		return closestBeat;
 	}
 	
-	public int getOffsetBeatIndex(List<Integer> beats) {
+	public int getOffsetTatumIndex(List<Integer> beats) {
 		int index = MathUtils.getFirstIndexAroundTime(offsetTime, beats);
 		
 		long diff = Math.abs(offsetTime - beats.get(index));
@@ -290,7 +308,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		return index;
 	}
 
-	public int getOnsetBeatIndex(List<Integer> beats) {
+	public int getOnsetTatumIndex(List<Integer> beats) {
 		int index = MathUtils.getFirstIndexAroundTime(onsetTime, beats);
 		
 		long diff = Math.abs(onsetTime - beats.get(index));
