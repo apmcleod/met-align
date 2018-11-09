@@ -1,17 +1,17 @@
 package metalign.hierarchy.lpcfg;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
 
 import metalign.Main;
+import metalign.beat.hmm.HmmBeatTrackingModelState;
 import metalign.generic.MidiModelState;
 import metalign.hierarchy.HierarchyModelState;
 import metalign.hierarchy.Measure;
+import metalign.utils.MathUtils;
 import metalign.utils.MidiNote;
 import metalign.voice.Voice;
 
@@ -83,6 +83,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 */
 	private double localLogProb;
 	
+	private double alignmentLogProbability;
+	
 	/**
 	 * The measure number of the next subbeat to be shifted onto the stack.
 	 */
@@ -109,14 +111,19 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	private final List<List<MidiNote>> unfinishedNotes;
 	
 	/**
-	 * Notes which we have yet to check for beat and sub beat matches.
+	 * The time of the most recent tatum, per voice.
 	 */
-	private final List<List<MidiNote>> notesToCheck;
+	private final List<List<Integer>> previous;
 	
 	/**
-	 * A List of a Queue per voice of notes to check for beat matching.
+	 * The quantums of the previous bar in each voice.
 	 */
-	private final List<List<MidiNote>> notesToCheckBeats;
+	private final List<List<MetricalLpcfgQuantum>> previousBarQuantum;
+	
+	/**
+	 * The index of the previous onset in each voice.
+	 */
+	private final List<Integer> previousOnset;
 	
 	/**
 	 * The number of times a sub beat match has been found.
@@ -154,15 +161,17 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		logProbability = 0.0;
 		localLogProb = 0.0;
+		alignmentLogProbability = 0.0;
 		
 		measureNum = 0;
 		nextMeasureIndex = 0;
 		measuresUsed = 0;
 		
 		unfinishedNotes = new ArrayList<List<MidiNote>>();
-		notesToCheck = new ArrayList<List<MidiNote>>();
-		notesToCheckBeats = new ArrayList<List<MidiNote>>();
 		hasBegun = new ArrayList<Boolean>();
+		previous = new ArrayList<List<Integer>>();
+		previousBarQuantum = new ArrayList<List<MetricalLpcfgQuantum>>();
+		previousOnset = new ArrayList<Integer>();
 	}
 	
 	/**
@@ -186,6 +195,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		logProbability = state.logProbability;
 		localLogProb = state.localLogProb;
+		alignmentLogProbability = state.alignmentLogProbability;
 		
 		measureNum = state.measureNum;
 		measuresUsed = state.measuresUsed;
@@ -205,17 +215,18 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			unfinishedNotes.add(new ArrayList<MidiNote>(voice));
 		}
 		
-		notesToCheckBeats = new ArrayList<List<MidiNote>>();
-		for (List<MidiNote> voice : state.notesToCheckBeats) {
-			notesToCheckBeats.add(new ArrayList<MidiNote>(voice));
+		previous = new ArrayList<List<Integer>>();
+		for (List<Integer> voice : state.previous) {
+			previous.add(new ArrayList<Integer>(voice));
 		}
 		
-		notesToCheck = new ArrayList<List<MidiNote>>();
-		for (List<MidiNote> voice : state.notesToCheck) {
-			notesToCheck.add(new ArrayList<MidiNote>(voice));
+		previousBarQuantum = new ArrayList<List<MetricalLpcfgQuantum>>();
+		for (List<MetricalLpcfgQuantum> voice : state.previousBarQuantum) {
+			previousBarQuantum.add(new ArrayList<MetricalLpcfgQuantum>(voice));
 		}
 		
 		hasBegun = new ArrayList<Boolean>(state.hasBegun);
+		previousOnset = new ArrayList<Integer>(state.previousOnset);
 		
 		localGrammar = state.localGrammar.deepCopy();
 		
@@ -243,13 +254,12 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		hasBegun.add(index, Boolean.FALSE);
 		unfinishedNotes.add(index, new ArrayList<MidiNote>());
 		
-		if (!matches(MetricalLpcfgMatch.BEAT)) {
-			notesToCheckBeats.add(index, new ArrayList<MidiNote>());
-		}
+		List<Integer> voicePrevious = new ArrayList<Integer>();
+		voicePrevious.add(Integer.MIN_VALUE);
+		previous.add(index, voicePrevious);
 		
-		if (!isFullyMatched()) {
-			notesToCheck.add(index, new ArrayList<MidiNote>());
-		}
+		previousBarQuantum.add(index, new ArrayList<MetricalLpcfgQuantum>());
+		previousOnset.add(index, Integer.MAX_VALUE);
 	}
 
 	@Override
@@ -269,14 +279,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			newStates.addAll(getAllFirstStepBranches());
 			
 		} else {
-			boolean parsed = false;
 			while (beatState.getNumTatums() > nextMeasureIndex) {
 				parseStep();
-				parsed = true;
-			}
-			
-			if (parsed && !isFullyMatched()) {
-				updateMatchType();
 			}
 			
 			if (!isWrong()) {
@@ -306,29 +310,20 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			int subBeatsPerMeasure = measure.getBeatsPerBar() * measure.getSubBeatsPerBeat();
 			for (int anacrusisLength = 0; anacrusisLength < subBeatsPerMeasure; anacrusisLength++) {
 				
-				measure = new Measure(measure.getBeatsPerBar(), measure.getSubBeatsPerBeat(), anacrusisLength);
+				measure = new Measure(measure.getBeatsPerBar(), measure.getSubBeatsPerBeat());
 				MetricalLpcfgHierarchyModelState newState =
 						new MetricalLpcfgHierarchyModelState(this, grammar, measure, anacrusisLength);
-				newState.updateMatchType();
 				
 				// This hypothesis could match the first note, and is ready to parse
+				while (newState.beatState.getNumTatums() > newState.nextMeasureIndex) {
+					newState.parseStep();
+				}
+				
 				if (!newState.isWrong()) {
+					newStates.add(newState);
 					
-					// Parse
-					while (newState.beatState.getNumTatums() > newState.nextMeasureIndex) {
-						newState.parseStep();
-					}
-					
-					if (!newState.isFullyMatched()) {
-						newState.updateMatchType();
-					}
-					
-					if (!newState.isWrong()) {
-						newStates.add(newState);
-						
-						if (Main.SUPER_VERBOSE) {
-							System.out.println("Adding " + newState);
-						}
+					if (Main.SUPER_VERBOSE) {
+						System.out.println("Adding " + newState);
 					}
 				}
 			}
@@ -345,16 +340,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				
 		// Branch
 		TreeSet<MetricalLpcfgHierarchyModelState> newStates = new TreeSet<MetricalLpcfgHierarchyModelState>();
-		
-		if (!isFullyMatched()) {
-			updateMatchType();
-		}
 			
 		if (!isWrong() && isFullyMatched()) {
-			/*for (MetricalLpcfgTree tree : localGrammar.getTrees()) {
-				double logProb = localGrammar.getTreeLogProbability(tree);
-				localEntropy -= logProb * Math.exp(logProb);
-			}*/
 			newStates.add(this);
 				
 		} else if (Main.SUPER_VERBOSE) {
@@ -366,7 +353,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	
 	/**
 	 * Perform a single parse step. That is, make a tree from {@link #unfinishedNotes},
-	 * add it and its probability to our model, and then rmove any finished notes.
+	 * add it and its probability to our model, and then remove any finished notes.
 	 */
 	private void parseStep() {
 		boolean measureUsed = false;
@@ -377,62 +364,109 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 		
 		for (int voiceIndex = 0; voiceIndex < unfinishedNotes.size(); voiceIndex++) {
-			List<MidiNote> voice = unfinishedNotes.get(voiceIndex);
+			List<MidiNote> voiceNotes = unfinishedNotes.get(voiceIndex);
+			List<Integer> voicePrevious = previous.get(voiceIndex);
 			
-			List <MetricalLpcfgQuantum> quantums = MetricalLpcfgTreeFactory.makeQuantumList(
-					voice, beatState.getBeatTimes(), measure, subBeatLength, anacrusisLength,
-					measureNum, hasBegun.get(voiceIndex));
+			List<List<Integer>> alignmentDiffs = new ArrayList<List<Integer>>();
 			
-			boolean isEmpty = true;
-			for (MetricalLpcfgQuantum quantum : quantums) {
-				if (quantum != MetricalLpcfgQuantum.REST) {
-					isEmpty = false;
-					break;
+			List<List<MetricalLpcfgQuantum>> quantumLists = MetricalLpcfgTreeFactory.makeQuantumLists(
+					voiceNotes, voicePrevious, beatState.getBeatTimes(), measure, anacrusisLength,
+					measureNum, hasBegun.get(voiceIndex), alignmentDiffs);
+			
+			double minTotalLogProb = Double.POSITIVE_INFINITY;
+			double minAlignmentLogProb = 0.0;
+			double minGlobalTreeLogProb = 0.0;
+			double minLocalTreeLogProb = 0.0;
+			boolean minIsEmpty = false;
+			boolean minUseTree = false;
+			MetricalLpcfgTree minTree = null;
+			List<MetricalLpcfgQuantum> minQuantums = null;
+			
+			// Try each hypothesis list, and use the one with the greatest probability according to the grammar and the alignment.
+			for (int i = 0; i < quantumLists.size(); i++) {
+				List<MetricalLpcfgQuantum> quantums = quantumLists.get(i);
+				List<Integer> alignments = alignmentDiffs.get(i);
+			
+				double alignmentLogProb = getAlignmentLogProbability(alignments);
+				double globalTreeLogProb = 0.0;
+				double localTreeLogProb = 0.0;
+				boolean useTree = false;
+				MetricalLpcfgTree tree = null;
+				
+				boolean isEmpty = true;
+				for (MetricalLpcfgQuantum quantum : quantums) {
+					if (quantum != MetricalLpcfgQuantum.REST) {
+						isEmpty = false;
+						break;
+					}
+				}
+				
+				if (!isEmpty && (hasBegun.get(voiceIndex) || quantums.get(0) != MetricalLpcfgQuantum.REST)) {
+					useTree = true;
+					int beatsPerMeasure = measure.getBeatsPerBar();
+					int subBeatsPerBeat = measure.getSubBeatsPerBeat();
+					while (treeMap.size() <= beatsPerMeasure) {
+						treeMap.add(new ArrayList<Map<List<MetricalLpcfgQuantum>, Double>>());
+					}
+					
+					while (treeMap.get(beatsPerMeasure).size() <= subBeatsPerBeat) {
+						treeMap.get(beatsPerMeasure).add(new HashMap<List<MetricalLpcfgQuantum>, Double>());
+					}
+					
+					Map<List<MetricalLpcfgQuantum>, Double> nestedTreeMap = treeMap.get(beatsPerMeasure).get(subBeatsPerBeat);
+					
+					Double logProb = nestedTreeMap.get(quantums);
+					if (logProb == null) {
+						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
+						logProb = grammar.getTreeLogProbability(tree);
+						nestedTreeMap.put(quantums, logProb);
+					}
+					globalTreeLogProb = logProb;
+					
+					
+					if (GLOBAL_WEIGHT != 1.0) {
+						if (tree == null) {
+							tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
+						}
+						
+						if (!localGrammar.getTrees().isEmpty()) {
+							localTreeLogProb = localGrammar.getTreeLogProbability(tree);
+						}
+					}
+				}
+				
+				double totalLogProb = alignmentLogProb + GLOBAL_WEIGHT * globalTreeLogProb + (1.0 - GLOBAL_WEIGHT) * localTreeLogProb;
+				
+				if (totalLogProb > minTotalLogProb) {
+					minTotalLogProb = totalLogProb;
+					minAlignmentLogProb = alignmentLogProb;
+					minGlobalTreeLogProb = globalTreeLogProb;
+					minLocalTreeLogProb = localTreeLogProb;
+					minQuantums = quantums;
+					minIsEmpty = isEmpty;
+					minUseTree = useTree;
 				}
 			}
 			
-			if (!isEmpty) {
-				if (!hasBegun.get(voiceIndex)) {
-					hasBegun.set(voiceIndex, Boolean.TRUE);
-					
-					if (quantums.get(0) == MetricalLpcfgQuantum.REST) {
-						continue;
-					}
-				}
-				
+			// Here we have the min of everything. Add them in.
+			alignmentLogProbability += minAlignmentLogProb;
+			logProbability += minGlobalTreeLogProb;
+			localLogProb += minLocalTreeLogProb;
+			
+			if (!minIsEmpty) {
+				hasBegun.set(voiceIndex, Boolean.TRUE);
+				updateMatch(previousBarQuantum.get(voiceIndex), minQuantums.get(0), previousOnset.get(voiceIndex));
+			}
+			
+			if (minUseTree) {
 				measureUsed = true;
-				int beatsPerMeasure = measure.getBeatsPerBar();
-				int subBeatsPerBeat = measure.getSubBeatsPerBeat();
-				while (treeMap.size() <= beatsPerMeasure) {
-					treeMap.add(new ArrayList<Map<List<MetricalLpcfgQuantum>, Double>>());
-				}
-				
-				while (treeMap.get(beatsPerMeasure).size() <= subBeatsPerBeat) {
-					treeMap.get(beatsPerMeasure).add(new HashMap<List<MetricalLpcfgQuantum>, Double>());
-				}
-				
-				Map<List<MetricalLpcfgQuantum>, Double> nestedTreeMap = treeMap.get(beatsPerMeasure).get(subBeatsPerBeat);
-				
-				MetricalLpcfgTree tree = null;
-				Double logProb = nestedTreeMap.get(quantums);
-				if (logProb == null) {
-					tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
-					logProb = grammar.getTreeLogProbability(tree);
-					nestedTreeMap.put(quantums, logProb);
-				}
-				logProbability += logProb;
-				
 				
 				if (GLOBAL_WEIGHT != 1.0) {
-					if (tree == null) {
-						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
+					if (minTree == null) {
+						minTree = MetricalLpcfgTreeFactory.makeTree(minQuantums, measure.getBeatsPerBar(), measure.getSubBeatsPerBeat());
 					}
 					
-					if (!localGrammar.getTrees().isEmpty()) {
-						localLogProb += localGrammar.getTreeLogProbability(tree);
-					}
-					
-					localGrammar.addTree(tree);
+					localGrammar.addTree(minTree);
 				}
 			}
 		}
@@ -446,6 +480,21 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 	}
 	
+	private double getAlignmentLogProbability(List<Integer> alignments) {
+		if (!(beatState instanceof HmmBeatTrackingModelState)) {
+			return 0.0;
+		}
+		HmmBeatTrackingModelState bs = (HmmBeatTrackingModelState) beatState;
+		
+		double logProb = 0.0;
+		
+		for (int diff : alignments) {
+			logProb += Math.log(MathUtils.getStandardNormal(0, diff, bs.params.NOTE_STD));
+		}
+		
+		return logProb;
+	}
+
 	/**
 	 * Remove any notes which are entirely finished from {@link #unfinishedNotes}.
 	 */
@@ -482,28 +531,18 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					List<MidiNote> newNote = new ArrayList<MidiNote>();
 					newNote.add(note);
 					unfinishedNotes.add(voiceIndex, newNote);
+					
 					hasBegun.add(voiceIndex, Boolean.FALSE);
 					
-					if (!matches(MetricalLpcfgMatch.BEAT)) {
-						notesToCheckBeats.add(voiceIndex, new ArrayList<MidiNote>(newNote));
-					}
+					List<Integer> voicePrevious = new ArrayList<Integer>();
+					voicePrevious.add(Integer.MIN_VALUE);
+					previous.add(voiceIndex, voicePrevious);
 					
-					if (!isFullyMatched()) {
-						newNote = new ArrayList<MidiNote>();
-						newNote.add(note);
-						notesToCheck.add(voiceIndex, newNote);
-					}
+					previousBarQuantum.add(voiceIndex, new ArrayList<MetricalLpcfgQuantum>());
+					previousOnset.add(voiceIndex, Integer.MAX_VALUE);
 					
 				} else {
 					unfinishedNotes.get(voiceIndex).add(note);
-					
-					if (!matches(MetricalLpcfgMatch.BEAT)) {
-						notesToCheckBeats.get(voiceIndex).add(note);
-					}
-					
-					if (!isFullyMatched()) {
-						notesToCheck.get(voiceIndex).add(note);
-					}
 				}
 			}
 		}
@@ -520,28 +559,18 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 							List<MidiNote> newNote = new ArrayList<MidiNote>();
 							newNote.add(note);
 							unfinishedNotes.add(voiceIndex, newNote);
+							
 							hasBegun.add(voiceIndex, Boolean.FALSE);
 							
-							if (!matches(MetricalLpcfgMatch.BEAT)) {
-								notesToCheckBeats.add(voiceIndex, new ArrayList<MidiNote>(newNote));
-							}
+							List<Integer> voicePrevious = new ArrayList<Integer>();
+							voicePrevious.add(Integer.MIN_VALUE);
+							previous.add(voiceIndex, voicePrevious);
 							
-							if (!isFullyMatched()) {
-								newNote = new ArrayList<MidiNote>();
-								newNote.add(note);
-								notesToCheck.add(voiceIndex, newNote);
-							}
+							previousBarQuantum.add(voiceIndex, new ArrayList<MetricalLpcfgQuantum>());
+							previousOnset.add(voiceIndex, Integer.MAX_VALUE);
 							
 						} else {
 							unfinishedNotes.get(voiceIndex).add(note);
-							
-							if (!matches(MetricalLpcfgMatch.BEAT)) {
-								notesToCheckBeats.get(voiceIndex).add(note);
-							}
-							
-							if (!isFullyMatched()) {
-								notesToCheck.get(voiceIndex).add(note);
-							}
 						}
 					}
 				}
@@ -550,339 +579,272 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	}
 	
 	/**
-	 * Go through the {@link #notesToCheck} Queue for any notes that have finished and update
-	 * the match for any that have.
+	 * Update this hypothesis's match type based on the current bar's quantum list, and the first
+	 * quantum of the next bar.
+	 * 
+	 * @param quantums A list of quantums of the current bar, or an empty list if we are approaching
+	 * the first one.
+	 * @param next The first quantum of the following bar.
 	 */
-	private void updateMatchType() {
-		if (beatState.getNumTatums() == 0) {
+	private void updateMatch(List<MetricalLpcfgQuantum> quantums, MetricalLpcfgQuantum next, int voiceIndex) {
+		if (isFullyMatched() || quantums.isEmpty()) {
 			return;
 		}
 		
-		// Check for conglomerate beat matches
-		for (int voiceIndex = 0; !isWrong() && !matches(MetricalLpcfgMatch.BEAT) && voiceIndex < notesToCheckBeats.size(); voiceIndex++) {
-			while (checkConglomerateBeatMatch(notesToCheckBeats.get(voiceIndex)));
-			
-			// Empty notesToCheckBeats if done
-			if (matches(MetricalLpcfgMatch.BEAT)) {
-				notesToCheckBeats.clear();
-			}
+		if (!matches(MetricalLpcfgMatch.BEAT)) {
+			checkConglomerateBeatMatch(quantums, next);
 		}
 		
-		int lastTime = beatState.getLastTatumTime();
+		if (!isFullyMatched()) {
+			checkMatch(quantums, next, previousOnset.get(voiceIndex));
+		}
 		
-		for (List<MidiNote> voice : notesToCheck) {
+		if (!isFullyMatched()) {
+			previousBarQuantum.set(voiceIndex, quantums);
 			
-			MidiNote nextNote = voice.isEmpty() ? null : voice.get(0);
-			int noteIndex = 0;
-			for (noteIndex = 0; !isWrong() && !isFullyMatched() &&
-					nextNote != null && nextNote.getOffsetTime() <= lastTime;) {
+			int lastIndex = quantums.lastIndexOf(MetricalLpcfgQuantum.ONSET);
+			
+			if (lastIndex == -1) {
+				// No onsets here
+				if (previousOnset.get(voiceIndex) != Integer.MAX_VALUE && next == MetricalLpcfgQuantum.TIE) {
+					// We are tied into, and we tie out. Just decrement previousOnset
+					previousOnset.set(voiceIndex, previousOnset.get(voiceIndex) - quantums.size());
+					
+				} else {
+					// We either have no notes, or our tie has ended
+					previousOnset.set(voiceIndex, Integer.MAX_VALUE);
+				}
 				
-				MidiNote note = nextNote;
-				nextNote = ++noteIndex < voice.size() ? voice.get(noteIndex) : null;
-				
-				updateMatchType(note, nextNote);
+			} else {
+				// We have an onset
+				if (next == MetricalLpcfgQuantum.TIE) {
+					// We tie out
+					previousOnset.set(voiceIndex, lastIndex);
+					
+				} else {
+					// We don't tie out
+					previousOnset.set(voiceIndex, Integer.MAX_VALUE);
+				}
 			}
-			
-			voice.subList(0, noteIndex).clear();
 		}
 	}
 	
 	/**
 	 * Check for a conglomerate beat match. That is, a match where some number of notes add up to a beat exactly
-	 * with no leading, trailing, or interspersed rests.
+	 * with no leading, trailing, or interspersed rests, and where the notes aren't all of equal length.
 	 * 
-	 * @param notes The unchecked notes in the voice we want to check.
-	 * @return True if we need to continue checking this voice. That is, if this model is not wrong yet, hasn't yet
-	 * been matched at the beat level, and if we were able to check the beat beginning with the previous first note.
-	 * False otherwise.
+	 * @param quantums The current bar's quantums.
+	 * @param next The first quantum of the following bar.
 	 */
-	private boolean checkConglomerateBeatMatch(List<MidiNote> notes) {
-		if (notes.isEmpty()) {
-			return false;
-		}
+	private void checkConglomerateBeatMatch(List<MetricalLpcfgQuantum> quantums, MetricalLpcfgQuantum next) {
+		int beatLength = quantums.size() / measure.getBeatsPerBar();
 		
-		int numNotesToRemove = 0;
-		int beatLength = subBeatLength * measure.getSubBeatsPerBeat();
-		
-		List<Integer> beats = beatState.getBeatTimes();
-		
-		int lastBeatTactus = beats.size() - 1;
-		lastBeatTactus -= anacrusisLength * subBeatLength;
-		
-		if (anacrusisLength % measure.getSubBeatsPerBeat() != 0) {
-			lastBeatTactus += subBeatLength * (measure.getSubBeatsPerBeat() - (anacrusisLength % measure.getSubBeatsPerBeat()));
-		}
-		int lastBeatNum = lastBeatTactus / beatLength;
-		
-		// First note
-		Iterator<MidiNote> iterator = notes.iterator();
-		MidiNote firstNote = iterator.next();
-		numNotesToRemove++;
-		MidiNote nextNote = iterator.hasNext() ? iterator.next() : null;
-		if (Main.EXTEND_NOTES && nextNote == null) {
-			return false;
-		}
-		
-		int startBeatIndex = firstNote.getOnsetBeatIndex(beats);
-		// Cut this note at the onset of the next note if they overlap
-		int endBeatIndex = firstNote.overlaps(nextNote) || Main.EXTEND_NOTES ? nextNote.getOnsetBeatIndex(beats) : firstNote.getOffsetBeatIndex(beats);
-		
-		int startTactus = startBeatIndex;
-		int endTactus = endBeatIndex;
-		
-		int noteLengthTacti = Math.max(1, endTactus - startTactus);
-		startTactus -= anacrusisLength * subBeatLength;
-		endTactus = startTactus + noteLengthTacti;
-		
-		// Add up possible partial beat at the start
-		if (anacrusisLength % measure.getSubBeatsPerBeat() != 0) {
-			startTactus += subBeatLength * (measure.getSubBeatsPerBeat() - (anacrusisLength % measure.getSubBeatsPerBeat()));
-		}
-		int beatOffset = startTactus % beatLength;
-		int firstBeatNum = startTactus / beatLength;
-		
-		// First note's beat hasn't finished yet
-		if (firstBeatNum == lastBeatNum) {
-			return false;
-		}
-
-		// First note doesn't begin on a beat
-		if (beatOffset != 0) {
-			notes.remove(0);
-			return nextNote != null;
-		}
-		
-		// Tracking array
-		MetricalLpcfgQuantum[] quantums = new MetricalLpcfgQuantum[beatLength + 1];
-		Arrays.fill(quantums, MetricalLpcfgQuantum.REST);
-		
-		// Add first note into tracking array
-		quantums[beatOffset] = MetricalLpcfgQuantum.ONSET;
-		for (int tactus = beatOffset + 1; tactus < noteLengthTacti && tactus < quantums.length; tactus++) {
-			quantums[tactus] = MetricalLpcfgQuantum.TIE;
-		}
-		
-		while (nextNote != null) {
-			MidiNote note = nextNote;
-			numNotesToRemove++;
-			nextNote = iterator.hasNext() ? iterator.next() : null;
-			if (Main.EXTEND_NOTES && nextNote == null) {
-				break;
-			}
+		for (int beat = 0; beat < measure.getBeatsPerBar(); beat++) {
+			List<MetricalLpcfgQuantum> beatQuantums = quantums.subList(beat * beatLength, (beat + 1) * beatLength);
+			MetricalLpcfgQuantum beatNext = beat == measure.getBeatsPerBar() - 1 ? next : quantums.get((beat + 1) * beatLength);
 			
-			startBeatIndex = note.getOnsetBeatIndex(beats);
-			// Cut off at beginning of next note if one exists and they overlap
-			endBeatIndex = note.overlaps(nextNote) || Main.EXTEND_NOTES ? nextNote.getOnsetBeatIndex(beats) : note.getOffsetBeatIndex(beats);
-			
-			startTactus = startBeatIndex;
-			endTactus = endBeatIndex;
-			
-			noteLengthTacti = Math.max(1, endTactus - startTactus);
-			startTactus -= anacrusisLength * subBeatLength;
-			endTactus = startTactus + noteLengthTacti;
-			
-			// Add up possible partial beat at the start
-			if (anacrusisLength % measure.getSubBeatsPerBeat() != 0) {
-				startTactus += subBeatLength * (measure.getSubBeatsPerBeat() - (anacrusisLength % measure.getSubBeatsPerBeat()));
-			}
-			beatOffset = startTactus % beatLength;
-			int beatNum = startTactus / beatLength;
-			
-			if (beatNum != firstBeatNum) {
-				if (beatOffset == 0) {
-					quantums[beatLength] = MetricalLpcfgQuantum.ONSET;
+			// This starts with an onset, and has no rests, and the following quantum is either a beat or a rest.
+			if (beatQuantums.get(0) == MetricalLpcfgQuantum.ONSET &&
+					(!beatQuantums.contains(MetricalLpcfgQuantum.REST) && beatNext != MetricalLpcfgQuantum.TIE)) {
+				
+				// Here we have a potential match, assuming the notes aren't all of identical length
+				int prevIndex = 0;
+				int nextIndex = 0;
+				int prevLength = 0;
+				
+				while ((nextIndex = beatQuantums.subList(nextIndex + 1, beatQuantums.size()).indexOf(MetricalLpcfgQuantum.ONSET)) != -1) {
+					int length = nextIndex - prevIndex;
+					
+					if (prevLength != 0 && prevLength != length) {
+						addMatch(MetricalLpcfgMatch.BEAT);
+						return;
+					}
+					
+					prevLength = length;
+					prevIndex = nextIndex;
 				}
 				
-				numNotesToRemove--;
-				break;
-			}
-			
-			// Add note into tracking array
-			quantums[beatOffset] = MetricalLpcfgQuantum.ONSET;
-			for (int tactus = beatOffset + 1; tactus - beatOffset < noteLengthTacti && tactus < quantums.length; tactus++) {
-				quantums[tactus] = MetricalLpcfgQuantum.TIE;
-			}
-		}
-		
-		// Some note tied over the beat boundary, no match
-		if (quantums[beatLength] == MetricalLpcfgQuantum.TIE) {
-			notes.subList(0, numNotesToRemove).clear();
-			return nextNote != null;
-		}
-		
-		// Get the onsets of this quantum
-		List<Integer> onsets = new ArrayList<Integer>();
-		for (int tactus = 0; tactus < beatLength; tactus++) {
-			MetricalLpcfgQuantum quantum = quantums[tactus];
-			
-			// There's a REST in this quantum, no match
-			if (quantum == MetricalLpcfgQuantum.REST) {
-				notes.subList(0, numNotesToRemove).clear();
-				return nextNote != null;
-			}
-			
-			if (quantum == MetricalLpcfgQuantum.ONSET) {
-				onsets.add(tactus);
+				nextIndex = beatQuantums.size();
+				
+				int length = nextIndex - prevIndex;
+				
+				if (prevLength != 0 && prevLength != length) {
+					addMatch(MetricalLpcfgMatch.BEAT);
+				}
 			}
 		}
-		
-		// Get the lengths of the notes of this quantum
-		List<Integer> lengths = new ArrayList<Integer>(onsets.size());
-		for (int i = 1; i < onsets.size(); i++) {
-			lengths.add(onsets.get(i) - onsets.get(i - 1));
-		}
-		lengths.add(beatLength - onsets.get(onsets.size() - 1));
-		
-		// Only 1 note, no match
-		if (lengths.size() == 1) {
-			notes.subList(0, numNotesToRemove).clear();
-			return nextNote != null;
-		}
-		
-		for (int i = 1; i < lengths.size(); i++) {
-			// Some lengths are different, match
-			if (lengths.get(i) != lengths.get(i - 1)) {
-				addMatch(MetricalLpcfgMatch.BEAT);
-				notes.subList(0, numNotesToRemove).clear();
-				return false;
-			}
-		}
-		
-		// All note lengths were the same, no match
-		notes.subList(0, numNotesToRemove).clear();
-		return nextNote != null;
 	}
-
+	
 	/**
 	 * Update the match for the given note.
 	 * 
 	 * @param note The note we need to check for a match.
 	 */
-	private void updateMatchType(MidiNote note, MidiNote nextNote) {
-		if (Main.EXTEND_NOTES && nextNote == null) {
-			return;
+	private void checkMatch(List<MetricalLpcfgQuantum> quantums, MetricalLpcfgQuantum next, int prevOnset) {
+		List<Integer> onsetTimes = new ArrayList<Integer>();
+		List<Integer> offsetTimes = new ArrayList<Integer>();
+		onsetTimes.add(prevOnset);
+		
+		for (int i = 0; i < quantums.size(); i++) {
+			switch (quantums.get(i)) {
+				case REST:
+					offsetTimes.add(i);
+					break;
+					
+				case ONSET:
+					offsetTimes.add(i);
+					onsetTimes.add(i);
+					break;
+					
+				case TIE:
+			}
 		}
-		List<Integer> beats = beatState.getBeatTimes();
-		int startBeatIndex = note.getOnsetBeatIndex(beats);
-		// Cut off note at next onset, if it overlaps
-		int endBeatIndex = note.overlaps(nextNote) || Main.EXTEND_NOTES ? nextNote.getOnsetBeatIndex(beats) : note.getOffsetBeatIndex(beats);
 		
-		int startTactus = startBeatIndex;
-		int endTactus = endBeatIndex;
+		switch (next) {
+			case REST:
+				offsetTimes.add(quantums.size());
+				break;
+				
+			case ONSET:
+				offsetTimes.add(quantums.size());
+				break;
+				
+			case TIE:
+		}
 		
-		int noteLengthTacti = Math.max(1, endTactus - startTactus);
-		startTactus -= anacrusisLength * subBeatLength;
-		endTactus = startTactus + noteLengthTacti;
+		if (offsetTimes.size() < onsetTimes.size()) {
+			offsetTimes.add(Integer.MAX_VALUE);
+		}
 		
-		int prefixStart = startTactus;
-		int middleStart = startTactus;
-		int postfixStart = endTactus;
+		int subBeatLength = quantums.size() / measure.getBeatsPerBar() / measure.getSubBeatsPerBeat();
 		
-		int prefixLength = 0;
-		int middleLength = noteLengthTacti;
-		int postfixLength = 0;
-		
-		int beatLength = subBeatLength * measure.getSubBeatsPerBeat();
-		
-		// Reinterpret note given matched levels
-		if (matches(MetricalLpcfgMatch.SUB_BEAT) && startTactus / subBeatLength != (endTactus - 1) / subBeatLength) {
-			// Interpret note as sub beats
+		for (int i = 0; i < onsetTimes.size() - 1; i++) {
+			int startTactus = onsetTimes.get(i);
+			int endTactus = offsetTimes.get(i);
 			
-			int subBeatOffset = startTactus % subBeatLength;
-			int subBeatEndOffset = endTactus % subBeatLength;
-			
-			// Prefix
-			if (subBeatOffset != 0) {
-				prefixLength = subBeatLength - subBeatOffset;
+			while (startTactus < 0 || endTactus < 0) {
+				startTactus += quantums.size();
+				endTactus += quantums.size();
 			}
 			
-			// Middle fix
-			middleStart += prefixLength;
-			middleLength -= prefixLength;
-			
-			// Postfix
-			postfixStart -= subBeatEndOffset;
-			postfixLength += subBeatEndOffset;
-			
-			// Middle fix
-			middleLength -= postfixLength;
-			
-		} else if (matches(MetricalLpcfgMatch.BEAT) && startTactus / beatLength != (endTactus - 1) / beatLength) {
-			// Interpret note as beats
-			
-			// Add up possible partial beat at the start
-			if (anacrusisLength % measure.getSubBeatsPerBeat() != 0) {
-				int diff = subBeatLength * (measure.getSubBeatsPerBeat() - (anacrusisLength % measure.getSubBeatsPerBeat()));
-				startTactus += diff;
-				endTactus += diff;
-			}
-			int beatOffset = (startTactus + subBeatLength * (anacrusisLength % measure.getSubBeatsPerBeat())) % beatLength;
-			int beatEndOffset = (endTactus + subBeatLength * (anacrusisLength % measure.getSubBeatsPerBeat())) % beatLength;
-			
-			// Prefix
-			if (beatOffset != 0) {
-				prefixLength = beatLength - beatOffset;
+			if (startTactus == Integer.MAX_VALUE || endTactus == Integer.MAX_VALUE) {
+				continue;
 			}
 			
-			// Middle fix
-			middleStart += prefixLength;
-			middleLength -= prefixLength;
+			int noteLengthTacti = Math.max(1, endTactus - startTactus);
+			startTactus -= anacrusisLength * subBeatLength;
+			endTactus = startTactus + noteLengthTacti;
 			
-			// Postfix
-			postfixStart -= beatEndOffset;
-			postfixLength += beatEndOffset;
+			int prefixStart = startTactus;
+			int middleStart = startTactus;
+			int postfixStart = endTactus;
 			
-			// Middle fix
-			middleLength -= postfixLength;
-		}
-		
-		// Prefix checking
-		if (prefixLength != 0) {
-			updateMatchType(prefixStart, prefixLength);
-		}
-		
-		// Middle checking
-		if (!isFullyMatched() && !isWrong() && middleLength != 0) {
-			updateMatchType(middleStart, middleLength);
-		}
-		
-		// Postfix checking
-		if (!isFullyMatched() && !isWrong() && postfixLength != 0) {
-			updateMatchType(postfixStart, postfixLength);
+			int prefixLength = 0;
+			int middleLength = noteLengthTacti;
+			int postfixLength = 0;
+			
+			int beatLength = subBeatLength * measure.getSubBeatsPerBeat();
+			
+			// Reinterpret note given matched levels
+			if (matches(MetricalLpcfgMatch.SUB_BEAT) && startTactus / subBeatLength != (endTactus - 1) / subBeatLength) {
+				// Interpret note as sub beats
+				
+				int subBeatOffset = startTactus % subBeatLength;
+				int subBeatEndOffset = endTactus % subBeatLength;
+				
+				// Prefix
+				if (subBeatOffset != 0) {
+					prefixLength = subBeatLength - subBeatOffset;
+				}
+				
+				// Middle fix
+				middleStart += prefixLength;
+				middleLength -= prefixLength;
+				
+				// Postfix
+				postfixStart -= subBeatEndOffset;
+				postfixLength += subBeatEndOffset;
+				
+				// Middle fix
+				middleLength -= postfixLength;
+				
+			} else if (matches(MetricalLpcfgMatch.BEAT) && startTactus / beatLength != (endTactus - 1) / beatLength) {
+				// Interpret note as beats
+				
+				// Add up possible partial beat at the start
+				if (anacrusisLength % measure.getSubBeatsPerBeat() != 0) {
+					int diff = subBeatLength * (measure.getSubBeatsPerBeat() - (anacrusisLength % measure.getSubBeatsPerBeat()));
+					startTactus += diff;
+					endTactus += diff;
+				}
+				int beatOffset = (startTactus + subBeatLength * (anacrusisLength % measure.getSubBeatsPerBeat())) % beatLength;
+				int beatEndOffset = (endTactus + subBeatLength * (anacrusisLength % measure.getSubBeatsPerBeat())) % beatLength;
+				
+				// Prefix
+				if (beatOffset != 0) {
+					prefixLength = beatLength - beatOffset;
+				}
+				
+				// Middle fix
+				middleStart += prefixLength;
+				middleLength -= prefixLength;
+				
+				// Postfix
+				postfixStart -= beatEndOffset;
+				postfixLength += beatEndOffset;
+				
+				// Middle fix
+				middleLength -= postfixLength;
+			}
+			
+			// Prefix checking
+			if (prefixLength != 0) {
+				updateMatchType(prefixStart, prefixLength, subBeatLength);
+			}
+			
+			// Middle checking
+			if (!isFullyMatched() && !isWrong() && middleLength != 0) {
+				updateMatchType(middleStart, middleLength, subBeatLength);
+			}
+			
+			// Postfix checking
+			if (!isFullyMatched() && !isWrong() && postfixLength != 0) {
+				updateMatchType(postfixStart, postfixLength, subBeatLength);
+			}
 		}
 	}
 
 	/**
 	 * Update the match for a note with the given start tactus and length.
 	 * 
-	 * @param startTactus The tactus at which this note begins, normalized to where 0
-	 * is the beginning of the full anacrusis measure, if any exists.
-	 * @param noteLengthTacti The length and tacti of the note.
+	 * @param startIndex The index at which this note begins, where 0 is the beginning of the bar.
+	 * @param noteLength The length of the note in quantums.
+	 * @param subBeatLength The length of a sub beat in quantums.
 	 */
-	private void updateMatchType(int startTactus, int noteLengthTacti) {
+	private void updateMatchType(int startIndex, int noteLength, int subBeatLength) {
 		int beatLength = subBeatLength * measure.getSubBeatsPerBeat();
 		int measureLength = beatLength * measure.getBeatsPerBar();
 		
-		int subBeatOffset = startTactus % subBeatLength;
-		int beatOffset = startTactus % beatLength;
-		int measureOffset = startTactus % measureLength;
+		int subBeatOffset = startIndex % subBeatLength;
+		int beatOffset = startIndex % beatLength;
+		int measureOffset = startIndex % measureLength;
 		
 		if (matches(MetricalLpcfgMatch.SUB_BEAT)) {
 			// Matches sub beat (and not beat)
 			
-			if (noteLengthTacti < subBeatLength) {
+			if (noteLength < subBeatLength) {
 				// Note is shorter than a sub beat
 				
-			} else if (noteLengthTacti == subBeatLength) {
+			} else if (noteLength == subBeatLength) {
 				// Note is exactly a sub beat
 				
-			} else if (noteLengthTacti < beatLength) {
+			} else if (noteLength < beatLength) {
 				// Note is between a sub beat and a beat in length
 				
 				// Can only happen when the beat is divided in 3, but this is 2 sub beats
 				addMatch(MetricalLpcfgMatch.WRONG);
 				
-			} else if (noteLengthTacti == beatLength) {
+			} else if (noteLength == beatLength) {
 				// Note is exactly a beat in length
 				
 				// Must match exactly
@@ -891,7 +853,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			} else {
 				// Note is greater than a beat in length
 				
-				if (noteLengthTacti % beatLength != 0) {
+				if (noteLength % beatLength != 0) {
 					// Not some multiple of the beat length
 					addMatch(MetricalLpcfgMatch.WRONG);	
 				}
@@ -900,29 +862,29 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		} else if (matches(MetricalLpcfgMatch.BEAT)) {
 			// Matches beat (and not sub beat)
 			
-			if (noteLengthTacti < subBeatLength) {
+			if (noteLength < subBeatLength) {
 				// Note is shorter than a sub beat
 				
-				if (subBeatLength % noteLengthTacti != 0 || subBeatOffset % noteLengthTacti != 0) {
+				if (subBeatLength % noteLength != 0 || subBeatOffset % noteLength != 0) {
 					// Note doesn't divide sub beat evenly
 					addMatch(MetricalLpcfgMatch.WRONG);
 				}
 				
-			} else if (noteLengthTacti == subBeatLength) {
+			} else if (noteLength == subBeatLength) {
 				// Note is exactly a sub beat
 				
 				// Must match sub beat exactly
 				addMatch(subBeatOffset == 0 ? MetricalLpcfgMatch.SUB_BEAT : MetricalLpcfgMatch.WRONG);
 				
-			} else if (noteLengthTacti < beatLength) {
+			} else if (noteLength < beatLength) {
 				// Note is between a sub beat and a beat in length
 				
 				// Wrong if not aligned with beat at onset or offset
-				if (beatOffset != 0 && beatOffset + noteLengthTacti != beatLength) {
+				if (beatOffset != 0 && beatOffset + noteLength != beatLength) {
 					addMatch(MetricalLpcfgMatch.WRONG);
 				}
 				
-			} else if (noteLengthTacti == beatLength) {
+			} else if (noteLength == beatLength) {
 				// Note is exactly a beat in length
 				
 			} else {
@@ -933,29 +895,29 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		} else {
 			// Matches neither sub beat nor beat
 			
-			if (noteLengthTacti < subBeatLength) {
+			if (noteLength < subBeatLength) {
 				// Note is shorter than a sub beat
 				
-				if (subBeatLength % noteLengthTacti != 0 || subBeatOffset % noteLengthTacti != 0) {
+				if (subBeatLength % noteLength != 0 || subBeatOffset % noteLength != 0) {
 					// Note doesn't divide sub beat evenly
 					addMatch(MetricalLpcfgMatch.WRONG);
 				}
 				
-			} else if (noteLengthTacti == subBeatLength) {
+			} else if (noteLength == subBeatLength) {
 				// Note is exactly a sub beat
 				
 				// Must match sub beat exactly
 				addMatch(subBeatOffset == 0 ? MetricalLpcfgMatch.SUB_BEAT : MetricalLpcfgMatch.WRONG);
 				
-			} else if (noteLengthTacti < beatLength) {
+			} else if (noteLength < beatLength) {
 				// Note is between a sub beat and a beat in length
 				
 				// Wrong if not aligned with beat at onset or offset
-				if (beatOffset != 0 && beatOffset + noteLengthTacti != beatLength) {
+				if (beatOffset != 0 && beatOffset + noteLength != beatLength) {
 					addMatch(MetricalLpcfgMatch.WRONG);
 				}
 				
-			} else if (noteLengthTacti == beatLength) {
+			} else if (noteLength == beatLength) {
 				// Note is exactly a beat in length
 				
 				// Must match beat exactly
@@ -964,8 +926,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			} else {
 				// Note is greater than a beat in length
 				
-				if (measureLength % noteLengthTacti != 0 || measureOffset % noteLengthTacti != 0 ||
-						beatOffset != 0 || noteLengthTacti % beatLength != 0) {
+				if (measureLength % noteLength != 0 || measureOffset % noteLength != 0 ||
+						beatOffset != 0 || noteLength % beatLength != 0) {
 					// Note doesn't divide measure evenly, or doesn't match a beat
 					addMatch(MetricalLpcfgMatch.WRONG);
 				}
@@ -1064,7 +1026,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 
 	@Override
 	public double getScore() {
-		return GLOBAL_WEIGHT * logProbability + (1.0 - GLOBAL_WEIGHT) * localLogProb;
+		return alignmentLogProbability + GLOBAL_WEIGHT * logProbability + (1.0 - GLOBAL_WEIGHT) * localLogProb;
 	}
 	
 	@Override
@@ -1143,7 +1105,10 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(measure).append(" anacrusis=").append(anacrusisLength);
-		sb.append(" Score=").append(GLOBAL_WEIGHT * logProbability).append(" + ").append((1.0 - GLOBAL_WEIGHT) * localLogProb).append(" = ").append(getScore());
+		sb.append(" Score=").append(alignmentLogProbability).append(" + ")
+			.append(GLOBAL_WEIGHT * logProbability).append(" + ")
+			.append((1.0 - GLOBAL_WEIGHT) * localLogProb).append(" = ")
+			.append(getScore());
 		
 		return sb.toString();
 	}

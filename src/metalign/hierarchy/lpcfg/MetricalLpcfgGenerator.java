@@ -2,13 +2,11 @@ package metalign.hierarchy.lpcfg;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import metalign.Main;
 import metalign.beat.Beat;
 import metalign.joint.JointModel;
-import metalign.time.NoteBTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.utils.MidiNote;
@@ -76,44 +74,111 @@ public class MetricalLpcfgGenerator {
 				quantums[i] = makeQuantum(previous, beats.subList(i, i + 2), notesBySubBeat.get(i));
 			}
 			
-			// TODO: Combine sub beats into bars
-			
-			
-			// Save valid measures
+			// Combine sub beats into bars
 			boolean hasBegun = false;
-			for (int i = 0; i < numMeasures; i++) {
-				if (quantums[i] != null) {
+			List<MetricalLpcfgQuantum[]> barQuantums = new ArrayList<MetricalLpcfgQuantum[]>();
+			int barNum = beats.get(0).getBar();
+			int beatsPerBar = beats.get(0).getBeat();
+			int subBeatsPerBeat = beats.get(0).getSubBeat();
+			
+			for (int i = 0; i < beats.size() - 1; i++) {
+				if (barNum == beats.get(i).getBar()) {
+					beatsPerBar = Math.max(beatsPerBar, beats.get(i).getBeat() + 1);
+					subBeatsPerBeat = Math.max(subBeatsPerBeat, beats.get(i).getSubBeat() + 1);
+					barQuantums.add(MetricalLpcfgTreeFactory.lengthenTo(quantums[i], 12));
+					
+				} else {
+					// Combine into a single bar-length quantum array
+					boolean isEmpty = true;
+					MetricalLpcfgQuantum[] barQuantum = new MetricalLpcfgQuantum[barQuantums.size() * 12];
+					int index = 0;
+					for (MetricalLpcfgQuantum[] subBeatQuantum : barQuantums) {
+						for (MetricalLpcfgQuantum quantum : subBeatQuantum) {
+							barQuantum[index++] = quantum;
+							
+							if (isEmpty && quantum != MetricalLpcfgQuantum.REST) {
+								isEmpty = false;
+							}
+						}
+					}
+					
+					// Don't need to do anything else if it is empty
+					if (isEmpty) {
+						barNum = beats.get(i).getBar();
+						beatsPerBar = beats.get(i).getBeat();
+						subBeatsPerBeat = beats.get(i).getSubBeat();
+						barQuantums.clear();
+						barQuantums.add(MetricalLpcfgTreeFactory.lengthenTo(quantums[i], 12));
+						continue;
+					}
+					
+					// Extend notes
 					if (Main.EXTEND_NOTES) {
-						boolean firstOnsetFound = false;
-						for (int j = 0; j < quantums[i].length; j++) {
-							if (!firstOnsetFound) {
-								if (quantums[i][j] == MetricalLpcfgQuantum.ONSET) {
-									firstOnsetFound = true;
+						boolean firstNonRestFound = false;
+						for (int j = 0; j < barQuantum.length; j++) {
+							if (!firstNonRestFound) {
+								if (barQuantum[j] != MetricalLpcfgQuantum.REST) {
+									firstNonRestFound = true;
 								}
 									
 							} else {
-								if (quantums[i][j] == MetricalLpcfgQuantum.REST) {
-									quantums[i][j] = MetricalLpcfgQuantum.TIE;
+								if (barQuantum[j] == MetricalLpcfgQuantum.REST) {
+									barQuantum[j] = MetricalLpcfgQuantum.TIE;
 								}
 							}
 						}
 					}
 					
-					MetricalLpcfgTree tree = MetricalLpcfgTreeFactory.makeTree(Arrays.asList(quantums[i]), beatsPerMeasure[i], subBeatsPerBeat[i]);
-					if (!hasBegun) {
+					// Check/set hasBegun
+					if (!hasBegun && barQuantum[0] == MetricalLpcfgQuantum.REST) {
 						hasBegun = true;
 						
-						if (tree.startsWithRest()) {
-							// Skip anacrusis measure
-							continue;
-						}
+						barNum = beats.get(i).getBar();
+						beatsPerBar = beats.get(i).getBeat();
+						subBeatsPerBeat = beats.get(i).getSubBeat();
+						barQuantums.clear();
+						barQuantums.add(MetricalLpcfgTreeFactory.lengthenTo(quantums[i], 12));
+						continue;
 					}
+					
+					hasBegun = true;
+					
+					// Check if anacrusis
+					if (barQuantum.length != subBeatsPerBeat * beatsPerBar * 12) {
+						barNum = beats.get(i).getBar();
+						beatsPerBar = beats.get(i).getBeat();
+						subBeatsPerBeat = beats.get(i).getSubBeat();
+						barQuantums.clear();
+						barQuantums.add(MetricalLpcfgTreeFactory.lengthenTo(quantums[i], 12));
+						continue;
+					}
+					
+					// Make tree
+					MetricalLpcfgTree tree = MetricalLpcfgTreeFactory.makeTree(Arrays.asList(barQuantum), beatsPerBar, subBeatsPerBeat);
+					
+					// Add tree to grammar
 					grammar.addTree(tree);
+					
+					barNum = beats.get(i).getBar();
+					beatsPerBar = beats.get(i).getBeat();
+					subBeatsPerBeat = beats.get(i).getSubBeat();
+					barQuantums.clear();
+					barQuantums.add(MetricalLpcfgTreeFactory.lengthenTo(quantums[i], 12));
 				}
 			}
 		}
 	}
-	
+
+	/**
+	 * Given the previous tatum, two other tatums, and a list of notes, generate and return a quantum array
+	 * of the given notes for the time between the two edge tatums.
+	 * 
+	 * @param previous A length 1 list containing the previous tatum. THIS WILL BE CHANGED TO THE NEXT PREVIOUS TATUM
+	 * DURING THIS METHOD.
+	 * @param edges The borders of the current sub beat.
+	 * @param notes The notes which may be within this sub beat.
+	 * @return The quantum array.
+	 */
 	private MetricalLpcfgQuantum[] makeQuantum(List<Beat> previous, List<Beat> edges, List<MidiNote> notes) {
 		List<Beat> tatums3 = addTatums(edges, 3);
 		List<Beat> tatums4 = addTatums(edges, 4);
@@ -126,7 +191,7 @@ public class MetricalLpcfgGenerator {
 		
 		previous.set(0, tatums.get(tatums.size() - 2));
 		
-		MetricalLpcfgQuantum[] quantums = new MetricalLpcfgQuantum[tatums.size() - 1];
+		MetricalLpcfgQuantum[] quantums = new MetricalLpcfgQuantum[tatums.size() - 2];
 		Arrays.fill(quantums, MetricalLpcfgQuantum.REST);
 		
 		for (MidiNote note : notes) {
@@ -138,7 +203,7 @@ public class MetricalLpcfgGenerator {
 			for (int i = 1; i < tatums.size() - 1; i++) {
 				if (!started) {
 					if (onsetTatum.equals(tatums.get(i))) {
-						quantums[i] = MetricalLpcfgQuantum.ONSET;
+						quantums[i - 1] = MetricalLpcfgQuantum.ONSET;
 						started = true;
 					}
 					
@@ -147,8 +212,8 @@ public class MetricalLpcfgGenerator {
 						break;
 					}
 					
-					if (quantums[i] == MetricalLpcfgQuantum.REST) {
-						quantums[i] = MetricalLpcfgQuantum.TIE;
+					if (quantums[i - 1] == MetricalLpcfgQuantum.REST) {
+						quantums[i - 1] = MetricalLpcfgQuantum.TIE;
 					}
 				}
 			}
@@ -157,6 +222,14 @@ public class MetricalLpcfgGenerator {
 		return quantums;
 	}
 
+	/**
+	 * Get the distance between the given note onsets and the given tatums.
+	 * 
+	 * @param previous The previous tatum, so that notes which onset before the first tatum are not penalized.
+	 * @param tatums The tatums we will compare the note onsets to.
+	 * @param notes The notes.
+	 * @return The average difference between each note onset and the closest tatum (assuming it isn't previous).
+	 */
 	private double getDistance(List<Beat> previous, List<Beat> tatums, List<MidiNote> notes) {
 		double distancePerNote = 0.0;
 		int noteCount = 0;
@@ -164,7 +237,7 @@ public class MetricalLpcfgGenerator {
 		for (MidiNote note : notes) {
 			double minDistance = Double.POSITIVE_INFINITY;
 			
-			for (int i = 1; i < tatums.size(); i++) {
+			for (int i = 0; i < tatums.size(); i++) {
 				double distance = Math.abs(tatums.get(i).getTime() - note.getOnsetTime());
 				
 				minDistance = Math.min(distance, minDistance);
@@ -176,9 +249,16 @@ public class MetricalLpcfgGenerator {
 			}
 		}
 		
-		return distancePerNote / noteCount;
+		return noteCount == 0 ? 0 : distancePerNote / noteCount;
 	}
 	
+	/**
+	 * Add some number of tatums, equally spaced between the 2 given edges.
+	 * 
+	 * @param edges A List containing the two edges, in index 0 and 1.
+	 * @param divisions The number of divisions to split into. We will add divisions-1 new tatums.
+	 * @return A new list of tatums, with the new beats added between the edges.
+	 */
 	private List<Beat> addTatums(List<Beat> edges, int divisions) {
 		List<Beat> tatums = new ArrayList<Beat>(divisions + 1);
 		tatums.add(edges.get(0));
@@ -188,8 +268,8 @@ public class MetricalLpcfgGenerator {
 		
 		for (int i = 1; i < divisions; i++) {
 			tatums.add(new Beat(edges.get(0).getBar(), edges.get(0).getBeat(), edges.get(0).getSubBeat(), i,
-					Math.round(edges.get(0).getTime() + divisions * timePerTatum),
-					Math.round(edges.get(0).getTick() + divisions * ticksPerTatum)));
+					Math.round(edges.get(0).getTime() + i * timePerTatum),
+					Math.round(edges.get(0).getTick() + i * ticksPerTatum)));
 		}
 		
 		tatums.add(edges.get(1));
@@ -205,7 +285,7 @@ public class MetricalLpcfgGenerator {
 	 * @param notesBySubBeat The note tracking list, divided by sub beat.
 	 */
 	private void addNote(MidiNote note, List<Beat> beats, List<List<MidiNote>> notesBySubBeat) {
-		Beat onsetBeat = note.getOnsetSubBeatIndex(beats);
+		Beat onsetBeat = note.getOnsetSubBeat(beats);
 		Beat offsetBeat = note.getOffsetSubBeat(beats);
 		
 		// Iterate to onset beat

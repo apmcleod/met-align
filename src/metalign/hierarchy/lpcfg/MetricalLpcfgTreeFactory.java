@@ -3,7 +3,6 @@ package metalign.hierarchy.lpcfg;
 import java.util.ArrayList;
 import java.util.List;
 
-import metalign.Main;
 import metalign.hierarchy.Measure;
 import metalign.hierarchy.lpcfg.MetricalLpcfgNonterminal.MetricalLpcfgLevel;
 import metalign.utils.MidiNote;
@@ -24,124 +23,194 @@ public class MetricalLpcfgTreeFactory {
 	 * Make a new tree based on a List of MidiNotes.
 	 * 
 	 * @param notes A List of the notes which lie within the tree we want.
-	 * @param list A List of ALL of the beat times of the current song.
+	 * @param subBeatTimes A List of ALL of the beat times of the current song.
 	 * @param measure The measure type for the tree we will make.
-	 * @param subBeatLength The sub beat length of the tree we will make.
-	 * @param anacrusisLengthSubBeats The anacrusis length of the current song, measured in sub beats.
+	 * @param anacrusisLength The anacrusis length of the current song, measured in sub beats.
 	 * @param measureNum The measure number of the tree we want.
 	 * @param hasBegun A boolean for whether this voice has begun or not. If it has, and Main.EXTEND_NOTES is true,
 	 * we want to fill this tree with ties rather than rests (unless it is totally empty).
 	 * 
 	 * @return A tree of the given measure type, containing the given notes.
 	 */
-	public static MetricalLpcfgTree makeTree(List<MidiNote> notes, List<Integer> list, Measure measure, int subBeatLength, int anacrusisLengthSubBeats, int measureNum, boolean hasBegun) {
-		int beatsPerMeasure = measure.getBeatsPerBar();
+	public static List<List<MetricalLpcfgQuantum>> makeQuantumLists(List<MidiNote> notes, List<Integer> previous,
+			List<Integer> subBeatTimes, Measure measure, int anacrusisLength, int measureNum, boolean hasBegun, List<List<Integer>> alignments) {
+		int beatsPerBar = measure.getBeatsPerBar();
 		int subBeatsPerBeat = measure.getSubBeatsPerBeat();
+		int subBeatsPerBar = beatsPerBar * subBeatsPerBeat;
 		
-		return makeTree(makeQuantumList(notes, list, measure, subBeatLength, anacrusisLengthSubBeats, measureNum, hasBegun), beatsPerMeasure, subBeatsPerBeat);
+		int firstBeatIndex = subBeatsPerBar * measureNum + anacrusisLength; 
+		int lastBeatIndex = firstBeatIndex + subBeatsPerBar;
+		
+		// Make quantums for each sub beat
+		List<List<MetricalLpcfgQuantum>> quantumLists = new ArrayList<List<MetricalLpcfgQuantum>>();
+		quantumLists.add(new ArrayList<MetricalLpcfgQuantum>());
+		
+		for (int i = firstBeatIndex; i < lastBeatIndex; i++) {
+			quantumLists = makeAllQuantums(previous, quantumLists, subBeatTimes.subList(i, i + 2), notes, alignments);
+		}
+		
+		return quantumLists;
 	}
-	
+
 	/**
-	 * Make a new tree based on a List of MidiNotes.
+	 * Get all of the possible quantum lists for the given sub beat.
 	 * 
-	 * @param notes A List of the notes which lie within the tree we want.
-	 * @param list A List of ALL of the beat times of the current song.
-	 * @param measure The measure type for the tree we will make.
-	 * @param subBeatLength The sub beat length of the tree we will make.
-	 * @param anacrusisLengthSubBeats The anacrusis length of the current song, measured in sub beats.
-	 * @param measureNum The measure number of the tree we want.
-	 * @param hasBegun A boolean for whether this voice has begun or not. If it has, and Main.EXTEND_NOTES is true,
-	 * we want to fill this tree with ties rather than rests (unless it is totally empty).
-	 * 
-	 * @return A tree of the given measure type, containing the given notes.
+	 * @param previous A List of all of the possible previous tatums. THIS WILL BE MODIFIED TO A LIST OF EACH OF
+	 * THIS SUB BEAT'S LAST TATUM TIMES.
+	 * @param existingQuantums A list of the existing quantums from previous sub beats.
+	 * @param edges A list containing the start and end times of this sub beat.
+	 * @param notes The notes we will add to this sub beat.
+	 * @return A List of length 2*previous.size(), containing for each in previous, a 3-length and a 4-length quantum list.
 	 */
-	public static List<MetricalLpcfgQuantum> makeQuantumList(List<MidiNote> notes, List<Integer> list, Measure measure, int subBeatLength, int anacrusisLengthSubBeats, int measureNum, boolean hasBegun) {
-		int beatsPerMeasure = measure.getBeatsPerBar();
-		int subBeatsPerBeat = measure.getSubBeatsPerBeat();
+	private static List<List<MetricalLpcfgQuantum>> makeAllQuantums(List<Integer> previous, List<List<MetricalLpcfgQuantum>> existingQuantums,
+			List<Integer> edges, List<MidiNote> notes, List<List<Integer>> alignments) {
+		List<List<Integer>> tatumLists = new ArrayList<List<Integer>>(2);
+		List<List<Integer>> newAlignments = new ArrayList<List<Integer>>();
 		
-		int measureLength = subBeatLength * beatsPerMeasure * subBeatsPerBeat;
-		int anacrusisLength = subBeatLength * anacrusisLengthSubBeats;
+		List<Integer> tatums3 = addTatums(edges, 3);
+		List<Integer> tatums4 = addTatums(edges, 4);
 		
-		List<MetricalLpcfgQuantum> quantums = new ArrayList<MetricalLpcfgQuantum>(measureLength);
-		for (int i = 0; i < measureLength; i++) {
-			quantums.add(MetricalLpcfgQuantum.REST);
+		for (int i = 0; i < previous.size(); i++) {
+			int prev = previous.get(i);
+			List<Integer> align = alignments.get(i);
+			
+			List<Integer> newTatums = new ArrayList<Integer>(tatums3.size() + 1);
+			newTatums.add(prev);
+			newTatums.addAll(tatums3);
+			tatumLists.add(newTatums);
+			newAlignments.add(new ArrayList<Integer>(align));
+			
+			newTatums = new ArrayList<Integer>(tatums4.size() + 1);
+			newTatums.add(prev);
+			newTatums.addAll(tatums4);
+			tatumLists.add(newTatums);
+			newAlignments.add(new ArrayList<Integer>(align));
 		}
 		
-		int firstBeatIndex = measureLength * measureNum + anacrusisLength; 
-		int lastBeatIndex = firstBeatIndex + measureLength;
+		previous.clear();
+		alignments.clear();
+		alignments.addAll(newAlignments);
+		List<List<MetricalLpcfgQuantum>> quantumLists = new ArrayList<List<MetricalLpcfgQuantum>>();
 		
-		int fromIndex = Math.max(firstBeatIndex - 1, 0);
-		int toIndex = Math.min(lastBeatIndex + 1, list.size());
-		List<Integer> toSearch = list.subList(fromIndex, toIndex);
 		
-		for (MidiNote note : notes) {
-			addNote(note, quantums, list, toSearch, firstBeatIndex, lastBeatIndex);
-		}
-		
-		// Check for first extend notes
-		if (Main.EXTEND_NOTES && !notes.isEmpty()) {
-			boolean firstOnsetFound = false;
-			for (int i = 0; i < quantums.size(); i++) {
-				if (!firstOnsetFound) {
-					if (quantums.get(i) == MetricalLpcfgQuantum.ONSET) {
-						firstOnsetFound = true;
-					}
-					
-				} else {
-					if (quantums.get(i) == MetricalLpcfgQuantum.REST) {
-						quantums.set(i, MetricalLpcfgQuantum.TIE);
+		for (int j = 0; j < tatumLists.size(); j++) {
+			List<Integer> tatums = tatumLists.get(j);
+			List<Integer> align = newAlignments.get(j);
+			
+			List<MetricalLpcfgQuantum> quantums = new ArrayList<MetricalLpcfgQuantum>(tatums.size() - 2);
+			for (int i = 0; i < tatums.size() - 2; i++) {
+				quantums.add(MetricalLpcfgQuantum.REST);
+			}
+			
+			for (MidiNote note : notes) {
+				int onsetTatumIndex = note.getOnsetTatumIndex(tatums);
+				int offsetTatumIndex = note.getOffsetTatumIndex(tatums);
+				
+				boolean started = onsetTatumIndex == 0;
+				
+				for (int i = 1; i < tatums.size() - 1; i++) {
+					if (!started) {
+						if (onsetTatumIndex == i) {
+							quantums.set(i - 1,  MetricalLpcfgQuantum.ONSET);
+							align.add((int) (Math.abs(note.getOnsetTime()) - tatums.get(i)));
+							started = true;
+						}
+						
+					} else {
+						if (offsetTatumIndex == i) {
+							break;
+						}
+						
+						if (quantums.get(i - 1) == MetricalLpcfgQuantum.REST) {
+							quantums.set(i - 1, MetricalLpcfgQuantum.TIE);
+						}
 					}
 				}
 			}
+			
+			for (List<MetricalLpcfgQuantum> existingQuantum : existingQuantums) {
+				previous.add(tatums.get(tatums.size() - 2));
+				
+				List<MetricalLpcfgQuantum> newList = new ArrayList<MetricalLpcfgQuantum>();
+				newList.addAll(existingQuantum);
+				newList.addAll(lengthenTo(quantums, 12));
+				
+				quantumLists.add(newList);
+			}
 		}
 		
-		return quantums;
+		
+		
+		return quantumLists;
 	}
-
+	
 	/**
-	 * Add the given note into the given quantums array. The quantums parameter here is changed
-	 * as a result of this call.
+	 * Lengthen the given quantum array to the given length. Length should be an exact multiple of
+	 * the length of the given array. Otherwise, weird things will happen.
 	 * 
-	 * @param note The note we want to add into our quantums array.
-	 * @param quantums The quantums array for tracking the current tree's quantums. This array may be
-	 * changed as a result of this call.
-	 * @param list A List of ALL of the beats in the current song.
-	 * @param firstBeatIndex The index of the beat which represents the first quantum in the quantum array.
-	 * @param lastBeatIndex The index of the beat after the last quantum in the quantum array.
+	 * @param quantums The array we want to lengthen.
+	 * @param length The resulting length we want.
+	 * @return A new quantums array, where each element is padded with an equal number of rests or ties.
 	 */
-	private static void addNote(MidiNote note, List<MetricalLpcfgQuantum> quantums, List<Integer> list, List<Integer> toSearch, int firstBeatIndex, int lastBeatIndex) {
-		int fromIndex = Math.max(firstBeatIndex - 1, 0);
+	public static List<MetricalLpcfgQuantum> lengthenTo(List<MetricalLpcfgQuantum> quantums, int length) {
+		int numToAdd = length / quantums.size() - 1;
+		List<MetricalLpcfgQuantum> lengthened = new ArrayList<MetricalLpcfgQuantum>(length / quantums.size() * quantums.size());
 		
-		int beatIndex = note.getOnsetBeatIndex(toSearch) + fromIndex;
-		int offsetBeatIndex = Math.min(note.getOffsetBeatIndex(toSearch) + fromIndex, list.size());
-		
-		// Add onset
-		if (beatIndex >= firstBeatIndex && beatIndex < lastBeatIndex) {
-			addQuantum(MetricalLpcfgQuantum.ONSET, quantums, beatIndex - firstBeatIndex);
+		for (MetricalLpcfgQuantum quantum : quantums) {
+			lengthened.add(quantum);
+			
+			for (int j = 0; j < numToAdd; j++) {
+				lengthened.add(quantum == MetricalLpcfgQuantum.REST ? MetricalLpcfgQuantum.REST : MetricalLpcfgQuantum.TIE);
+			}
 		}
 		
-		// Add ties
-		beatIndex = Math.max(beatIndex + 1, firstBeatIndex);
-		while (beatIndex < lastBeatIndex && beatIndex < offsetBeatIndex) {
-			addQuantum(MetricalLpcfgQuantum.TIE, quantums, beatIndex - firstBeatIndex);
-			beatIndex++;
-		}
+		return lengthened;
 	}
-
+	
 	/**
-	 * Add the given quantum into the given index of the given quantums array, if the type overrides that index's
-	 * current value. That is, if the current value is not already an ONSET. The quantums array may be changed
-	 * as a result of this call.
+	 * Lengthen the given quantum array to the given length. Length should be an exact multiple of
+	 * the length of the given array. Otherwise, weird things will happen.
 	 * 
-	 * @param quantum The quantum we want to add to the quantums array.
-	 * @param quantums The quantums array. This array may be changed as a result of this call.
-	 * @param index The index at which we want to try to insert the given quantum.
+	 * @param quantums The array we want to lengthen.
+	 * @param length The resulting length we want.
+	 * @return A new quantums array, where each element is padded with an equal number of rests or ties.
 	 */
-	private static void addQuantum(MetricalLpcfgQuantum quantum, List<MetricalLpcfgQuantum> quantums, int index) {
-		// Update value if not ONSET. (We don't want a TIE to overwrite an ONSET)
-		if (quantums.get(index) != MetricalLpcfgQuantum.ONSET) {
-			quantums.set(index, quantum);
+	public static MetricalLpcfgQuantum[] lengthenTo(MetricalLpcfgQuantum[] quantums, int length) {
+		int numToAdd = length / quantums.length - 1;
+		MetricalLpcfgQuantum[] lengthened = new MetricalLpcfgQuantum[length / quantums.length * quantums.length];
+		
+		int i = 0;
+		for (MetricalLpcfgQuantum quantum : quantums) {
+			lengthened[i++] = quantum;
+			
+			for (int j = 0; j < numToAdd; j++) {
+				lengthened[i++] = quantum == MetricalLpcfgQuantum.REST ? MetricalLpcfgQuantum.REST : MetricalLpcfgQuantum.TIE;
+			}
 		}
+		
+		return lengthened;
+	}
+	
+	/**
+	 * Add some number of tatums, equally spaced between the 2 given edges.
+	 * 
+	 * @param edges A List containing the two edges, in index 0 and 1.
+	 * @param divisions The number of divisions to split into. We will add divisions-1 new tatums.
+	 * @return A new list of tatums, with the new beats added between the edges.
+	 */
+	private static List<Integer> addTatums(List<Integer> edges, int divisions) {
+		List<Integer> tatums = new ArrayList<Integer>(divisions + 1);
+		tatums.add(edges.get(0));
+		
+		double timePerTatum = ((double) (edges.get(1) - edges.get(0))) / divisions;
+		
+		for (int i = 1; i < divisions; i++) {
+			tatums.add((int) Math.round(edges.get(0) + i * timePerTatum));
+		}
+		
+		tatums.add(edges.get(1));
+		
+		return tatums;
 	}
 
 	/**

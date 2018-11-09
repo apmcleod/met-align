@@ -240,7 +240,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		return guessedVoice;
 	}
 	
-	public Beat getOnsetSubBeatIndex(List<Beat> beats) {
+	public Beat getOnsetSubBeat(List<Beat> beats) {
 		if (beats.isEmpty()) {
 			return null;
 		}

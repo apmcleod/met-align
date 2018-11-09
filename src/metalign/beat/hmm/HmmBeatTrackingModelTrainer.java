@@ -293,7 +293,7 @@ public class HmmBeatTrackingModelTrainer {
 			} else if (tatums != null && nlg != null) {
 				for (List<MidiNote> noteList : nlg.getIncomingLists()) {
 					for (MidiNote note : noteList) {
-						Beat closestTatum = note.getOnsetBeat(tatums);
+						Beat closestTatum = note.getOnsetSubBeat(tatums);
 						
 						double diff = Math.abs(closestTatum.getTime() - note.getOnsetTime());
 						deviationCount++;

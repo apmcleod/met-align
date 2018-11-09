@@ -45,7 +45,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 	/**
 	 * The parameters for this model.
 	 */
-	private final HmmBeatTrackingModelParameters params;
+	public final HmmBeatTrackingModelParameters params;
 	
 	/**
 	 * A LinkedList of those note times which we haven't assigned to a Beat yet.
@@ -688,43 +688,6 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 		}
 		
 		return times;
-	}
-
-	/**
-	 * Add the note error to {@link #logProb} for a note at the given time.
-	 * 
-	 * @param time The time for which to add the note error.
-	 */
-	private void addNoteError(int time) {
-		int closestTatum = getClosestTatumToTime(time, tatums);
-		
-		logProb += Math.log(MathUtils.getStandardNormal(0, Math.abs(closestTatum - time), params.NOTE_STD));
-	}
-
-	/**
-	 * Get the tatum which is closest to the given time.
-	 * 
-	 * @param time The time which we are searching for.
-	 * @return The closest tatum time to the given note in time.
-	 */
-	private static int getClosestTatumToTime(int time, List<Integer> tatums) {
-		double minDiff = Double.MAX_VALUE;
-		int minIndex = -1;
-		
-		for (int i = tatums.size() - 1; i >= 0; i--) {
-			double diff = Math.abs(tatums.get(i) - time);
-			
-			if (diff < minDiff) {
-				minDiff = diff;
-				minIndex = i;
-				
-			} else {
-				return tatums.get(minIndex);
-			}
-		}
-		
-		// No tatums found
-		return minIndex == -1 ? 0 : tatums.get(minIndex);
 	}
 	
 	@Override

@@ -229,6 +229,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				grammar = generateGrammar(testFiles, anacrusisFiles, useChannel).getGrammar();
 			}
 			
+			System.out.println(grammar.getProbabilityTracker());
 			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
