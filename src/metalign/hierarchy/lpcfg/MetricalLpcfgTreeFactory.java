@@ -40,6 +40,7 @@ public class MetricalLpcfgTreeFactory {
 		
 		int firstBeatIndex = subBeatsPerBar * measureNum + anacrusisLength; 
 		int lastBeatIndex = firstBeatIndex + subBeatsPerBar;
+		firstBeatIndex = Math.max(firstBeatIndex, 0);
 		
 		// Make quantums for each sub beat
 		List<List<MetricalLpcfgQuantum>> quantumLists = new ArrayList<List<MetricalLpcfgQuantum>>();
@@ -66,6 +67,7 @@ public class MetricalLpcfgTreeFactory {
 			List<Integer> edges, List<MidiNote> notes, List<List<Integer>> alignments) {
 		List<List<Integer>> tatumLists = new ArrayList<List<Integer>>(2);
 		List<List<Integer>> newAlignments = new ArrayList<List<Integer>>();
+		List<List<MetricalLpcfgQuantum>> newQuantums = new ArrayList<List<MetricalLpcfgQuantum>>();
 		
 		List<Integer> tatums3 = addTatums(edges, 3);
 		List<Integer> tatums4 = addTatums(edges, 4);
@@ -79,19 +81,19 @@ public class MetricalLpcfgTreeFactory {
 			newTatums.addAll(tatums3);
 			tatumLists.add(newTatums);
 			newAlignments.add(new ArrayList<Integer>(align));
+			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existingQuantums.get(i)));
 			
 			newTatums = new ArrayList<Integer>(tatums4.size() + 1);
 			newTatums.add(prev);
 			newTatums.addAll(tatums4);
 			tatumLists.add(newTatums);
 			newAlignments.add(new ArrayList<Integer>(align));
+			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existingQuantums.get(i)));
 		}
 		
 		previous.clear();
 		alignments.clear();
 		alignments.addAll(newAlignments);
-		List<List<MetricalLpcfgQuantum>> quantumLists = new ArrayList<List<MetricalLpcfgQuantum>>();
-		
 		
 		for (int j = 0; j < tatumLists.size(); j++) {
 			List<Integer> tatums = tatumLists.get(j);
@@ -128,20 +130,11 @@ public class MetricalLpcfgTreeFactory {
 				}
 			}
 			
-			for (List<MetricalLpcfgQuantum> existingQuantum : existingQuantums) {
-				previous.add(tatums.get(tatums.size() - 2));
-				
-				List<MetricalLpcfgQuantum> newList = new ArrayList<MetricalLpcfgQuantum>();
-				newList.addAll(existingQuantum);
-				newList.addAll(lengthenTo(quantums, 12));
-				
-				quantumLists.add(newList);
-			}
+			previous.add(tatums.get(tatums.size() - 2));
+			newQuantums.get(j).addAll(lengthenTo(quantums, 12));
 		}
 		
-		
-		
-		return quantumLists;
+		return newQuantums;
 	}
 	
 	/**

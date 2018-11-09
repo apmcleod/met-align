@@ -368,17 +368,19 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			List<Integer> voicePrevious = previous.get(voiceIndex);
 			
 			List<List<Integer>> alignmentDiffs = new ArrayList<List<Integer>>();
+			alignmentDiffs.add(new ArrayList<Integer>());
 			
 			List<List<MetricalLpcfgQuantum>> quantumLists = MetricalLpcfgTreeFactory.makeQuantumLists(
 					voiceNotes, voicePrevious, beatState.getBeatTimes(), measure, anacrusisLength,
 					measureNum, hasBegun.get(voiceIndex), alignmentDiffs);
 			
-			double minTotalLogProb = Double.POSITIVE_INFINITY;
+			double minTotalLogProb = Double.NEGATIVE_INFINITY;
 			double minAlignmentLogProb = 0.0;
 			double minGlobalTreeLogProb = 0.0;
 			double minLocalTreeLogProb = 0.0;
 			boolean minIsEmpty = false;
 			boolean minUseTree = false;
+			int minPrevious = Integer.MIN_VALUE;
 			MetricalLpcfgTree minTree = null;
 			List<MetricalLpcfgQuantum> minQuantums = null;
 			
@@ -401,7 +403,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					}
 				}
 				
-				if (!isEmpty && (hasBegun.get(voiceIndex) || quantums.get(0) != MetricalLpcfgQuantum.REST)) {
+				if (!isEmpty && quantums.size() == measure.getBeatsPerBar() * measure.getSubBeatsPerBeat() * 12 &&
+						(hasBegun.get(voiceIndex) || quantums.get(0) != MetricalLpcfgQuantum.REST)) {
 					useTree = true;
 					int beatsPerMeasure = measure.getBeatsPerBar();
 					int subBeatsPerBeat = measure.getSubBeatsPerBeat();
@@ -445,6 +448,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					minQuantums = quantums;
 					minIsEmpty = isEmpty;
 					minUseTree = useTree;
+					minPrevious = voicePrevious.get(voiceIndex);
 				}
 			}
 			
@@ -455,8 +459,13 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			
 			if (!minIsEmpty) {
 				hasBegun.set(voiceIndex, Boolean.TRUE);
-				updateMatch(previousBarQuantum.get(voiceIndex), minQuantums.get(0), previousOnset.get(voiceIndex));
 			}
+			
+			updateMatch(previousBarQuantum.get(voiceIndex), minQuantums.get(0), voiceIndex);
+			
+			previousBarQuantum.set(voiceIndex, minQuantums);
+			voicePrevious.clear();
+			voicePrevious.add(minPrevious);
 			
 			if (minUseTree) {
 				measureUsed = true;
@@ -591,6 +600,14 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			return;
 		}
 		
+		// Front-pad with rests
+		List<MetricalLpcfgQuantum> newQuantums = new ArrayList<MetricalLpcfgQuantum>(measure.getBeatsPerBar() * measure.getSubBeatsPerBeat() * 12);
+		for (int i = 0; i < measure.getBeatsPerBar() * measure.getSubBeatsPerBeat() * 12 - quantums.size(); i++) {
+			newQuantums.add(MetricalLpcfgQuantum.REST);
+		}
+		newQuantums.addAll(quantums);
+		quantums = newQuantums;
+		
 		if (!matches(MetricalLpcfgMatch.BEAT)) {
 			checkConglomerateBeatMatch(quantums, next);
 		}
@@ -600,8 +617,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 		
 		if (!isFullyMatched()) {
-			previousBarQuantum.set(voiceIndex, quantums);
-			
 			int lastIndex = quantums.lastIndexOf(MetricalLpcfgQuantum.ONSET);
 			
 			if (lastIndex == -1) {
@@ -685,15 +700,22 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		List<Integer> offsetTimes = new ArrayList<Integer>();
 		onsetTimes.add(prevOnset);
 		
+		boolean inOnset = true;
 		for (int i = 0; i < quantums.size(); i++) {
 			switch (quantums.get(i)) {
 				case REST:
-					offsetTimes.add(i);
+					if (inOnset) {
+						offsetTimes.add(i);
+						inOnset = false;
+					}
 					break;
 					
 				case ONSET:
-					offsetTimes.add(i);
+					if (inOnset) {
+						offsetTimes.add(i);
+					}
 					onsetTimes.add(i);
+					inOnset = true;
 					break;
 					
 				case TIE:
@@ -702,7 +724,9 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		switch (next) {
 			case REST:
-				offsetTimes.add(quantums.size());
+				if (inOnset) {
+					offsetTimes.add(quantums.size());
+				}
 				break;
 				
 			case ONSET:
@@ -718,7 +742,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		int subBeatLength = quantums.size() / measure.getBeatsPerBar() / measure.getSubBeatsPerBeat();
 		
-		for (int i = 0; i < onsetTimes.size() - 1; i++) {
+		for (int i = 0; i < onsetTimes.size(); i++) {
 			int startTactus = onsetTimes.get(i);
 			int endTactus = offsetTimes.get(i);
 			
@@ -732,7 +756,6 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			}
 			
 			int noteLengthTacti = Math.max(1, endTactus - startTactus);
-			startTactus -= anacrusisLength * subBeatLength;
 			endTactus = startTactus + noteLengthTacti;
 			
 			int prefixStart = startTactus;
