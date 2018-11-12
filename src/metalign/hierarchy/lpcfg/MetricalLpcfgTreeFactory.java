@@ -35,6 +35,7 @@ public class MetricalLpcfgTreeFactory {
 	 */
 	public static List<List<MetricalLpcfgQuantum>> makeQuantumLists(List<MidiNote> notes, List<Integer> previous,
 			List<Integer> subBeatTimes, Measure measure, int anacrusisLength, int measureNum, boolean hasBegun, List<List<Integer>> alignments) {
+		
 		int beatsPerBar = measure.getBeatsPerBar();
 		int subBeatsPerBeat = measure.getSubBeatsPerBeat();
 		int subBeatsPerBar = beatsPerBar * subBeatsPerBeat;
@@ -130,7 +131,7 @@ public class MetricalLpcfgTreeFactory {
 				
 				boolean started = onsetTatumIndex == 0;
 				
-				for (int i = 1; i < tatums.size() - 1; i++) {
+				for (int i = 1; i < Math.min(tatums.size() - 1, offsetTatumIndex); i++) {
 					if (!started) {
 						if (onsetTatumIndex == i) {
 							quantums.set(i - 1,  MetricalLpcfgQuantum.ONSET);
@@ -139,15 +140,8 @@ public class MetricalLpcfgTreeFactory {
 						}
 						
 					} else {
-						if (offsetTatumIndex == i) {
-							break;
-						}
-						
 						if (quantums.get(i - 1) == MetricalLpcfgQuantum.REST) {
 							quantums.set(i - 1, MetricalLpcfgQuantum.TIE);
-							if (i > 1 && quantums.get(i - 2) == MetricalLpcfgQuantum.REST) {
-								System.err.println("Error created");
-							}
 						}
 					}
 				}
