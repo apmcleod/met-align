@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import metalign.utils.MathUtils;
-
 /**
  * A <code>MetricalLpcfgTerminal</code> object represents a terminal symbol in the
  * rhythmic grammar. That is, any pattern of ties, notes, and rests which make
@@ -71,7 +69,8 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 		} else {
 			originalPattern = beatQuantum;
 		}
-		reducedPattern = beatQuantum.size() == 0 ? new ArrayList<MetricalLpcfgQuantum>(0) : generateReducedPattern(originalPattern);
+		//reducedPattern = beatQuantum.size() == 0 ? new ArrayList<MetricalLpcfgQuantum>(0) : generateReducedPattern(originalPattern);
+		reducedPattern = originalPattern;
 		this.baseLength = baseLength;
 		head = generateHead();
 	}
@@ -84,194 +83,6 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 		originalPattern = terminal.originalPattern;
 		baseLength = terminal.baseLength;
 		head = terminal.head;
-	}
-
-	/**
-	 * Convert the given pattern into reduced form and return it. That is, divide all constituent
-	 * lengths by their GCF.
-	 * 
-	 * @param beatQuantum The pattern we want to reduce.
-	 * @return The given pattern in fully reduced form.
-	 */
-	private static List<MetricalLpcfgQuantum> generateReducedPattern(List<MetricalLpcfgQuantum> beatQuantum) {
-		int gcf = getGCF(beatQuantum);
-		
-		List<MetricalLpcfgQuantum> reducedPattern = new ArrayList<MetricalLpcfgQuantum>(beatQuantum.size() / gcf);
-		
-		// Are we initially in a rest?
-		boolean inRest = beatQuantum.get(0) == MetricalLpcfgQuantum.REST;
-		int currentLength = 1;
-		
-		for (int i = 1; i < beatQuantum.size(); i++) {
-			switch (beatQuantum.get(i)) {
-			case REST:
-				if (inRest) {
-					// Rest continues
-					currentLength++;
-					
-				} else {
-					// New rest
-					int reducedLength = currentLength / gcf;
-					
-					// Add initial symbol (complex in case pattern begins with a TIE)
-					reducedPattern.add(reducedPattern.isEmpty() ? beatQuantum.get(0) : MetricalLpcfgQuantum.ONSET);
-					
-					// Add all ties
-					for (int j = 1; j < reducedLength; j++) {
-						reducedPattern.add(MetricalLpcfgQuantum.TIE);
-					}
-					
-					inRest = true;
-					currentLength = 1;
-				}
-				break;
-				
-			case ONSET:
-				// New note
-				int reducedLength = currentLength / gcf;
-
-				if (inRest) {
-					// Add all RESTs
-					for (int j = 0; j < reducedLength; j++) {
-						reducedPattern.add(MetricalLpcfgQuantum.REST);
-					}
-					
-				} else {
-					// Add initial symbol (complex in case pattern begins with a TIE)
-					reducedPattern.add(reducedPattern.isEmpty() ? beatQuantum.get(0) : MetricalLpcfgQuantum.ONSET);
-				
-					// Add all TIEs
-					for (int j = 1; j < reducedLength; j++) {
-						reducedPattern.add(MetricalLpcfgQuantum.TIE);
-					}
-				}
-				
-				currentLength = 1;
-				inRest = false;
-				break;
-				
-			case TIE:
-				if (inRest) {
-					System.err.println("ERROR: TIE after REST - Treating as ONSET");
-					
-					reducedLength = currentLength / gcf;
-					
-					for (int j = 0; j < reducedLength; j++) {
-						reducedPattern.add(MetricalLpcfgQuantum.REST);
-					}
-					
-					currentLength = 1;
-					inRest = false;
-					
-				} else {
-					// Note continues
-					currentLength++;
-				}
-				break;
-			}
-		}
-		
-		// Handle final constituent
-		int reducedLength = currentLength / gcf;
-
-		if (inRest) {
-			// Add all RESTs
-			for (int j = 0; j < reducedLength; j++) {
-				reducedPattern.add(MetricalLpcfgQuantum.REST);
-			}
-			
-		} else {
-			// Add initial symbol (complex in case pattern begins with a TIE)
-			reducedPattern.add(reducedPattern.isEmpty() ? beatQuantum.get(0) : MetricalLpcfgQuantum.ONSET);
-		
-			// Add all TIEs
-			for (int j = 1; j < reducedLength; j++) {
-				reducedPattern.add(MetricalLpcfgQuantum.TIE);
-			}
-		}
-		
-		return reducedPattern;
-	}
-
-	/**
-	 * Get the greatest common factor of the lengths of all of the constituents in the given
-	 * pattern.
-	 * 
-	 * @param beatQuantum The pattern we want to reduce.
-	 * @return The greatest common factor of the constituents of the given pattern.
-	 */
-	private static int getGCF(List<MetricalLpcfgQuantum> beatQuantum) {
-		// Find constituent lengths
-		List<Integer> lengths = new ArrayList<Integer>();
-		lengths.add(1);
-		
-		int gcf = 0;
-		
-		// Are we initially in a rest?
-		boolean inRest = beatQuantum.get(0) == MetricalLpcfgQuantum.REST;
-		
-		for (int i = 1; i < beatQuantum.size(); i++) {
-			if (gcf == 1) {
-				return 1;
-			}
-			
-			switch (beatQuantum.get(i)) {
-			case REST:
-				if (inRest) {
-					// Rest continues
-					incrementLast(lengths);
-					
-				} else {
-					// New rest
-					inRest = true;
-					int lastLength = lengths.get(lengths.size() - 1);
-					gcf = gcf == 0 ? lastLength : MathUtils.getGCF(gcf, lastLength);
-					lengths.add(1);
-				}
-				break;
-				
-			case ONSET:
-				// New note
-				int lastLength = lengths.get(lengths.size() - 1);
-				gcf = gcf == 0 ? lastLength : MathUtils.getGCF(gcf, lastLength);
-				lengths.add(1);
-				inRest = false;
-				break;
-				
-			case TIE:
-				if (inRest) {
-					System.err.println("ERROR: TIE after REST - Treating as ONSET");
-					lastLength = lengths.get(lengths.size() - 1);
-					gcf = gcf == 0 ? lastLength : MathUtils.getGCF(gcf, lastLength);
-					lengths.add(1);
-					inRest = false;
-					
-				} else {
-					// Note continues
-					incrementLast(lengths);
-				}
-				break;
-			}
-		}
-		
-		// Add last constituent (if we already did, it won't affect the gcf anyways)
-		int lastLength = lengths.get(lengths.size() - 1);
-		gcf = gcf == 0 ? lastLength : MathUtils.getGCF(gcf, lastLength);
-		
-		return gcf;
-	}
-
-	/**
-	 * Utility method to increment the last value in an Integer List.
-	 * 
-	 * @param list The Integer List whose last value we want to increment.
-	 */
-	private static void incrementLast(List<Integer> list) {
-		if (list.isEmpty()) {
-			return;
-		}
-		
-		list.set(list.size() - 1, list.get(list.size() - 1) + 1);
 	}
 	
 	/**

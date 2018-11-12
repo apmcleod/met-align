@@ -661,7 +661,7 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		sb.append(typeString).append(';');
 		sb.append(head.getLength());
 		
-		return sb.toString().intern();
+		return sb.toString();
 	}
 	
 	/**
@@ -691,7 +691,7 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 				break;
 		}
 		
-		return encode(measureKey, typeString, head).intern();
+		return encode(measureKey, typeString, head);
 	}
 	
 	/**
@@ -710,6 +710,6 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		sb.append(typeString).append(';');
 		sb.append(head.getLength());
 		
-		return sb.toString().intern();
+		return sb.toString();
 	}
 }
