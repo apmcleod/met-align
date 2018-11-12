@@ -3,6 +3,7 @@ package metalign.hierarchy.lpcfg;
 import java.util.ArrayList;
 import java.util.List;
 
+import metalign.Main;
 import metalign.hierarchy.Measure;
 import metalign.hierarchy.lpcfg.MetricalLpcfgNonterminal.MetricalLpcfgLevel;
 import metalign.utils.MidiNote;
@@ -48,6 +49,25 @@ public class MetricalLpcfgTreeFactory {
 		
 		for (int i = firstBeatIndex; i < lastBeatIndex; i++) {
 			quantumLists = makeAllQuantums(previous, quantumLists, subBeatTimes.subList(i, i + 2), notes, alignments);
+		}
+		
+		// Extend notes
+		if (Main.EXTEND_NOTES) {
+			for (List<MetricalLpcfgQuantum> barQuantum : quantumLists) {
+				boolean firstNonRestFound = false;
+				for (int i = 0; i < barQuantum.size(); i++) {
+					if (!firstNonRestFound) {
+						if (barQuantum.get(i) != MetricalLpcfgQuantum.REST) {
+							firstNonRestFound = true;
+						}
+							
+					} else {
+						if (barQuantum.get(i) == MetricalLpcfgQuantum.REST) {
+							barQuantum.set(i, MetricalLpcfgQuantum.TIE);
+						}
+					}
+				}
+			}
 		}
 		
 		return quantumLists;
@@ -125,6 +145,9 @@ public class MetricalLpcfgTreeFactory {
 						
 						if (quantums.get(i - 1) == MetricalLpcfgQuantum.REST) {
 							quantums.set(i - 1, MetricalLpcfgQuantum.TIE);
+							if (i > 1 && quantums.get(i - 2) == MetricalLpcfgQuantum.REST) {
+								System.err.println("Error created");
+							}
 						}
 					}
 				}
