@@ -11,9 +11,9 @@ import java.util.List;
  */
 public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable {
 	/**
-	 * Version 2
+	 * Version 3
 	 */
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 3L;
 	
 	/**
 	 * An enum representing the type of a {@link MetricalLpcfgNonterminal}
@@ -169,29 +169,6 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	}
 	
 	/**
-	 * Save terminal for faster computation.
-	 */
-	private MetricalLpcfgTerminal terminal = null;
-	
-	@Override
-	public MetricalLpcfgTerminal getTerminal() {
-		if (terminal != null) {
-			return terminal;
-		}
-		
-		List<MetricalLpcfgQuantum> quantumsList = new ArrayList<MetricalLpcfgQuantum>();
-		
-		for (MetricalLpcfgNode child : children) {
-			for (MetricalLpcfgQuantum quantum : child.getTerminal().getOriginalPattern()) {
-				quantumsList.add(quantum);
-			}
-		}
-		
-		terminal = new MetricalLpcfgTerminal(quantumsList, getLength());
-		return terminal;
-	}
-	
-	/**
 	 * Get the transition String of this non-terminal.
 	 * 
 	 * @return The transition String of this non-terminal.
@@ -212,6 +189,11 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	}
 	
 	/**
+	 * Save head for faster computation.
+	 */
+	private MetricalLpcfgHead head = null;
+	
+	/**
 	 * Get the head of this non-terminal. This is calculated recursively as the max of the heads
 	 * of all of its children with onsets shifted, or a length 0 head if it has no children.
 	 * 
@@ -219,7 +201,29 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	 */
 	@Override
 	public MetricalLpcfgHead getHead() {
-		return getTerminal().getHead();
+		if (head != null) {
+			return head;
+		}
+		
+		if (children.size() == 1 && children.get(0) instanceof MetricalLpcfgTerminal) {
+			head = children.get(0).getHead();
+			return head;
+		}
+		
+		// Head is either a head of a child, or some head overlapping a boundary
+		head = MetricalLpcfgTerminal.generateHead(getQuantum(), getLength());
+		return head;
+	}
+	
+	@Override
+	public List<MetricalLpcfgQuantum> getQuantum() {
+		List<MetricalLpcfgQuantum> quantum = new ArrayList<MetricalLpcfgQuantum>();
+		
+		for (MetricalLpcfgNode child : children) {
+			quantum.addAll(child.getQuantum());
+		}
+		
+		return quantum;
 	}
 	
 	/**
@@ -227,8 +231,8 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	 * a terminal node, do nothing to it.
 	 */
 	public void fixChildrenTypes() {
-		MetricalLpcfgHead min = new MetricalLpcfgHead(Double.MAX_VALUE, 0, false);
-		MetricalLpcfgHead max = new MetricalLpcfgHead();
+		MetricalLpcfgHead min = MetricalLpcfgHead.MAX_HEAD;
+		MetricalLpcfgHead max = MetricalLpcfgHead.MIN_HEAD;
 		
 		for (MetricalLpcfgNode child : children) {
 			MetricalLpcfgHead childHead = child.getHead();
@@ -245,31 +249,21 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 		if (max.equals(min)) {
 			// EVEN
 			for (MetricalLpcfgNode child : children) {
-				if (child instanceof MetricalLpcfgNonterminal) {
-					((MetricalLpcfgNonterminal) child).setType(MetricalLpcfgType.EVEN);
-				}
+				((MetricalLpcfgNonterminal) child).setType(MetricalLpcfgType.EVEN);
 			}
 			
 		} else {
 			// Strong (max) and weak (other)
 			for (MetricalLpcfgNode child : children) {
-				if (child instanceof MetricalLpcfgNonterminal) {
-					((MetricalLpcfgNonterminal) child).setType(child.getHead().equals(max) ?
+				((MetricalLpcfgNonterminal) child).setType(child.getHead().equals(max) ?
 							MetricalLpcfgType.STRONG : MetricalLpcfgType.WEAK);
-				}
 			}
 		}
 	}
 	
 	@Override
 	public int getLength() {
-		int length = 0;
-		
-		for (MetricalLpcfgNode child : children) {
-			length += child.getLength();
-		}
-		
-		return length;
+		return children.get(0).getLength() * children.size();
 	}
 	
 	@Override

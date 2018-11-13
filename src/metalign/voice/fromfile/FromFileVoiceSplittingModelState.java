@@ -115,26 +115,28 @@ public class FromFileVoiceSplittingModelState extends VoiceSplittingModelState {
 			return -1;
 		}
 		
-		FromFileVoiceSplittingModelState o = (FromFileVoiceSplittingModelState) other;
-		
-		int result = Long.compare(mostRecentTime, o.mostRecentTime);
-		if (result != 0) {
-			return result;
-		}
-		
-		result = voices.size() - o.voices.size();
-		if (result != 0) {
-			return result;
-		}
-		
-		for (int i = 0; i < voices.size(); i++) {
-			result = voices.get(i).compareTo(o.voices.get(i));
-			if (result != 0) {
-				return result;
-			}
-		}
-		
 		return 0;
+		
+//		FromFileVoiceSplittingModelState o = (FromFileVoiceSplittingModelState) other;
+//		
+//		int result = Long.compare(mostRecentTime, o.mostRecentTime);
+//		if (result != 0) {
+//			return result;
+//		}
+//		
+//		result = voices.size() - o.voices.size();
+//		if (result != 0) {
+//			return result;
+//		}
+//		
+//		for (int i = 0; i < voices.size(); i++) {
+//			result = voices.get(i).compareTo(o.voices.get(i));
+//			if (result != 0) {
+//				return result;
+//			}
+//		}
+//		
+//		return 0;
 	}
 
 }

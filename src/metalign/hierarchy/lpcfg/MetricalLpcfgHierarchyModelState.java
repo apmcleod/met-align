@@ -370,7 +370,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			List<List<Integer>> alignmentDiffs = new ArrayList<List<Integer>>();
 			alignmentDiffs.add(new ArrayList<Integer>());
 			
-			List<List<MetricalLpcfgQuantum>> quantumLists = MetricalLpcfgTreeFactory.makeQuantumLists(
+			Iterable<List<MetricalLpcfgQuantum>> quantumLists = MetricalLpcfgTreeFactory.makeQuantumLists(
 					voiceNotes, voicePrevious, beatState.getBeatTimes(), measure, anacrusisLength,
 					measureNum, hasBegun.get(voiceIndex), alignmentDiffs);
 			
@@ -385,9 +385,9 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			List<MetricalLpcfgQuantum> minQuantums = null;
 			
 			// Try each hypothesis list, and use the one with the greatest probability according to the grammar and the alignment.
-			for (int i = 0; i < quantumLists.size(); i++) {
-				List<MetricalLpcfgQuantum> quantums = quantumLists.get(i);
-				List<Integer> alignments = alignmentDiffs.get(i);
+			int i = -1;
+			for (List<MetricalLpcfgQuantum> quantums : quantumLists) {
+				List<Integer> alignments = alignmentDiffs.get(++i);
 			
 				double alignmentLogProb = getAlignmentLogProbability(alignments);
 				double globalTreeLogProb = 0.0;
@@ -448,7 +448,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					minQuantums = quantums;
 					minIsEmpty = isEmpty;
 					minUseTree = useTree;
-					minPrevious = voicePrevious.get(voiceIndex);
+					minPrevious = voicePrevious.get(i);
 				}
 			}
 			

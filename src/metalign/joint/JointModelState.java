@@ -176,8 +176,9 @@ public class JointModelState extends MidiModelState {
 				
 				// Special case to add new voice to hierarchy note trackers if the note has been removed
 				if (hierarchyStateCopy instanceof MetricalLpcfgHierarchyModelState && newNotes.size() < notes.size()) {
-					for (int j = 0; j < newVoiceState.getVoices().size(); j++) {
-						Voice voice = newVoiceState.getVoices().get(j);
+					List<Voice> voices = newVoiceState.getVoices();
+					for (int j = 0; j < voices.size(); j++) {
+						Voice voice = voices.get(j);
 						
 						boolean needToFix = true;
 						for (MidiNote note : voice.getNotes()) {

@@ -1,5 +1,7 @@
 package metalign.hierarchy.lpcfg;
 
+import java.util.List;
+
 /**
  * A <code>MetricalLpcfgNode</code> represents a node in the tree of the metrical lpcfg.
  * Each node can be either a terminal ({@link MetricalLpcfgTerminal}) or a non-terminal
@@ -8,6 +10,13 @@ package metalign.hierarchy.lpcfg;
  * @author Andrew McLeod - 25 April, 2016
  */
 public interface MetricalLpcfgNode {
+	/**
+	 * Get the quantum List of this lpcfg node.
+	 * 
+	 * @return The quantum List of this node.
+	 */
+	public List<MetricalLpcfgQuantum> getQuantum();
+	
 	/**
 	 * Get the head of this lpcfg node. This implements the lexicalization of the lpcfg.
 	 * 
@@ -22,13 +31,6 @@ public interface MetricalLpcfgNode {
 	 * @return The length of this node in sub beats.
 	 */
 	public int getLength();
-	
-	/**
-	 * Get the terminal at this level of the tree.
-	 * 
-	 * @return The terminal at this node.
-	 */
-	public MetricalLpcfgTerminal getTerminal();
 	
 	/**
 	 * Get if this node is empty or not.

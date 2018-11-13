@@ -16,6 +16,9 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 	 * Version 1
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	public static final MetricalLpcfgHead MAX_HEAD = new MetricalLpcfgHead(Double.MAX_VALUE, 0, false);
+	public static final MetricalLpcfgHead MIN_HEAD = new MetricalLpcfgHead();
 
 	/**
 	 * The length of this head, normalized so that a value of <code>1.0</code> represents

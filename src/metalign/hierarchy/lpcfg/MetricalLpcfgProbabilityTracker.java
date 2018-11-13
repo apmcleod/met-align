@@ -384,10 +384,7 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		}
 		
 		String key = encode(measure, typeString, head);
-		String backoffKey = encodeBackoff(measure, typeString, head, level);
-		
 		Map<String, Integer> transitionMapConditioned = transitionMap.get(key);
-		Map<String, Integer> transitionMapBackoffConditioned = transitionMap.get(backoffKey);
 		
 		double logProbability = 0.0;
 		
@@ -403,13 +400,18 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		}
 		
 		// Get backoff probability if needed
-		if (count == 0 && transitionMapBackoffConditioned != null) {
-			count = transitionMapBackoffConditioned.get(transitionString);
-			if (count == null) {
-				count = 0;
-			}
+		if (count == 0) {
+			String backoffKey = encodeBackoff(measure, typeString, head, level);
+			Map<String, Integer> transitionMapBackoffConditioned = transitionMap.get(backoffKey);
 			
-			logProbability += Math.log(transitionMapSmoothed.get(backoffKey).get(count)); 
+			if (transitionMapBackoffConditioned != null) {
+				count = transitionMapBackoffConditioned.get(transitionString);
+				if (count == null) {
+					count = 0;
+				}
+				
+				logProbability += Math.log(transitionMapSmoothed.get(backoffKey).get(count));
+			}
 		}
 		
 		return logProbability;
@@ -555,11 +557,8 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		}
 		
 		String key = encode(measure, typeString, parentHead);
-		String backoffKey = encodeBackoff(measure, typeString, parentHead, level);
 		double headLength = head.getLength();
-		
 		Map<Double, Integer> headMapConditioned = headMap.get(key);
-		Map<Double, Integer> headMapBackoffConditioned = headMap.get(backoffKey);
 		
 		double logProbability = 0.0;
 		
@@ -575,13 +574,18 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		}
 		
 		// Get backoff probability if needed
-		if (count == 0 && headMapBackoffConditioned != null) {
-			count = headMapBackoffConditioned.get(headLength);
-			if (count == null) {
-				count = 0;
-			}
+		if (count == 0) {
+			String backoffKey = encodeBackoff(measure, typeString, parentHead, level);
+			Map<Double, Integer> headMapBackoffConditioned = headMap.get(backoffKey);
 			
-			logProbability += Math.log(headMapSmoothed.get(backoffKey).get(count)); 
+			if (headMapBackoffConditioned != null) {
+				count = headMapBackoffConditioned.get(headLength);
+				if (count == null) {
+					count = 0;
+				}
+				
+				logProbability += Math.log(headMapSmoothed.get(backoffKey).get(count));
+			}
 		}
 		
 		return logProbability;

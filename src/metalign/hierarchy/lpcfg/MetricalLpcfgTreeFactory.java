@@ -1,7 +1,9 @@
 package metalign.hierarchy.lpcfg;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import metalign.Main;
 import metalign.hierarchy.Measure;
@@ -33,7 +35,7 @@ public class MetricalLpcfgTreeFactory {
 	 * 
 	 * @return A tree of the given measure type, containing the given notes.
 	 */
-	public static List<List<MetricalLpcfgQuantum>> makeQuantumLists(List<MidiNote> notes, List<Integer> previous,
+	public static Set<List<MetricalLpcfgQuantum>> makeQuantumLists(List<MidiNote> notes, List<Integer> previous,
 			List<Integer> subBeatTimes, Measure measure, int anacrusisLength, int measureNum, boolean hasBegun, List<List<Integer>> alignments) {
 		
 		int beatsPerBar = measure.getBeatsPerBar();
@@ -45,7 +47,7 @@ public class MetricalLpcfgTreeFactory {
 		firstBeatIndex = Math.max(firstBeatIndex, 0);
 		
 		// Make quantums for each sub beat
-		List<List<MetricalLpcfgQuantum>> quantumLists = new ArrayList<List<MetricalLpcfgQuantum>>();
+		Set<List<MetricalLpcfgQuantum>> quantumLists = new LinkedHashSet<List<MetricalLpcfgQuantum>>();
 		quantumLists.add(new ArrayList<MetricalLpcfgQuantum>());
 		
 		for (int i = firstBeatIndex; i < lastBeatIndex; i++) {
@@ -84,44 +86,45 @@ public class MetricalLpcfgTreeFactory {
 	 * @param notes The notes we will add to this sub beat.
 	 * @return A List of length 2*previous.size(), containing for each in previous, a 3-length and a 4-length quantum list.
 	 */
-	private static List<List<MetricalLpcfgQuantum>> makeAllQuantums(List<Integer> previous, List<List<MetricalLpcfgQuantum>> existingQuantums,
+	private static Set<List<MetricalLpcfgQuantum>> makeAllQuantums(List<Integer> previous, Set<List<MetricalLpcfgQuantum>> existingQuantums,
 			List<Integer> edges, List<MidiNote> notes, List<List<Integer>> alignments) {
 		List<List<Integer>> tatumLists = new ArrayList<List<Integer>>(2);
 		List<List<Integer>> newAlignments = new ArrayList<List<Integer>>();
 		List<List<MetricalLpcfgQuantum>> newQuantums = new ArrayList<List<MetricalLpcfgQuantum>>();
+		Set<List<MetricalLpcfgQuantum>> quantumSet = new LinkedHashSet<List<MetricalLpcfgQuantum>>();
 		
 		List<Integer> tatums3 = addTatums(edges, 3);
 		List<Integer> tatums4 = addTatums(edges, 4);
 		
-		for (int i = 0; i < previous.size(); i++) {
+		int i = 0;
+		for (List<MetricalLpcfgQuantum> existing : existingQuantums) {
 			int prev = previous.get(i);
-			List<Integer> align = alignments.get(i);
+			List<Integer> align = alignments.get(i++);
 			
 			List<Integer> newTatums = new ArrayList<Integer>(tatums3.size() + 1);
 			newTatums.add(prev);
 			newTatums.addAll(tatums3);
 			tatumLists.add(newTatums);
 			newAlignments.add(new ArrayList<Integer>(align));
-			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existingQuantums.get(i)));
+			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
 			
 			newTatums = new ArrayList<Integer>(tatums4.size() + 1);
 			newTatums.add(prev);
 			newTatums.addAll(tatums4);
 			tatumLists.add(newTatums);
 			newAlignments.add(new ArrayList<Integer>(align));
-			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existingQuantums.get(i)));
+			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
 		}
 		
 		previous.clear();
 		alignments.clear();
-		alignments.addAll(newAlignments);
 		
 		for (int j = 0; j < tatumLists.size(); j++) {
 			List<Integer> tatums = tatumLists.get(j);
 			List<Integer> align = newAlignments.get(j);
 			
 			List<MetricalLpcfgQuantum> quantums = new ArrayList<MetricalLpcfgQuantum>(tatums.size() - 2);
-			for (int i = 0; i < tatums.size() - 2; i++) {
+			for (i = 0; i < tatums.size() - 2; i++) {
 				quantums.add(MetricalLpcfgQuantum.REST);
 			}
 			
@@ -131,7 +134,7 @@ public class MetricalLpcfgTreeFactory {
 				
 				boolean started = onsetTatumIndex == 0;
 				
-				for (int i = 1; i < Math.min(tatums.size() - 1, offsetTatumIndex); i++) {
+				for (i = 1; i < Math.min(tatums.size() - 1, offsetTatumIndex); i++) {
 					if (!started) {
 						if (onsetTatumIndex == i) {
 							quantums.set(i - 1,  MetricalLpcfgQuantum.ONSET);
@@ -147,11 +150,14 @@ public class MetricalLpcfgTreeFactory {
 				}
 			}
 			
-			previous.add(tatums.get(tatums.size() - 2));
 			newQuantums.get(j).addAll(lengthenTo(quantums, 12));
+			if (quantumSet.add(newQuantums.get(j))) {
+				previous.add(tatums.get(tatums.size() - 2));
+				alignments.add(align);
+			}
 		}
 		
-		return newQuantums;
+		return quantumSet;
 	}
 	
 	/**
@@ -238,14 +244,8 @@ public class MetricalLpcfgTreeFactory {
 		int beatLength = quantums.size() / beatsPerMeasure;
 		
 		// Create beat quantum arrays
-		List<List<MetricalLpcfgQuantum>> beatQuantums = new ArrayList<List<MetricalLpcfgQuantum>>(beatsPerMeasure);
-		for (int beat = 0; beat < beatsPerMeasure; beat++) {
-			beatQuantums.add(quantums.subList(beatLength * beat, beatLength * (beat + 1)));
-		}
-		
-		// Create beat nodes
-		for (List<MetricalLpcfgQuantum> beatQuantum : beatQuantums) {
-			measure.addChild(makeBeatNonterminal(beatQuantum, subBeatsPerBeat));
+		for (int beat = 0; beat < quantums.size();) {
+			measure.addChild(makeBeatNonterminal(quantums.subList(beat, (beat += beatLength)), subBeatsPerBeat));
 		}
 		measure.fixChildrenTypes();
 		
@@ -262,23 +262,16 @@ public class MetricalLpcfgTreeFactory {
 	private static MetricalLpcfgNonterminal makeBeatNonterminal(List<MetricalLpcfgQuantum> beatQuantum, int subBeatsPerBeat) {
 		MetricalLpcfgNonterminal beatNonterminal = new MetricalLpcfgNonterminal(MetricalLpcfgLevel.BEAT);
 		
-		MetricalLpcfgTerminal beatTerminal = new MetricalLpcfgTerminal(beatQuantum, subBeatsPerBeat);
-		if (beatTerminal.reducesToOne()) {
-			beatNonterminal.addChild(beatTerminal);
+		if (MetricalLpcfgTerminal.reducesToOne(beatQuantum)) {
+			beatNonterminal.addChild(new MetricalLpcfgTerminal(beatQuantum, subBeatsPerBeat));
 			
 		} else {
 			// Need to split into sub beats
 			int subBeatLength = beatQuantum.size() / subBeatsPerBeat;
 			
 			// Create sub beat quantum arrays
-			List<List<MetricalLpcfgQuantum>> subBeatQuantums = new ArrayList<List<MetricalLpcfgQuantum>>(subBeatsPerBeat);
-			for (int subBeat = 0; subBeat < subBeatsPerBeat; subBeat++) {
-				subBeatQuantums.add(beatQuantum.subList(subBeatLength * subBeat, subBeatLength * (subBeat + 1)));
-			}
-			
-			// Create sub beat nodes
-			for (List<MetricalLpcfgQuantum> subBeatQuantum : subBeatQuantums) {
-				beatNonterminal.addChild(makeSubBeatNonterminal(subBeatQuantum));
+			for (int subBeat = 0; subBeat < beatQuantum.size();) {
+				beatNonterminal.addChild(makeSubBeatNonterminal(beatQuantum.subList(subBeat, (subBeat += subBeatLength))));
 			}
 			beatNonterminal.fixChildrenTypes();
 		}
