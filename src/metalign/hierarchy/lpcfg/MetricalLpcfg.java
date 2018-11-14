@@ -79,7 +79,8 @@ public class MetricalLpcfg implements Serializable {
 	 * @return The log probability of the given tree in our grammar.
 	 */
 	public double getTreeLogProbability(MetricalLpcfgTree tree) {
-		return getNodeLogProbability(tree.getMeasure(), tree.getMeasure().getHead(), tree.getMeasure().getMeasure());
+		MetricalLpcfgMeasure measure = tree.getMeasure();
+		return getNodeLogProbability(measure, measure.getHead(), measure.getMeasure());
 	}
 	
 	/**

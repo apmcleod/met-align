@@ -70,7 +70,12 @@ public class NoteBParser implements EventParser {
 				long time = Long.parseLong(beatMatcher.group(1)) * 1000;
 				int level = Integer.parseInt(beatMatcher.group(2));
 				lastTick = Math.max(lastTick, time);
-				tt.addBeat(time, level);
+				try {
+					tt.addBeat(time, level);
+				} catch (IOException e) {
+					br.close();
+					throw new IOException("Error on line " + line + ":\n" + e.getLocalizedMessage());
+				}
 				
 			} else if (noteMatcher.matches()) {
 				long onsetTime = Long.parseLong(noteMatcher.group(1)) * 1000;

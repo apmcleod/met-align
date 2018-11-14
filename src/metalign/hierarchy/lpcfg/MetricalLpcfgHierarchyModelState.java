@@ -51,7 +51,13 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	/**
 	 * Object to save tree log probabilities so as not to regenerate every time.
 	 */
-	public static List<List<Map<List<MetricalLpcfgQuantum>, Double>>> treeMap = new ArrayList<List<Map<List<MetricalLpcfgQuantum>, Double>>>();
+	public static List<List<Map<List<MetricalLpcfgQuantum>, Double>>> treeProbMap = new ArrayList<List<Map<List<MetricalLpcfgQuantum>, Double>>>();
+	
+	/**
+	 * Object to save trees so as not to regenerate every time.
+	 */
+	public static List<List<Map<List<MetricalLpcfgQuantum>, MetricalLpcfgTree>>> treeMap = new ArrayList<List<Map<List<MetricalLpcfgQuantum>, MetricalLpcfgTree>>>();
+	
 	
 	/**
 	 * The length of the anacrusis in this state, measured in quantums.
@@ -279,7 +285,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			newStates.addAll(getAllFirstStepBranches());
 			
 		} else {
-			while (beatState.getNumTatums() > nextMeasureIndex) {
+			while (beatState.getNumTatums() > nextMeasureIndex && getScore() != Double.NEGATIVE_INFINITY) {
 				parseStep();
 			}
 			
@@ -307,7 +313,20 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		// Add measure hypotheses
 		for (Measure measure : grammar.getMeasures()) {
 			
-			int subBeatsPerMeasure = measure.getBeatsPerBar() * measure.getSubBeatsPerBeat();
+			int beatsPerMeasure = measure.getBeatsPerBar();
+			int subBeatsPerBeat = measure.getSubBeatsPerBeat();
+			
+			while (treeProbMap.size() <= beatsPerMeasure) {
+				treeProbMap.add(new ArrayList<Map<List<MetricalLpcfgQuantum>, Double>>());
+				treeMap.add(new ArrayList<Map<List<MetricalLpcfgQuantum>, MetricalLpcfgTree>>());
+			}
+			
+			while (treeProbMap.get(beatsPerMeasure).size() <= subBeatsPerBeat) {
+				treeProbMap.get(beatsPerMeasure).add(new HashMap<List<MetricalLpcfgQuantum>, Double>());
+				treeMap.get(beatsPerMeasure).add(new HashMap<List<MetricalLpcfgQuantum>, MetricalLpcfgTree>());
+			}
+			
+			int subBeatsPerMeasure = beatsPerMeasure * subBeatsPerBeat;
 			for (int anacrusisLength = 0; anacrusisLength < subBeatsPerMeasure; anacrusisLength++) {
 				
 				measure = new Measure(measure.getBeatsPerBar(), measure.getSubBeatsPerBeat());
@@ -334,7 +353,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	
 	@Override
 	public TreeSet<MetricalLpcfgHierarchyModelState> close() {
-		while (nextMeasureIndex <= beatState.getNumTatums()) {
+		while (nextMeasureIndex <= beatState.getNumTatums() && getScore() != Double.NEGATIVE_INFINITY) {
 			parseStep();
 		}
 				
@@ -390,6 +409,10 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				List<Integer> alignments = alignmentDiffs.get(++i);
 			
 				double alignmentLogProb = getAlignmentLogProbability(alignments);
+				if (alignmentLogProb <= minTotalLogProb) {
+					continue;
+				}
+				
 				double globalTreeLogProb = 0.0;
 				double localTreeLogProb = 0.0;
 				boolean useTree = false;
@@ -408,24 +431,24 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					useTree = true;
 					int beatsPerMeasure = measure.getBeatsPerBar();
 					int subBeatsPerBeat = measure.getSubBeatsPerBeat();
-					while (treeMap.size() <= beatsPerMeasure) {
-						treeMap.add(new ArrayList<Map<List<MetricalLpcfgQuantum>, Double>>());
-					}
 					
-					while (treeMap.get(beatsPerMeasure).size() <= subBeatsPerBeat) {
-						treeMap.get(beatsPerMeasure).add(new HashMap<List<MetricalLpcfgQuantum>, Double>());
-					}
+					Map<List<MetricalLpcfgQuantum>, Double> nestedTreeProbMap = treeProbMap.get(beatsPerMeasure).get(subBeatsPerBeat);
+					Map<List<MetricalLpcfgQuantum>, MetricalLpcfgTree> nestedTreeMap = treeMap.get(beatsPerMeasure).get(subBeatsPerBeat);
 					
-					Map<List<MetricalLpcfgQuantum>, Double> nestedTreeMap = treeMap.get(beatsPerMeasure).get(subBeatsPerBeat);
-					
-					Double logProb = nestedTreeMap.get(quantums);
+					Double logProb = nestedTreeProbMap.get(quantums);
 					if (logProb == null) {
 						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
+						nestedTreeMap.put(quantums, tree);
 						logProb = grammar.getTreeLogProbability(tree);
-						nestedTreeMap.put(quantums, logProb);
+						nestedTreeProbMap.put(quantums, logProb);
+					} else {
+						tree = nestedTreeMap.get(quantums);
 					}
-					globalTreeLogProb = logProb;
+					globalTreeLogProb = logProb * GLOBAL_WEIGHT;
 					
+					if (alignmentLogProb + globalTreeLogProb <= minTotalLogProb) {
+						continue;
+					}
 					
 					if (GLOBAL_WEIGHT != 1.0) {
 						if (tree == null) {
@@ -438,7 +461,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					}
 				}
 				
-				double totalLogProb = alignmentLogProb + GLOBAL_WEIGHT * globalTreeLogProb + (1.0 - GLOBAL_WEIGHT) * localTreeLogProb;
+				double totalLogProb = alignmentLogProb + globalTreeLogProb + (1.0 - GLOBAL_WEIGHT) * localTreeLogProb;
 				
 				if (totalLogProb > minTotalLogProb) {
 					minTotalLogProb = totalLogProb;
@@ -450,6 +473,14 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					minUseTree = useTree;
 					minPrevious = voicePrevious.get(i);
 				}
+			}
+			
+			if (minQuantums == null) {
+				alignmentLogProbability = Double.NEGATIVE_INFINITY;
+				logProbability += minGlobalTreeLogProb;
+				localLogProb += minLocalTreeLogProb;
+				
+				return;
 			}
 			
 			// Here we have the min of everything. Add them in.

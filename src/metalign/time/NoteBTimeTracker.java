@@ -1,5 +1,6 @@
 package metalign.time;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,27 +34,43 @@ public class NoteBTimeTracker extends TimeTracker {
 		minimumForSubBeat = 0;
 	}
 
-	public void addBeat(long time, int level) {
+	public void addBeat(long time, int level) throws IOException {
 		if (level == 0) {
 			// Skip level 0. Extrapolate.
 			return;
 		}
 		
+		Beat beat = new Beat(barNum, beatNum, subBeatNum, 0, time , time);
 		if (level == downBeatLevel) {
-			barNum++;
-			beatNum = 0;
-			subBeatNum = 0;
+			if (beatNum != 0 || subBeatNum != 0) {
+				throw new IOException("Unexpected downbeat.");
+			}
+			subBeatNum++;
 			
 		} else if (level >= minimumForBeat) {
-			beatNum++;
-			subBeatNum = 0;
+			if (beatNum == 0 || subBeatNum != 0) {
+				throw new IOException("Unexpected beat.");
+			}
+			subBeatNum++;
 			
 		} else if (level >= minimumForSubBeat) {
+			if (subBeatNum == 0) {
+				throw new IOException("Unexpected sub beat.");
+			}
 			subBeatNum++;
 		}
 		
+		if (subBeatNum >= timeSig.getMeasure().getSubBeatsPerBeat()) {
+			subBeatNum = 0;
+			beatNum++;
+			
+			if (beatNum >= timeSig.getMeasure().getBeatsPerBar()) {
+				beatNum = 0;
+				barNum++;
+			}
+		}
+		
 		if (level >= minimumForSubBeat) {
-			Beat beat = new Beat(barNum, beatNum, subBeatNum, 0, time , time);
 			beats.add(beat);
 		}
 	}
@@ -165,8 +182,8 @@ public class NoteBTimeTracker extends TimeTracker {
 		anacrusisSubBeats = length;
 		
 		if (anacrusisSubBeats != 0) {
-			subBeatNum = (-anacrusisSubBeats + timeSig.getMeasure().getSubBeatsPerBeat() * timeSig.getMeasure().getBeatsPerBar()) % timeSig.getMeasure().getSubBeatsPerBeat() - 1 - 1;
-			beatNum = (-anacrusisSubBeats + timeSig.getMeasure().getSubBeatsPerBeat() * timeSig.getMeasure().getBeatsPerBar()) % timeSig.getMeasure().getBeatsPerBar();
+			subBeatNum = (-anacrusisSubBeats + timeSig.getMeasure().getSubBeatsPerBeat() * timeSig.getMeasure().getBeatsPerBar()) % timeSig.getMeasure().getSubBeatsPerBeat();
+			beatNum = (-anacrusisSubBeats + timeSig.getMeasure().getSubBeatsPerBeat() * timeSig.getMeasure().getBeatsPerBar()) / timeSig.getMeasure().getSubBeatsPerBeat();
 		}
 	}
 	

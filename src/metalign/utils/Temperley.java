@@ -167,7 +167,7 @@ public class Temperley {
 		
 		// -1 is needed here because we increment subBeat in the level == 2 case
 		int subBeat = (-anacrusisLengthSubBeats + subBeatsPerBeat * beatsPerBar) % subBeatsPerBeat - 1;
-		int beat = (-anacrusisLengthSubBeats + subBeatsPerBeat * beatsPerBar) % beatsPerBar;
+		int beat = (-anacrusisLengthSubBeats + subBeatsPerBeat * beatsPerBar) / subBeatsPerBeat;
 		int bar = 0;
 		
 		for (int i = 0; i < times.size(); i++) {

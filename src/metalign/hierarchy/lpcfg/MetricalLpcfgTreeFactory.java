@@ -42,7 +42,8 @@ public class MetricalLpcfgTreeFactory {
 		int subBeatsPerBeat = measure.getSubBeatsPerBeat();
 		int subBeatsPerBar = beatsPerBar * subBeatsPerBeat;
 		
-		int firstBeatIndex = subBeatsPerBar * measureNum + anacrusisLength; 
+		int firstBeatIndex = subBeatsPerBar * measureNum + anacrusisLength;
+		int firstSubBeatNum = firstBeatIndex < 0 ? -firstBeatIndex : 0;
 		int lastBeatIndex = firstBeatIndex + subBeatsPerBar;
 		firstBeatIndex = Math.max(firstBeatIndex, 0);
 		
@@ -50,8 +51,12 @@ public class MetricalLpcfgTreeFactory {
 		Set<List<MetricalLpcfgQuantum>> quantumLists = new LinkedHashSet<List<MetricalLpcfgQuantum>>();
 		quantumLists.add(new ArrayList<MetricalLpcfgQuantum>());
 		
+		List<List<Integer>> subBeatSplits = new ArrayList<List<Integer>>();
+		subBeatSplits.add(new ArrayList<Integer>());
+		
 		for (int i = firstBeatIndex; i < lastBeatIndex; i++) {
-			quantumLists = makeAllQuantums(previous, quantumLists, subBeatTimes.subList(i, i + 2), notes, alignments);
+			quantumLists = makeAllQuantums(previous, quantumLists, subBeatTimes.subList(i, i + 2), notes, alignments,
+					subBeatSplits, firstSubBeatNum % subBeatsPerBeat == 0);
 		}
 		
 		// Extend notes
@@ -87,9 +92,11 @@ public class MetricalLpcfgTreeFactory {
 	 * @return A List of length 2*previous.size(), containing for each in previous, a 3-length and a 4-length quantum list.
 	 */
 	private static Set<List<MetricalLpcfgQuantum>> makeAllQuantums(List<Integer> previous, Set<List<MetricalLpcfgQuantum>> existingQuantums,
-			List<Integer> edges, List<MidiNote> notes, List<List<Integer>> alignments) {
+			List<Integer> edges, List<MidiNote> notes, List<List<Integer>> alignments, List<List<Integer>> subBeatSplits,
+			boolean isFirstSubBeat) {
 		List<List<Integer>> tatumLists = new ArrayList<List<Integer>>(2);
 		List<List<Integer>> newAlignments = new ArrayList<List<Integer>>();
+		List<List<Integer>> newSplits = new ArrayList<List<Integer>>();
 		List<List<MetricalLpcfgQuantum>> newQuantums = new ArrayList<List<MetricalLpcfgQuantum>>();
 		Set<List<MetricalLpcfgQuantum>> quantumSet = new LinkedHashSet<List<MetricalLpcfgQuantum>>();
 		
@@ -99,12 +106,16 @@ public class MetricalLpcfgTreeFactory {
 		int i = 0;
 		for (List<MetricalLpcfgQuantum> existing : existingQuantums) {
 			int prev = previous.get(i);
+			List<Integer> splits = subBeatSplits.get(i);
 			List<Integer> align = alignments.get(i++);
 			
 			List<Integer> newTatums = new ArrayList<Integer>(tatums3.size() + 1);
 			newTatums.add(prev);
 			newTatums.addAll(tatums3);
 			tatumLists.add(newTatums);
+			List<Integer> newSplit = new ArrayList<Integer>(splits);
+			newSplit.add(3);
+			newSplits.add(newSplit);
 			newAlignments.add(new ArrayList<Integer>(align));
 			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
 			
@@ -112,16 +123,25 @@ public class MetricalLpcfgTreeFactory {
 			newTatums.add(prev);
 			newTatums.addAll(tatums4);
 			tatumLists.add(newTatums);
+			newSplit = new ArrayList<Integer>(splits);
+			newSplit.add(4);
+			newSplits.add(newSplit);
 			newAlignments.add(new ArrayList<Integer>(align));
 			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
 		}
 		
 		previous.clear();
 		alignments.clear();
+		subBeatSplits.clear();
 		
 		for (int j = 0; j < tatumLists.size(); j++) {
 			List<Integer> tatums = tatumLists.get(j);
 			List<Integer> align = newAlignments.get(j);
+			List<Integer> split = newSplits.get(j);
+			
+			if (!isFirstSubBeat && split.size() > 1 && split.get(split.size() - 1) != split.get(split.size() - 2)) {
+				continue;
+			}
 			
 			List<MetricalLpcfgQuantum> quantums = new ArrayList<MetricalLpcfgQuantum>(tatums.size() - 2);
 			for (i = 0; i < tatums.size() - 2; i++) {
@@ -134,7 +154,7 @@ public class MetricalLpcfgTreeFactory {
 				
 				boolean started = onsetTatumIndex == 0;
 				
-				for (i = 1; i < Math.min(tatums.size() - 1, offsetTatumIndex); i++) {
+				for (i = Math.max(onsetTatumIndex, 1); i < offsetTatumIndex && i < tatums.size() - 1; i++) {
 					if (!started) {
 						if (onsetTatumIndex == i) {
 							quantums.set(i - 1,  MetricalLpcfgQuantum.ONSET);
@@ -154,6 +174,7 @@ public class MetricalLpcfgTreeFactory {
 			if (quantumSet.add(newQuantums.get(j))) {
 				previous.add(tatums.get(tatums.size() - 2));
 				alignments.add(align);
+				subBeatSplits.add(split);
 			}
 		}
 		

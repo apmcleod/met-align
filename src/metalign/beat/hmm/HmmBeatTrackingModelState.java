@@ -264,7 +264,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 			
 			// Add sub beat times
 			if (subBeatsUntilFirstBeat > 0) {
-				timePerSubBeat = (beatTimes.get(0) - firstNoteTime) / subBeatsUntilFirstBeat;
+				timePerSubBeat = ((double) (beatTimes.get(0) - firstNoteTime)) / subBeatsUntilFirstBeat;
 				
 				// Handle until first beat
 				for (int i = 1; i <= subBeatsUntilFirstBeat; i++) {
@@ -279,7 +279,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 				int initialIndex = subBeatsUntilFirstBeat + i * subBeatsPerBeat;
 				int finalTime = beatTimes.get(i + 1);
 				
-				timePerSubBeat = (finalTime - initialTime) / subBeatsPerBeat;
+				timePerSubBeat = ((double) (finalTime - initialTime)) / subBeatsPerBeat;
 				
 				for (int j = 1; j < subBeatsPerBeat; j++) {
 					int time = (int) Math.round(initialTime + timePerSubBeat * j);
@@ -291,9 +291,9 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 		Set<List<Integer>> nudgedSubBeatTimesList = new HashSet<List<Integer>>();
 		
 		// Handle first beat
-		if (subBeatsUntilFirstBeat > 0) {
+		if (subBeatsUntilFirstBeat > 1) {
 			for (List<Integer> subBeatTimes : subBeatTimesList) {
-				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, 0, subBeatsUntilFirstBeat, timePerSubBeat * 2, params.MAGNETISM_SUB_BEAT));
+				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, 1, subBeatsUntilFirstBeat, timePerSubBeat * 2, params.MAGNETISM_SUB_BEAT));
 			}
 			subBeatTimesList = new ArrayList<List<Integer>>(nudgedSubBeatTimesList);
 		}
@@ -331,6 +331,10 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 			
 			// Add sub beat times into the new state
 			newState.tatums.addAll(subBeatTimes);
+			
+			if (subBeatTimes.get(0) != firstNoteTime) {
+				System.err.println("ERRORbt");
+			}
 			
 			// Get note probabilities and removed from unused notes list
 			for (int j = 0; j < newState.unusedNoteTimes.size(); j++) {
