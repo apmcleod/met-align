@@ -287,7 +287,6 @@ Beat  44380  2
 Beat  44520  0
 Beat  44695  1
 Beat  44835  0
-Beat  45010  2
 Note      0    315  68
 Note    315    630  66
 Note    630    945  64
