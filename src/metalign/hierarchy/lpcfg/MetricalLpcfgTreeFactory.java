@@ -80,6 +80,8 @@ public class MetricalLpcfgTreeFactory {
 		
 		return quantumLists;
 	}
+	
+	public static int[] SPLITS = new int[] {3, 4};
 
 	/**
 	 * Get all of the possible quantum lists for the given sub beat.
@@ -100,8 +102,10 @@ public class MetricalLpcfgTreeFactory {
 		List<List<MetricalLpcfgQuantum>> newQuantums = new ArrayList<List<MetricalLpcfgQuantum>>();
 		Set<List<MetricalLpcfgQuantum>> quantumSet = new LinkedHashSet<List<MetricalLpcfgQuantum>>();
 		
-		List<Integer> tatums3 = addTatums(edges, 3);
-		List<Integer> tatums4 = addTatums(edges, 4);
+		List<List<Integer>> tatumsS = new ArrayList<List<Integer>>(SPLITS.length);
+		for (int s : SPLITS) {
+			tatumsS.add(addTatums(edges, s));
+		}
 		
 		int i = 0;
 		for (List<MetricalLpcfgQuantum> existing : existingQuantums) {
@@ -109,25 +113,17 @@ public class MetricalLpcfgTreeFactory {
 			List<Integer> splits = subBeatSplits.get(i);
 			List<Integer> align = alignments.get(i++);
 			
-			List<Integer> newTatums = new ArrayList<Integer>(tatums3.size() + 1);
-			newTatums.add(prev);
-			newTatums.addAll(tatums3);
-			tatumLists.add(newTatums);
-			List<Integer> newSplit = new ArrayList<Integer>(splits);
-			newSplit.add(3);
-			newSplits.add(newSplit);
-			newAlignments.add(new ArrayList<Integer>(align));
-			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
-			
-			newTatums = new ArrayList<Integer>(tatums4.size() + 1);
-			newTatums.add(prev);
-			newTatums.addAll(tatums4);
-			tatumLists.add(newTatums);
-			newSplit = new ArrayList<Integer>(splits);
-			newSplit.add(4);
-			newSplits.add(newSplit);
-			newAlignments.add(new ArrayList<Integer>(align));
-			newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
+			for (List<Integer> tatum : tatumsS) {
+				List<Integer> newTatums = new ArrayList<Integer>(tatum.size() + 1);
+				newTatums.add(prev);
+				newTatums.addAll(tatum);
+				tatumLists.add(newTatums);
+				List<Integer> newSplit = new ArrayList<Integer>(splits);
+				newSplit.add(3);
+				newSplits.add(newSplit);
+				newAlignments.add(new ArrayList<Integer>(align));
+				newQuantums.add(new ArrayList<MetricalLpcfgQuantum>(existing));
+			}
 		}
 		
 		previous.clear();

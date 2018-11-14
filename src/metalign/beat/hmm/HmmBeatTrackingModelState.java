@@ -241,7 +241,8 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 		// Nudge beats
 		Set<List<Integer>> nudgedBeatTimesList = new HashSet<List<Integer>>();
 		for (List<Integer> beatTimes : beatTimesList) {
-			nudgedBeatTimesList.addAll(nudgeTimes(beatTimes, 0, beatTimes.size(), timePerSubBeat, params.MAGNETISM_BEAT));
+			nudgedBeatTimesList.addAll(nudgeTimes(beatTimes, subBeatsUntilFirstBeat == 0 ? 1 : 0,
+					beatTimes.size() - 1, timePerSubBeat, params.MAGNETISM_BEAT));
 		}
 		beatTimesList = new HashSet<List<Integer>>(nudgedBeatTimesList);
 		
@@ -293,7 +294,9 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 		// Handle first beat
 		if (subBeatsUntilFirstBeat > 1) {
 			for (List<Integer> subBeatTimes : subBeatTimesList) {
-				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, 1, subBeatsUntilFirstBeat, timePerSubBeat * 2, params.MAGNETISM_SUB_BEAT));
+				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, 1,
+						Math.min(subBeatsUntilFirstBeat, subBeatTimes.size() - 1), timePerSubBeat * 2,
+						params.MAGNETISM_SUB_BEAT));
 			}
 			subBeatTimesList = new ArrayList<List<Integer>>(nudgedSubBeatTimesList);
 		}
@@ -304,7 +307,9 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 			nudgedSubBeatTimesList = new HashSet<List<Integer>>();
 			
 			for (List<Integer> subBeatTimes : subBeatTimesList) {
-				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, initialIndex + 1, initialIndex + subBeatsPerBeat, timePerSubBeat * 2, params.MAGNETISM_SUB_BEAT));
+				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, initialIndex + 1,
+						Math.min(initialIndex + subBeatsPerBeat, subBeatTimes.size() - 1), timePerSubBeat * 2,
+						params.MAGNETISM_SUB_BEAT));
 			}
 			subBeatTimesList = new ArrayList<List<Integer>>(nudgedSubBeatTimesList);
 		}
@@ -333,7 +338,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 			newState.tatums.addAll(subBeatTimes);
 			
 			if (subBeatTimes.get(0) != firstNoteTime) {
-				System.err.println("ERRORbt");
+				System.out.println("ERRORb");
 			}
 			
 			// Get note probabilities and removed from unused notes list
