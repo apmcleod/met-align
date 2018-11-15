@@ -111,4 +111,6 @@ public abstract class HierarchyModelState extends MidiModelState {
 	public abstract HierarchyModelState deepCopy();
 	
 	public abstract int compareToNoRecurse(MidiModelState o);
+
+	public abstract Iterable<Measure> getMeasureTypes();
 }

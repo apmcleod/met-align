@@ -1176,4 +1176,9 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		return sb.toString();
 	}
+
+	@Override
+	public Iterable<Measure> getMeasureTypes() {
+		return grammar.getMeasures();
+	}
 }

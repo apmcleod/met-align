@@ -1,5 +1,6 @@
 package metalign.hierarchy.fromfile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -168,5 +169,12 @@ public class FromFileHierarchyModelState extends HierarchyModelState {
 		sb.append(" Score=").append(getScore());
 		
 		return sb.toString();
+	}
+
+	@Override
+	public Iterable<Measure> getMeasureTypes() {
+		List<Measure> measures = new ArrayList<Measure>(1);
+		measures.add(measure);
+		return measures;
 	}
 }
