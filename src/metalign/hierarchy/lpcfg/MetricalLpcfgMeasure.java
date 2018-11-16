@@ -33,38 +33,6 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 		setType(MetricalLpcfgType.MEASURE);
 		measure = new Measure(beatsPerMeasure, subBeatsPerBeat);
 	}
-
-	/**
-	 * Create a new measure node as a copy of the given one.
-	 * 
-	 * @param measure The measure node which we want a copy of.
-	 */
-	private MetricalLpcfgMeasure(MetricalLpcfgMeasure measure) {
-		super(measure);
-		
-		this.measure = new Measure(measure.measure.getBeatsPerMeasure(), measure.measure.getSubBeatsPerBeat());
-	}
-	
-	/**
-	 * Get the head of this non-terminal. This is calculated recursively as the max of the heads
-	 * of all of its children, or a length 0 head if it has no children.
-	 * 
-	 *  @return The head of this non-terminal.
-	 *
-	@Override
-	public MetricalLpcfgHead getHead() {
-		MetricalLpcfgHead head = new MetricalLpcfgHead();
-		
-		for (MetricalLpcfgNode child : getChildren()) {
-			MetricalLpcfgHead childHead = child.getHead();
-			
-			if (childHead.compareTo(head) < 0) {
-				head = childHead;
-			}
-		}
-		
-		return head;
-	}
 	
 	/**
 	 * Get the Measure type of this node.
@@ -83,11 +51,6 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 	@Override
 	public String getTypeString() {
 		return measure.toString();
-	}
-
-	@Override
-	public MetricalLpcfgMeasure deepCopy() {
-		return new MetricalLpcfgMeasure(this);
 	}
 	
 	@Override

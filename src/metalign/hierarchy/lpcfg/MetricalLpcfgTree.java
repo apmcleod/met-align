@@ -30,15 +30,6 @@ public class MetricalLpcfgTree implements Serializable {
 	}
 	
 	/**
-	 * Create a new tree as a deep copy of the given one.
-	 * 
-	 * @param tree The tree we want a deep copy of.
-	 */
-	private MetricalLpcfgTree(MetricalLpcfgTree tree) {
-		measure = tree.measure.deepCopy();
-	}
-	
-	/**
 	 * Get if this tree is empty or not.
 	 * 
 	 * @return True if this tree contains no notes. False otherwise.
@@ -63,15 +54,6 @@ public class MetricalLpcfgTree implements Serializable {
 	 */
 	public MetricalLpcfgMeasure getMeasure() {
 		return measure;
-	}
-
-	/**
-	 * Get a deep copy of this tree.
-	 * 
-	 * @return A deep copy of this tree.
-	 */
-	public MetricalLpcfgTree deepCopy() {
-		return new MetricalLpcfgTree(this);
 	}
 	
 	@Override

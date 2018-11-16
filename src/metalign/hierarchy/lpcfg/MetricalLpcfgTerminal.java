@@ -76,16 +76,6 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 		this.baseLength = baseLength;
 		head = generateHead();
 	}
-	
-	/**
-	 * Create a new MetricalGrammarTerminal, a shallow copy of the given one.
-	 */
-	private MetricalLpcfgTerminal(MetricalLpcfgTerminal terminal) {
-		reducedPattern = terminal.reducedPattern;
-		originalPattern = terminal.originalPattern;
-		baseLength = terminal.baseLength;
-		head = terminal.head;
-	}
 
 	/**
 	 * Convert the given pattern into reduced form and return it. That is, divide all constituent
@@ -397,16 +387,6 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	@Override
 	public MetricalLpcfgTerminal getTerminal() {
 		return this;
-	}
-	
-	/**
-	 * Return a copy of this terminal.
-	 * 
-	 * @return A copy of this terminal.
-	 */
-	@Override
-	public MetricalLpcfgTerminal deepCopy() {
-		return new MetricalLpcfgTerminal(this);
 	}
 	
 	@Override

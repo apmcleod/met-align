@@ -45,14 +45,6 @@ public interface MetricalLpcfgNode {
 	public boolean startsWithRest();
 	
 	/**
-	 * Get a deep copy of this node. Each node needs this because we sometimes need a deep
-	 * copy of the entire tree.
-	 * 
-	 * @return A deep copy of this node.
-	 */
-	public MetricalLpcfgNode deepCopy();
-	
-	/**
 	 * Print the given node recursively in a pretty format.
 	 * 
 	 * @param depth The depth of this node.

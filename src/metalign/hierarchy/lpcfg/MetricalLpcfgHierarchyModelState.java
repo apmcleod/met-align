@@ -225,7 +225,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		hasBegun = new ArrayList<Boolean>(state.hasBegun);
 		
-		localGrammar = state.localGrammar.deepCopy();
+		localGrammar = state.localGrammar.shallowCopy();
 		
 		setVoiceState(state.voiceState);
 		setBeatState(state.beatState.deepCopy());
