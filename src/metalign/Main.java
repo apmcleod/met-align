@@ -66,6 +66,8 @@ public class Main {
 	
 	public static int NUM_FROM_FILE = 0;
 	
+	public static boolean USE_MEASURE_PROBABILITY = false;
+	
 	/**
 	 * The main method for running this program.
 	 * <p>
@@ -287,6 +289,10 @@ public class Main {
 							} catch (NumberFormatException e) {
 								argumentError("Exception reading beam size. Must be an integer: " + args[i]);
 							}
+							break;
+							
+						case 'M':
+							USE_MEASURE_PROBABILITY = true;
 							break;
 							
 						// Error

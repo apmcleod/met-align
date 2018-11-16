@@ -3,6 +3,7 @@ package metalign.joint;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
 import metalign.Main;
@@ -118,7 +119,11 @@ public class JointBeam {
 	 * @return The worst score of any hypothesis in that beam.
 	 */
 	public double getWorstScore(Measure measure) {
-		return startedBeam.get(measure).last().getScore();
+		try {
+			return startedBeam.get(measure).last().getScore();
+		} catch (NoSuchElementException e) {
+			return Double.NEGATIVE_INFINITY;
+		}
 	}
 	
 	/**

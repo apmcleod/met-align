@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import metalign.Main;
@@ -651,6 +652,32 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 		}
 		
 		return logProbability;
+	}
+	
+	/**
+	 * Get p(measure).
+	 * @param measure The measure type whose probability we want.
+	 * @return
+	 */
+	public double getMeasureProbability(Measure measure) {
+		int totalCount = 0;
+		int thisCount = 0;
+		
+		for (Entry<Measure, Map<Double, Integer>> map : measureHeadMap.entrySet()) {
+			if (measure.equals(map.getKey())) {
+				for (int count : map.getValue().values()) {
+					totalCount += count;
+					thisCount += count;
+				}
+				
+			} else {
+				for (int count : map.getValue().values()) {
+					totalCount += count;
+				}
+			}
+		}
+		
+		return Math.log(((double) thisCount) / totalCount);
 	}
 	
 	/**

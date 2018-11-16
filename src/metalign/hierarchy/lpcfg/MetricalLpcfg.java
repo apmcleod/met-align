@@ -114,6 +114,11 @@ public class MetricalLpcfg implements Serializable {
 			} else {
 				// p(head(measure) | measure)
 				logProbability += probabilities.getMeasureHeadProbability(measure, head);
+				
+				// p(measure)
+				if (Main.USE_MEASURE_PROBABILITY) {
+					logProbability += probabilities.getMeasureProbability(measure);
+				}
 			}
 			
 			// Recursive probability of children nodes
