@@ -381,9 +381,7 @@ Beat  47250  1
 Beat  47390  0
 Beat  47495  2
 Beat  47635  0
-Beat  47740  1
-Beat  47810  0
-Beat  47880  1
+Beat  47810  1
 Beat  47915  0
 Beat  47985  3
 Beat  48125  0

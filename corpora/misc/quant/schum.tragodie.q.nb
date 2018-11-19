@@ -1,9 +1,7 @@
 Bar 4 2 0
 Beat      0  4
 Beat    140  0
-Beat    315  1
-Beat    525  0
-Beat    735  1
+Beat    525  1
 Beat    910  0
 Beat   1190  2
 Beat   1505  0
