@@ -15,6 +15,8 @@ import metalign.beat.BeatTrackingModelState;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.beat.hmm.HmmBeatTrackingModelParameters;
 import metalign.beat.hmm.HmmBeatTrackingModelState;
+import metalign.beat.hmmprior.DownbeatPriors;
+import metalign.beat.hmmprior.HmmPriorBeatTrackingModelState;
 import metalign.hierarchy.HierarchyModelState;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.hierarchy.lpcfg.MetricalLpcfg;
@@ -109,6 +111,7 @@ public class Main {
 	public static void main(String[] args) throws InterruptedException, IOException, ParserConfigurationException, SAXException, InvalidMidiDataException {
 		boolean useChannel = true;
 		List<File> files = new ArrayList<File>();
+		File priorFile = null;
 		List<File> anacrusisFiles = new ArrayList<File>();
 		String voiceClass = Runner.DEFAULT_VOICE_SPLITTER;
 		String beatClass = Runner.DEFAULT_BEAT_TRACKER;
@@ -278,6 +281,18 @@ public class Main {
 							}
 							break;
 							
+						// Use this Hmm downbeat Prior file
+						case 'y':
+							i++;
+							if (args.length == i) {
+								argumentError("No downbeat prior file given with -E option.");
+							}
+							priorFile = new File(args[i]);
+							if (!priorFile.exists()) {
+								argumentError("Prior file " + priorFile + " not found.");
+							}
+							break;
+							
 						// Beam size
 						case 'b':
 							i++;
@@ -400,7 +415,7 @@ public class Main {
 					}
 				}
 				
-				JointModel jm = getJointModel(voiceClass, "FromFile", "FromFile", ep, tt, grammar);
+				JointModel jm = getJointModel(voiceClass, "FromFile", "FromFile", ep, tt, grammar, priorFile, nlg);
 				
 				// Run with VOICE_BEAM as BEAM
 				TESTING = true;
@@ -450,7 +465,7 @@ public class Main {
 					
 					newFile.delete();
 					
-					JointModel newJm = getJointModel("FromFile", beatClass, hierarchyClass, newEp, newTt, grammar);
+					JointModel newJm = getJointModel("FromFile", beatClass, hierarchyClass, newEp, newTt, grammar, priorFile, nlg);
 					
 					// Run
 					TESTING = true;
@@ -546,7 +561,7 @@ public class Main {
 				}
 				
 				try {
-					jm = getJointModel(voiceClass, beatClass, hierarchyClass, ep, tt, grammar);
+					jm = getJointModel(voiceClass, beatClass, hierarchyClass, ep, tt, grammar, priorFile, nlg);
 					
 				} catch (InvalidMidiDataException e) {
 					System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
@@ -674,11 +689,12 @@ public class Main {
 	 * 
 	 * @return A joint model which can be used to perform inference jointly.
 	 * @throws InvalidMidiDataException 
+	 * @throws IOException 
 	 */
-	private static JointModel getJointModel(String voiceClass, String beatClass, String hierarchyClass, EventParser ep, TimeTracker tt, MetricalLpcfg grammar)
-			throws InvalidMidiDataException {
+	private static JointModel getJointModel(String voiceClass, String beatClass, String hierarchyClass, EventParser ep, TimeTracker tt, MetricalLpcfg grammar, File priorFile, NoteListGenerator nlg)
+			throws InvalidMidiDataException, IOException {
 		VoiceSplittingModelState vs = getVoiceState(voiceClass, ep);
-		BeatTrackingModelState bs = getBeatState(beatClass, tt);
+		BeatTrackingModelState bs = getBeatState(beatClass, tt, priorFile, nlg);
 		HierarchyModelState hs = getHierarchyState(hierarchyClass, tt, grammar);
 		
 		return new JointModel(vs, bs, hs);
@@ -709,10 +725,13 @@ public class Main {
 	 * @param tt A time tracker, used in case the beat class String is FromFile (default).
 	 * 
 	 * @return The beat state requested by the beat class String.
+	 * @throws IOException 
 	 */
-	private static BeatTrackingModelState getBeatState(String beatClass, TimeTracker tt) {
+	private static BeatTrackingModelState getBeatState(String beatClass, TimeTracker tt, File priorFile, NoteListGenerator nlg) throws IOException {
 		if ("Hmm".equalsIgnoreCase(beatClass)) {
 			return new HmmBeatTrackingModelState(new HmmBeatTrackingModelParameters());
+		} else if ("HmmPrior".equalsIgnoreCase(beatClass)) {
+			return new HmmPriorBeatTrackingModelState(new HmmBeatTrackingModelParameters(), DownbeatPriors.fromFile(priorFile, nlg));
 		}
 		
 		NUM_FROM_FILE++;

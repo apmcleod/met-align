@@ -1,8 +1,14 @@
 package metalign.beat.hmmprior;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import metalign.parsing.NoteListGenerator;
 import metalign.utils.MidiNote;
 
 public class DownbeatPriors {
@@ -32,8 +38,12 @@ public class DownbeatPriors {
 	 * 
 	 * @param note The note to add.
 	 * @param prior The probability of a downbeat being on the given note.
+	 * @throws IOException 
 	 */
-	public void addNote(MidiNote note, double prior) {
+	public void addNote(MidiNote note, double prior) throws IOException {
+		if (notePriors.containsKey(note)) {
+			throw new IOException("Warning: note added twice");
+		}
 		notePriors.put(note, prior);
 	}
 	
@@ -59,5 +69,45 @@ public class DownbeatPriors {
 		} catch (NullPointerException e) {
 			return 0.0;
 		}
+	}
+
+	public static DownbeatPriors fromFile(File priorFile, NoteListGenerator nlg) throws IOException {
+		DownbeatPriors priors = null;
+		List<MidiNote> notes = nlg.getNoteList();
+		
+		BufferedReader br = new BufferedReader(new FileReader(priorFile));
+		
+		while (br.ready()) {
+			if (priors == null) {
+				priors = new DownbeatPriors(Double.parseDouble(br.readLine()));
+				continue;
+			}
+			
+			String[] split = br.readLine().split("\\s+");
+			double start = Double.parseDouble(split[0]);
+			double end = Double.parseDouble(split[1]);
+			int pitch = Integer.parseInt(split[2]);
+			double prior = Double.parseDouble(split[4]);
+			
+			priors.addNote(findMatchedNote(start, end, pitch, notes), prior);
+		}
+		
+		br.close();
+		
+		return priors;
+	}
+
+	private static MidiNote findMatchedNote(double start, double end, int pitch, List<MidiNote> notes) throws IOException {
+		double startMicros = start * 1000000;
+		double endMicros = start * 1000000;
+		
+		for (MidiNote note : notes) {
+			if (note.getPitch() == pitch && Math.abs(note.getOnsetTime() - startMicros) < 30000 &&
+					Math.abs(note.getOffsetTime() - endMicros) < 30000) {
+				return note;
+			}
+		}
+		
+		throw new IOException("Warning: Note match not found!");
 	}
 }
