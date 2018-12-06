@@ -70,7 +70,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 	 * 
 	 * @param state The state whose copy we want.
 	 */
-	private HmmBeatTrackingModelState(HmmBeatTrackingModelState state) {
+	public HmmBeatTrackingModelState(HmmBeatTrackingModelState state) {
 		tatums = new ArrayList<Integer>(state.tatums);
 		logProb = state.logProb;
 		params = state.params;
@@ -395,13 +395,13 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 			}
 			
 			// Get note probabilities and removed from unused notes list
-			for (int j = 0; j < newState.unusedNoteTimes.size(); j++) {
-				int time = newState.unusedNoteTimes.get(j);
+			noteTimeIterator = newState.unusedNoteTimes.iterator();
+			while (noteTimeIterator.hasNext()) {
+				int time = noteTimeIterator.next();
 				
 				if (time < newState.tatums.get(newState.tatums.size() - 1)) {
 					newState.addNoteError(time);
-					newState.unusedNoteTimes.remove(j);
-					j--;
+					noteTimeIterator.remove();
 					
 				} else {
 					break;
@@ -592,13 +592,13 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 			}
 			
 			// Get note probabilities and removed from unused notes list
-			for (int i = 0; i < newState.unusedNoteTimes.size(); i++) {
-				int time = newState.unusedNoteTimes.get(i);
+			Iterator<Integer> noteTimeIterator = newState.unusedNoteTimes.iterator();
+			while (noteTimeIterator.hasNext()) {
+				int time = noteTimeIterator.next();
 				
 				if (time < newState.tatums.get(newState.tatums.size() - 1)) {
 					newState.addNoteError(time);
-					newState.unusedNoteTimes.remove(i);
-					i--;
+					noteTimeIterator.remove();
 					
 				} else {
 					break;
