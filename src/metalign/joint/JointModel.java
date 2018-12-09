@@ -40,7 +40,7 @@ public class JointModel extends MidiModel {
 	 * @param hierarchy The hierarchy detection state to use.
 	 */
 	public JointModel(VoiceSplittingModelState voice, BeatTrackingModelState beat, HierarchyModelState hierarchy) {
-		beam = new JointBeam(hierarchy.getMeasureTypes());
+		beam = new JointBeam();
 		beam.add(new JointModelState(this, voice, beat, hierarchy));
 	}
 
@@ -115,7 +115,7 @@ public class JointModel extends MidiModel {
 	private void printLog(List<MidiNote> notes) {
 		long newTime = System.currentTimeMillis();
 		long timeDiff = newTime - previousTime;
-		System.out.println("Time = " + timeDiff + "ms; Hypotheses = " + beam.totalSize() + "; " + (notes == null ? "Close" : ("Notes = " + notes)));
+		System.out.println("Time = " + timeDiff + "ms; Hypotheses = " + beam.size() + "; " + (notes == null ? "Close" : ("Notes = " + notes)));
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class JointModel extends MidiModel {
 	 * for this joint model.
 	 */
 	public List<? extends VoiceSplittingModelState> getVoiceHypotheses() {
-		List<VoiceSplittingModelState> voiceHypotheses = new ArrayList<VoiceSplittingModelState>(beam.totalSize());
+		List<VoiceSplittingModelState> voiceHypotheses = new ArrayList<VoiceSplittingModelState>(beam.size());
 		
 		for (JointModelState jointState : beam.getOrderedStates(false)) {
 			voiceHypotheses.add(jointState.getVoiceState());
@@ -150,7 +150,7 @@ public class JointModel extends MidiModel {
 	 * for this joint model.
 	 */
 	public List<? extends BeatTrackingModelState> getBeatHypotheses() {
-		List<BeatTrackingModelState> beatHypotheses = new ArrayList<BeatTrackingModelState>(beam.totalSize());
+		List<BeatTrackingModelState> beatHypotheses = new ArrayList<BeatTrackingModelState>(beam.size());
 		
 		for (JointModelState jointState : beam.getOrderedStates(false)) {
 			beatHypotheses.add(jointState.getBeatState());
@@ -168,7 +168,7 @@ public class JointModel extends MidiModel {
 	 * for this joint model.
 	 */
 	public List<? extends HierarchyModelState> getHierarchyHypotheses() {
-		List<HierarchyModelState> hierarchyHypotheses = new ArrayList<HierarchyModelState>(beam.totalSize());
+		List<HierarchyModelState> hierarchyHypotheses = new ArrayList<HierarchyModelState>(beam.size());
 		
 		for (JointModelState jointState : beam.getOrderedStates(false)) {
 			hierarchyHypotheses.add(jointState.getHierarchyState());

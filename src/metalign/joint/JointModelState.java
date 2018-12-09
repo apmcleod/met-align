@@ -81,8 +81,8 @@ public class JointModelState extends MidiModelState {
 		TreeSet<JointModelState> newStates = new TreeSet<JointModelState>();
 		
 		// Check if we even need to compute anything
-		boolean beamFull = Main.BEAM_SIZE != -1 && jointModel.beam.size(hierarchyState.getMetricalMeasure()) >= Main.BEAM_SIZE;
-		if (beamFull && getScore() < jointModel.beam.getWorstScore(hierarchyState.getMetricalMeasure())) {
+		boolean beamFull = Main.BEAM_SIZE != -1 && jointModel.beam.size() >= Main.BEAM_SIZE;
+		if (beamFull && getScore() < jointModel.beam.getWorstScore()) {
 			return newStates;
 		}
 		
@@ -108,7 +108,7 @@ public class JointModelState extends MidiModelState {
 		for (VoiceSplittingModelState voiceState : newVoiceStates) {
 			
 			// This falls outside the main beam, we can skip it.
-			if (beamFull && jointModel.beam.getWorstScore(hierarchyState.getMetricalMeasure()) >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+			if (beamFull && jointModel.beam.getWorstScore() >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 				newNotesLists.add(new ArrayList<MidiNote>());
 				newBeatStates.add(new TreeSet<BeatTrackingModelState>());
 				continue;
@@ -162,7 +162,7 @@ public class JointModelState extends MidiModelState {
 			for (BeatTrackingModelState beatState : beatStateSet) {
 				
 				// Main Beam is full and score is not possibly better than any of them
-				if (beamFull && jointModel.beam.getWorstScore(hierarchyState.getMetricalMeasure()) >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+				if (beamFull && jointModel.beam.getWorstScore() >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 					if (Main.SUPER_VERBOSE && Main.TESTING) {
 						System.out.println("ELIMINATING (Joint Beam): " + newVoiceState + beatState + beatState.getHierarchyState());
 					}
@@ -218,8 +218,8 @@ public class JointModelState extends MidiModelState {
 		TreeSet<JointModelState> newStates = new TreeSet<JointModelState>();
 		
 		// Check if we even need to compute anything
-		boolean beamFull = Main.BEAM_SIZE != -1 && jointModel.beam.size(hierarchyState.getMetricalMeasure()) >= Main.BEAM_SIZE;
-		if (beamFull && getScore() < jointModel.beam.getWorstScore(hierarchyState.getMetricalMeasure())) {
+		boolean beamFull = Main.BEAM_SIZE != -1 && jointModel.beam.size() >= Main.BEAM_SIZE;
+		if (beamFull && getScore() < jointModel.beam.getWorstScore()) {
 			return newStates;
 		}
 		
@@ -237,7 +237,7 @@ public class JointModelState extends MidiModelState {
 		List<TreeSet<BeatTrackingModelState>> newBeatStates = new ArrayList<TreeSet<BeatTrackingModelState>>();
 		for (VoiceSplittingModelState voiceState : newVoiceStates) {
 			// This falls outside the main beam, we can skip it.
-			if (beamFull && jointModel.beam.getWorstScore(hierarchyState.getMetricalMeasure()) >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+			if (beamFull && jointModel.beam.getWorstScore() >= voiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 				newBeatStates.add(new TreeSet<BeatTrackingModelState>());
 				continue;
 			}
@@ -257,7 +257,7 @@ public class JointModelState extends MidiModelState {
 			
 			for (BeatTrackingModelState beatState : beatStateSet) {
 				// Main Beam is full and score is not possibly better than any of them
-				if (beamFull && jointModel.beam.getWorstScore(hierarchyState.getMetricalMeasure()) >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
+				if (beamFull && jointModel.beam.getWorstScore() >= newVoiceState.getScore() + beatState.getScore() + beatState.getHierarchyState().getScore()) {
 					if (Main.SUPER_VERBOSE && Main.TESTING) {
 						System.out.println("ELIMINATING (Joint Beam): " + newVoiceState + beatState + beatState.getHierarchyState());
 					}

@@ -1,32 +1,24 @@
 package metalign.joint;
 
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
 import metalign.Main;
-import metalign.hierarchy.Measure;
 import metalign.voice.VoiceSplittingModelState;
 
 public class JointBeam {
 
-	private Map<Measure, TreeSet<JointModelState>> beam;
-	private Map<Measure, TreeSet<JointModelState>> startedBeam;
+	private TreeSet<JointModelState> beam;
+	private TreeSet<JointModelState> startedBeam;
 	
 	/**
 	 * Make a new Joint Beam with the given measure types.
 	 * @param measures
 	 */
-	public JointBeam(Iterable<Measure> measures) {
-		beam = new HashMap<Measure, TreeSet<JointModelState>>();
-		startedBeam = new HashMap<Measure, TreeSet<JointModelState>>();
-		
-		for (Measure measure : measures) {
-			beam.put(measure, new TreeSet<JointModelState>());
-			startedBeam.put(measure, new TreeSet<JointModelState>());
-		}
+	public JointBeam() {
+		beam = new TreeSet<JointModelState>();
+		startedBeam = new TreeSet<JointModelState>();
 	}
 	
 	/**
@@ -36,19 +28,15 @@ public class JointBeam {
 	public void fixForBeam() {
 		if (Main.BEAM_SIZE != -1) {
 			
-			for (Measure key : startedBeam.keySet()) {
-				TreeSet<JointModelState> measure = startedBeam.get(key);
+			// Remove down to the top beam size started hypotheses.
+			while (startedBeam.size() > Main.BEAM_SIZE) {
+				startedBeam.pollLast();
+			}
 				
-				// Remove down to the top beam size started hypotheses.
-				while (measure.size() > Main.BEAM_SIZE) {
-					measure.pollLast();
-				}
-				
-				// Remove any hypotheses from the full beam outside of the least probable started hypothesis,
-				// if the beam is full.
-				if (startedBeam.size() == Main.BEAM_SIZE) {
-					beam.get(key).tailSet(measure.last(), false).clear();
-				}
+			// Remove any hypotheses from the full beam outside of the least probable started hypothesis,
+			// if the beam is full.
+			if (startedBeam.size() == Main.BEAM_SIZE) {
+				beam.tailSet(startedBeam.last(), false).clear();
 			}
 		}
 	}
@@ -81,14 +69,11 @@ public class JointBeam {
 			TreeSet<JointModelState> orderedJointStates = new TreeSet<JointModelState>(orderJointStatesByVoiceStateFirst);
 			
 			// Add all voice states into an ordered list
-			for (TreeSet<JointModelState> measure : beam.values()) {
-				for (JointModelState jms : measure) {
-					voiceStatesSet.add(jms.getVoiceState());
-					orderedJointStates.add(jms);
-				}
-				
-				measure.clear();
+			for (JointModelState jms : beam) {
+				voiceStatesSet.add(jms.getVoiceState());
+				orderedJointStates.add(jms);
 			}
+			beam.clear();
 			
 			// No beam necessary
 			if (voiceStatesSet.size() <= Main.VOICE_BEAM_SIZE) {
@@ -113,28 +98,26 @@ public class JointBeam {
 	}
 	
 	/**
-	 * Get the worst score of a started hypothesis of the given measure's beam.
+	 * Get the worst score of a started hypothesis of the beam.
 	 * 
-	 * @param metricalMeasure The measure type whose beam we want.
-	 * @return The worst score of any hypothesis in that beam.
+	 * @return The worst score of any hypothesis in the beam. Or, negative infinity if
+	 * the started beam is empty.
 	 */
-	public double getWorstScore(Measure measure) {
+	public double getWorstScore() {
 		try {
-			return startedBeam.get(measure).last().getScore();
+			return startedBeam.last().getScore();
 		} catch (NoSuchElementException e) {
 			return Double.NEGATIVE_INFINITY;
 		}
 	}
 	
 	/**
-	 * Add the given state to the beam.
+	 * Add the given state to the beam, and DO NOT add it to the started beam.
 	 * 
 	 * @param state The state to add to the beam.
 	 */
 	public void addWithoutStarted(JointModelState state) {
-		Measure measure = state.getHierarchyState().getMetricalMeasure();
-		
-		beam.get(measure).add(state);
+		beam.add(state);
 	}
 	
 	/**
@@ -143,19 +126,10 @@ public class JointBeam {
 	 * @param state The state to add to the beam.
 	 */
 	public void add(JointModelState state) {
-		Measure measure = state.getHierarchyState().getMetricalMeasure();
-		
-		try {
-			beam.get(measure).add(state);
-		
-			if (state.isStarted()) {
-				startedBeam.get(measure).add(state);
-			}
-		} catch (NullPointerException e) {
-			for (TreeSet<JointModelState> set : beam.values()) {
-				set.add(state);
-				break;
-			}
+		beam.add(state);
+	
+		if (state.isStarted()) {
+			startedBeam.add(state);
 		}
 	}
 	
@@ -168,35 +142,14 @@ public class JointBeam {
 	public TreeSet<JointModelState> getOrderedStates(boolean remove) {
 		TreeSet<JointModelState> toReturn = new TreeSet<JointModelState>();
 		
-		for (TreeSet<JointModelState> measure : beam.values()) {
-			toReturn.addAll(measure);
+		toReturn.addAll(beam);
 			
-			if (remove) {
-				measure.clear();
-			}
-		}
-		
 		if (remove) {
-			for (TreeSet<JointModelState> measure : startedBeam.values()) {
-				measure.clear();
-			}
+			beam.clear();
+			startedBeam.clear();
 		}
 		
 		return toReturn;
-	}
-	
-	/**
-	 * Get the number of hypotheses currently in the given measure's beam.
-	 * 
-	 * @param The measure we want to check.
-	 * @return The number of hypotheses currently in the given measure's beam.
-	 */
-	public int size(Measure measure) {
-		try {
-			return beam.get(measure).size();
-		} catch (NullPointerException e) {
-			return totalSize();
-		}
 	}
 	
 	/**
@@ -204,13 +157,7 @@ public class JointBeam {
 	 * 
 	 * @return The number of hypotheses currently in the beam.
 	 */
-	public int totalSize() {
-		int size = 0;
-		
-		for (TreeSet<JointModelState> measure : beam.values()) {
-			size += measure.size();
-		}
-		
-		return size;
+	public int size() {
+		return beam.size();
 	}
 }
