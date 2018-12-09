@@ -658,9 +658,9 @@ public class Main {
 	 * @param beatClass The beat class String.
 	 */
 	private static void validateBeatClass(String beatClass) {
-		if (!"Hmm".equalsIgnoreCase(beatClass) && !"FromFile".equalsIgnoreCase(beatClass)) {
+		if (!"HmmPrior".equalsIgnoreCase(beatClass) && !"Hmm".equalsIgnoreCase(beatClass) && !"FromFile".equalsIgnoreCase(beatClass)) {
 			argumentError("Unrecognized beat tracker " + beatClass + ".\n" +
-					"Possible values are FromFile (default) or Hmm");
+					"Possible values are FromFile (default), Hmm, or HmmPrior");
 		}
 	}
 

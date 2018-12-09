@@ -38,12 +38,13 @@ public class DownbeatPriors {
 	 * 
 	 * @param note The note to add.
 	 * @param prior The probability of a downbeat being on the given note.
-	 * @throws IOException 
+	 * @throws IOException The note already has a prior probability.
 	 */
 	public void addNote(MidiNote note, double prior) throws IOException {
 		if (notePriors.containsKey(note)) {
 			throw new IOException("Warning: note added twice");
 		}
+		
 		notePriors.put(note, prior);
 	}
 	
@@ -71,6 +72,15 @@ public class DownbeatPriors {
 		}
 	}
 
+	/**
+	 * Parse and return a new DownbeatPriors object from the given file.
+	 * 
+	 * @param priorFile The file to parse the new object from.
+	 * @param nlg The NoteListGenerator containing the notes with which we need to match the
+	 * parsed priors.
+	 * @return The newly created DownbeatPriors object.
+	 * @throws IOException
+	 */
 	public static DownbeatPriors fromFile(File priorFile, NoteListGenerator nlg) throws IOException {
 		DownbeatPriors priors = null;
 		List<MidiNote> notes = nlg.getNoteList();
@@ -78,18 +88,20 @@ public class DownbeatPriors {
 		BufferedReader br = new BufferedReader(new FileReader(priorFile));
 		
 		while (br.ready()) {
+			// The first line should be p(rest)
 			if (priors == null) {
 				priors = new DownbeatPriors(Double.parseDouble(br.readLine()));
 				continue;
 			}
 			
+			// The other lines should be "start end pitch p(downbeat)"
 			String[] split = br.readLine().split("\\s+");
 			double start = Double.parseDouble(split[0]);
 			double end = Double.parseDouble(split[1]);
 			int pitch = Integer.parseInt(split[2]);
-			double prior = Double.parseDouble(split[4]);
+			double prior = Double.parseDouble(split[3]);
 			
-			priors.addNote(findMatchedNote(start, end, pitch, notes), prior);
+			priors.addNote(start, end, pitch, notes, prior);
 		}
 		
 		br.close();
@@ -97,17 +109,37 @@ public class DownbeatPriors {
 		return priors;
 	}
 
-	private static MidiNote findMatchedNote(double start, double end, int pitch, List<MidiNote> notes) throws IOException {
+	/**
+	 * Find the matching note for the parsed values and add it to this object.
+	 * 
+	 * @param start The onset time of the note, in seconds, parsed from the python output.
+	 * @param end The offset time of the note, in seconds, parsed from the python output.
+	 * @param pitch The pitch of the note, parsed from the python output.
+	 * @param notes A List of all of the notes of the song we are generating the prior of.
+	 * @param prior The prior downbeat probability, parsed from the python output.
+	 * 
+	 * @throws IOException If a matching note was not found. Probably this is due to using
+	 * a differend MIDI file to generate the python output vs. parsing it here with Java.
+	 */
+	private void addNote(double start, double end, int pitch, List<MidiNote> notes, double prior) throws IOException {
+		// Start and end are given in seconds, but we measure them in microseconds
 		double startMicros = start * 1000000;
-		double endMicros = start * 1000000;
+		double endMicros = end * 1000000;
 		
+		// Find a match
 		for (MidiNote note : notes) {
-			if (note.getPitch() == pitch && Math.abs(note.getOnsetTime() - startMicros) < 30000 &&
-					Math.abs(note.getOffsetTime() - endMicros) < 30000) {
-				return note;
+			// Check if this note has already been matched
+			if (notePriors.containsKey(note)) {
+				continue;
+			}
+			
+			// Check if this note matches
+			if (note.getPitch() == pitch && Math.abs(note.getOnsetTime() - startMicros) < 10000) {
+				addNote(note, prior);
+				return;
 			}
 		}
 		
-		throw new IOException("Warning: Note match not found!");
+		throw new IOException("Warning: Note match not found! s=" + start + " e=" + end + " p=" + pitch);
 	}
 }
