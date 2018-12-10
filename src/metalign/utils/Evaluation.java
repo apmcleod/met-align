@@ -298,11 +298,11 @@ public class Evaluation {
 			localGrammar.addTree(tree);
 			
 			if (VERBOSE) {
-				System.out.println("Log probability = " + (logProb * MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT) + " + " + (localLogProb * (1.0 - MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT)));
+				System.out.println("Log probability = " + logProb + " + " + (localLogProb * MetricalLpcfgHierarchyModelState.LOCAL_WEIGHT));
 			}
 		}
-		System.out.println("Hierarchy log probability = " + (grammarLogProb * MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT) + " + " + (localGrammarLogProb * (1.0 - MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT)) + " = " +
-				(MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT * grammarLogProb + (1.0 - MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT) * localGrammarLogProb));
+		System.out.println("Hierarchy log probability = " + grammarLogProb + " + " + (localGrammarLogProb * MetricalLpcfgHierarchyModelState.LOCAL_WEIGHT) + " = " +
+				(grammarLogProb + MetricalLpcfgHierarchyModelState.LOCAL_WEIGHT * localGrammarLogProb));
 		
 		// TODO: For beats, go through each bar, create a static method in HmmBeatTracker to calculate prob of tatums in beat (given previous tempo)
 		

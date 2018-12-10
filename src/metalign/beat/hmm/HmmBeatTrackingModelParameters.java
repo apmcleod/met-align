@@ -68,7 +68,7 @@ public class HmmBeatTrackingModelParameters {
 	 * Create a new beat tracking model with default parameters.
 	 */
 	public HmmBeatTrackingModelParameters() {
-		TEMPO_PERCENT_CHANGE_STD = 0.0356;
+		TEMPO_PERCENT_CHANGE_STD = 0.0743;
 		
 		BEAT_SPACING_STD = 0.0336;
 		BEAT_SPACING_MEAN = 0.0181;
