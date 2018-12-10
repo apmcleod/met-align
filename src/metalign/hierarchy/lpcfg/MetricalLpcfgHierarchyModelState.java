@@ -437,7 +437,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				logProbability += logProb;
 				
 				
-				if (LOCAL_WEIGHT == 0.0) {
+				if (LOCAL_WEIGHT != 0.0) {
 					if (tree == null) {
 						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
 					}
@@ -1172,13 +1172,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(measure).append(" length=").append(subBeatLength).append(" anacrusis=").append(anacrusisLength);
-		sb.append(" Score=").append(logProbability).append(" + ").append(LOCAL_WEIGHT * localLogProb).append(" = ").append(getScore());
+		sb.append(" Score=").append(logProbability).append(" + ").append(localLogProb).append(" = ").append(getScore());
 		
 		return sb.toString();
-	}
-
-	@Override
-	public Iterable<Measure> getMeasureTypes() {
-		return grammar.getMeasures();
 	}
 }

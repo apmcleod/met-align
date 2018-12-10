@@ -91,6 +91,18 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 		children = new ArrayList<MetricalLpcfgNode>();
 	}
 	
+	/**
+	 * Create a new non-terminal as a deep copy of the given one.
+	 * 
+	 * @param nonterminal The non-terminal we want a deep copy of.
+	 */
+	public MetricalLpcfgNonterminal(MetricalLpcfgNonterminal nonterminal) {
+		type = nonterminal.type;
+		level = nonterminal.level;
+		
+		children = new ArrayList<MetricalLpcfgNode>(nonterminal.children);
+	}
+	
 	@Override
 	public boolean isEmpty() {
 		for (MetricalLpcfgNode child : children) {

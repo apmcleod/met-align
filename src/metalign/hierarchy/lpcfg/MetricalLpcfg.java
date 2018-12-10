@@ -63,9 +63,9 @@ public class MetricalLpcfg implements Serializable {
 	 * Create a new grammar, used by the {@link #deepCopy()} and {@link #shallowCopy()} methods.
 	 * 
 	 * @param lpcfg The old grammar this one is to be a copy of.
-	 * @param deep True if this is to be a deep copy. False for a shallow copy.
+	 * @param deep True if this is to be a deep copy. False otherwise.
 	 */
-	private MetricalLpcfg(MetricalLpcfg lpcfg, boolean deep) {
+	private MetricalLpcfg(MetricalLpcfg lpcfg) {
 		trees = new ArrayList<MetricalLpcfgTree>(lpcfg.trees);
 		
 		probabilities = lpcfg.probabilities.deepCopy();
@@ -112,11 +112,6 @@ public class MetricalLpcfg implements Serializable {
 			} else {
 				// p(head(measure) | measure)
 				logProbability += probabilities.getMeasureHeadProbability(measure, head);
-				
-				// p(measure)
-				if (Main.USE_MEASURE_PROBABILITY) {
-					logProbability += probabilities.getMeasureProbability(measure);
-				}
 			}
 			
 			// Recursive probability of children nodes
@@ -279,12 +274,12 @@ public class MetricalLpcfg implements Serializable {
 	}
 	
 	/**
-	 * Get a shallow copy of this grammar. That is, one where each tree remains the same.
+	 * Get a shallow copy of this grammar.
 	 * 
 	 * @return A shallow copy of this grammar.
 	 */
 	public MetricalLpcfg shallowCopy() {
-		return new MetricalLpcfg(this, false);
+		return new MetricalLpcfg(this);
 	}
 	
 	@Override
