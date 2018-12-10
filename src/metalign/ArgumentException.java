@@ -91,7 +91,7 @@ public class ArgumentException extends Exception {
 		sb.append("-v INT = Use INT as the voice beam size.\n");
 		sb.append("-E FILE = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
-		sb.append("-G DOUBLE = Set the global grammar weight alpha.\n");
+		sb.append("-L DOUBLE = Set the local grammar weight alpha.\n");
 		
 		return sb.toString();
 	}

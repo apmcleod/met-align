@@ -178,15 +178,15 @@ public class Main {
 							EXTEND_NOTES = true;
 							break;
 							
-						case 'G':
+						case 'L':
 							i++;
 							if (args.length == i) {
-								argumentError("No global weight given with -G option.");
+								argumentError("No local weight given with -L option.");
 							}
 							try {
-								MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT = Double.parseDouble(args[i]);
+								MetricalLpcfgHierarchyModelState.LOCAL_WEIGHT = Double.parseDouble(args[i]);
 							} catch (NumberFormatException e) {
-								argumentError("Exception reading global weight. Must be a double: " + args[i]);
+								argumentError("Exception reading local weight. Must be a double: " + args[i]);
 							}
 							break;
 							

@@ -46,7 +46,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		WRONG;
 	}
 	
-	public static double GLOBAL_WEIGHT = 2.0 / 3.0;
+	public static double LOCAL_WEIGHT = 0.5;
 	
 	/**
 	 * Object to save tree log probabilities so as not to regenerate every time.
@@ -437,7 +437,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				logProbability += logProb;
 				
 				
-				if (GLOBAL_WEIGHT != 1.0) {
+				if (LOCAL_WEIGHT != 0.0) {
 					if (tree == null) {
 						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
 					}
@@ -1083,7 +1083,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 
 	@Override
 	public double getScore() {
-		return GLOBAL_WEIGHT * logProbability + (1.0 - GLOBAL_WEIGHT) * localLogProb;
+		return logProbability + LOCAL_WEIGHT * localLogProb;
 	}
 	
 	@Override
