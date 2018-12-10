@@ -124,6 +124,11 @@ public class DownbeatPriors {
 	private void addNote(double start, double end, int pitch, List<MidiNote> notes, double prior) throws IOException {
 		// Start and end are given in seconds, but we measure them in microseconds
 		double startMicros = start * 1000000;
+		
+		// We don't use this because pretty_midi matches offsets to the most recent onset, while we do the opposite.
+		// This breaks offset checking with overlapping notes on the same pitch.
+		// Luckily, we only really care about onset time.
+		@SuppressWarnings("unused")
 		double endMicros = end * 1000000;
 		
 		// Find a match
