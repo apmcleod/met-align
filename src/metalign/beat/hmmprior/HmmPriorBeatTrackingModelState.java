@@ -1,6 +1,7 @@
 package metalign.beat.hmmprior;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -40,7 +41,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	/**
 	 * The parameters for this model.
 	 */
-	private final HmmBeatTrackingModelParameters params;
+	public final HmmBeatTrackingModelParameters params;
 	
 	/**
 	 * The downbeat priors for this model.
@@ -452,9 +453,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	 * @return True if we are ready. False otherwise.
 	 */
 	private boolean readyForNewBar() {
-		int beatsPerBar = hierarchyState.getMetricalMeasure().getBeatsPerMeasure();
-		
-		double nextBarTime = getLastTatumTime() + previousTempo * beatsPerBar;
+		double nextBarTime = getLastTatumTime() + previousTempo * hierarchyState.getMetricalMeasure().getBeatsPerMeasure();
 		
 		return nextBarTime + previousTempo < unusedNotes.getLast().getOnsetTime();
 	}
@@ -467,193 +466,249 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	 * @return A Set of the states we have reached when adding tatums.
 	 */
 	private TreeSet<HmmPriorBeatTrackingModelState> addBar() {
-		TreeSet<HmmPriorBeatTrackingModelState> newStates = new TreeSet<HmmPriorBeatTrackingModelState>();
-		
+		// Set up useful variables
 		Measure bar = hierarchyState.getMetricalMeasure();
 		int beatsPerBar = bar.getBeatsPerMeasure();
-		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
-		int subBeatsPerBar = subBeatsPerBeat * beatsPerBar;
-		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();
-		int tatumsPerBeat = tatumsPerSubBeat * subBeatsPerBeat;
-		int tatumsPerBar = tatumsPerBeat * beatsPerBar;
-		double timePerBeat = previousTempo;
-		double timePerSubBeat = previousTempo / subBeatsPerBeat;
-		double timePerTatum = timePerSubBeat / tatumsPerSubBeat;
+		double timePerTatum = previousTempo / bar.getSubBeatsPerBeat() / hierarchyState.getSubBeatLength();
 		
-		// Add times, initially 0
-		List<List<Integer>> subBeatTimesList = new ArrayList<List<Integer>>();
-		List<List<Integer>> tatumTimesList = new ArrayList<List<Integer>>();
+		// Calculate previous and next downbeat times
+		int lastTatumTime = getLastTatumTime();
+		double estimatedDownbeatTime = getLastTatumTime() + beatsPerBar * previousTempo;
 		
-		// Move beats to any note within 1 sub beat, then nudge
-		Set<List<Integer>> beatTimesList = new HashSet<List<Integer>>();
-		
-		// Evenly spaced beats times
-		List<Integer> defaultBeatTimes = new ArrayList<Integer>(beatsPerBar + 1);
-		for (int beat = 0; beat <= beatsPerBar; beat++) {
-			defaultBeatTimes.add((int) Math.round(getLastTatumTime() + beat * timePerBeat));
-		}
-		beatTimesList.add(defaultBeatTimes);
-		
-		// TODO: Shifting and nudging 1 beat at a time?
-		
-		// Shift beats to notes within a sub beat away
-		Set<List<Integer>> shiftedBeatTimesList = new HashSet<List<Integer>>();
-		
-		// Move the rest of the beats (except the last one)
-		for (int beat = 1; beat <= beatsPerBar; beat++) {
-			for (int time : getCloseNotes(defaultBeatTimes.get(beat), timePerSubBeat)) {
-				// Shift and add
-				for (List<Integer> list : beatTimesList) {
-					if (time != list.get(beat)) {
-						List<Integer> shiftedBeatTimesListTmp = new ArrayList<Integer>(list);
-						shiftedBeatTimesListTmp.set(beat, time);
-						shiftedBeatTimesList.add(shiftedBeatTimesListTmp);
-					}
-				}
-			}
-		}
-		
-		// Add all shifted to final list
-		beatTimesList.addAll(shiftedBeatTimesList);
-		
-		// Nudge beats
-		Set<List<Integer>> nudgedBeatTimesList = new HashSet<List<Integer>>();
-		for (List<Integer> beatTimes : beatTimesList) {
-			nudgedBeatTimesList.addAll(nudgeTimes(beatTimes, 1, beatTimes.size(), timePerTatum, params.MAGNETISM_BEAT));
-		}
-		beatTimesList = new HashSet<List<Integer>>(nudgedBeatTimesList);
-		
-		// Add sub beats
-		for (List<Integer> beatTimes : beatTimesList) {
-			// Place sub beats
-			List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsPerBar + 1);
-			subBeatTimesList.add(subBeatTimes);
-			
-			for (int i = 0; i <= subBeatsPerBar; i++) {
-				subBeatTimes.add(-1);
-			}
-			
-			// Add beats into sub beat list
-			for (int i = 0; i < beatTimes.size(); i++) {
-				subBeatTimes.set(i * subBeatsPerBeat, beatTimes.get(i));
-			}
-			
-			// Add sub beat times
-			for (int i = 0; i < beatsPerBar; i++) {
-				int initialTime = beatTimes.get(i);
-				int initialIndex = i * subBeatsPerBeat;
-				int finalTime = beatTimes.get(i + 1);
-				
-				timePerTatum = (finalTime - initialTime) / tatumsPerBeat;
-				timePerSubBeat = timePerTatum * tatumsPerSubBeat;
-				
-				for (int j = 1; j < subBeatsPerBeat; j++) {
-					int time = (int) Math.round(initialTime + timePerSubBeat * j);
-					subBeatTimes.set(initialIndex + j, time);
-				}
-			}
-		}
-		
-		// Nudge sub beats
-		for (int i = 0; i < beatsPerBar; i++) {
-			int initialIndex = i * subBeatsPerBeat;
-			Set<List<Integer>> nudgedSubBeatTimesList = new HashSet<List<Integer>>();
-			
-			for (List<Integer> subBeatTimes : subBeatTimesList) {
-				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, initialIndex + 1, initialIndex + subBeatsPerBeat, timePerTatum * 2, params.MAGNETISM_SUB_BEAT));
-			}
-			
-			subBeatTimesList = new ArrayList<List<Integer>>(nudgedSubBeatTimesList);
-		}
-		
-		// Add tatums
-		for (List<Integer> subBeatTimes : subBeatTimesList) {
-			// Place tatums
-			List<Integer> tatumTimes = new ArrayList<Integer>(tatumsPerBar + 1);
-			tatumTimesList.add(tatumTimes);
-			for (int i = 0; i <= tatumsPerBar; i++) {
-				tatumTimes.add(-1);
-			}
-			
-			// Add sub beats into tatums list
-			for (int i = 0; i < subBeatTimes.size(); i++) {
-				tatumTimes.set(i * tatumsPerSubBeat, subBeatTimes.get(i));
-			}
-			
-			// Add tatum times
-			for (int i = 0; i < subBeatsPerBar; i++) {
-				int initialTime = subBeatTimes.get(i);
-				int initialIndex = i * tatumsPerSubBeat;
-				int finalTime = subBeatTimes.get(i + 1);
-				
-				timePerTatum = (finalTime - initialTime) / tatumsPerSubBeat;
-				
-				for (int j = 1; j < tatumsPerSubBeat; j++) {
-					int time = (int) Math.round(initialTime + timePerTatum * j);
-					tatumTimes.set(initialIndex + j, time);
-				}
-			}
-		}
 		
 		// Branch
-		for (List<Integer> tatumTimes : tatumTimesList) {
-			HmmPriorBeatTrackingModelState newState = this.deepCopy();
-			
-			// TODO: Set bar and tatum number correctly? Now that we have it...
-			// Add tatums into tatums list
-			for (int i = 1; i < tatumTimes.size(); i++) {
-				int time = tatumTimes.get(i);
-				newState.tatums.add(time);
+		TreeSet<HmmPriorBeatTrackingModelState> newStates = new TreeSet<HmmPriorBeatTrackingModelState>();
+		
+		for (int downbeatTime : getPossibleDownbeatTimes(estimatedDownbeatTime, previousTempo, timePerTatum)) {
+			for (List<Integer> times : getNudgedTimes(lastTatumTime, downbeatTime)) {
+				HmmPriorBeatTrackingModelState newState = this.deepCopy();
+				newState.addBar(times);
+				newStates.add(newState);
 			}
-			
-			newState.addDownbeatProbability(tatumTimes.get(tatumTimes.size() - 1));
-			
-			// Get note probabilities and removed from unused notes list
-			Iterator<MidiNote> noteIterator = newState.unusedNotes.iterator();
-			while (noteIterator.hasNext()) {
-				int time = (int) noteIterator.next().getOnsetTime();
-				
-				if (time < newState.tatums.get(newState.tatums.size() - 1)) {
-					newState.addNoteError(time);
-					noteIterator.remove();
-					
-				} else {
-					break;
-				}
-			}
-			
-			// Beat spacings
-			List<Integer> beatTimes = new ArrayList<Integer>(beatsPerBar + 1);
-			for (int i = 0; i < beatsPerBar + 1; i++) {
-				beatTimes.add(tatumTimes.get(i * tatumsPerBeat));
-			}
-			newState.addSpacingProbability(beatTimes);
-			
-			// Sub beat spacings
-			for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
-				List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsPerBeat + 1);
-				for (int i = 0; i < subBeatsPerBeat + 1; i++) {
-					subBeatTimes.add(tatumTimes.get(beatNum * tatumsPerBeat + i * tatumsPerSubBeat));
-				}
-				newState.addSpacingProbability(subBeatTimes);
-			}
-			
-			// Tatum spacings
-			for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
-				for (int subBeatNum = 0; subBeatNum < subBeatsPerBeat; subBeatNum++) {
-					newState.addSpacingProbability(tatumTimes.subList(beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat, beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat + tatumsPerSubBeat + 1));
-				}
-			}
-			
-			timePerBeat = ((double) (beatTimes.get(beatsPerBar) - beatTimes.get(0))) / beatsPerBar;
-			newState.updateTempoProbability(timePerBeat);
-			newState.barCount++;
-			newStates.add(newState);
 		}
 
 		return newStates;
 	}
-	
+
+	/**
+	 * Get all of the possible nudged times of the given base downbeat times.
+	 * 
+	 * @param prev The time of the downbeat of the previous bar.
+	 * @param next The time of the downbeat of the upcoming bar.
+	 * 
+	 * @return A List of all possible times given the anchor downbeat times, which
+	 * will not change.
+	 */
+	private List<List<Integer>> getNudgedTimes(int prev, int next) {
+		// Set up useful variables
+		Measure bar = hierarchyState.getMetricalMeasure();
+		int beatsPerBar = bar.getBeatsPerMeasure();
+		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
+		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();
+		int tatumsPerBar = tatumsPerSubBeat * subBeatsPerBeat * beatsPerBar;
+		
+		// Add even beats
+		List<Integer> evenBeats = getEvenTimes(prev, next, beatsPerBar);
+		
+		// Nudge beats
+		double nudgeWindow = ((double) (next - prev)) / tatumsPerBar;
+		Set<List<Integer>> nudgedBeats = new HashSet<List<Integer>>(
+				nudgeTimes(evenBeats, 1, beatsPerBar, nudgeWindow, params.MAGNETISM_BEAT));
+		
+		// Nudge sub beats
+		Set<List<Integer>> nudgedSubBeats = new HashSet<List<Integer>>();
+		for (List<Integer> beats : nudgedBeats) {
+			nudgedSubBeats.addAll(getNextDivisionNudgedTimes(
+					beats, subBeatsPerBeat, nudgeWindow, params.MAGNETISM_SUB_BEAT));
+		}
+		
+		// For each sub beat
+		List<List<Integer>> tatums = new ArrayList<List<Integer>>();
+		for (List<Integer> subBeats : nudgedSubBeats) {
+			// Add even tatums
+			tatums.add(getEvenTimes(subBeats, tatumsPerSubBeat));
+		}
+		
+		return tatums;
+	}
+
+	/**
+	 * Get a collection of all of the possible nudged times of the next division down the hierarchy.
+	 * 
+	 * @param times The times of the pulses at some level of the hierarchy tree.
+	 * @param divisions The number of divisions to make between each element in times.
+	 * @param nudgeWindow The window width within which to nudge.
+	 * @param magnetism The magnetism to use to nudge.
+	 * 
+	 * @return A Collection of every possible List of times at the next level down the hierarchy
+	 * from the given times. Each List in the returned Collection will contain the values from
+	 * the given times List, with (divisions - 1) extra times between each of them.
+	 */
+	private Collection<List<Integer>> getNextDivisionNudgedTimes(List<Integer> times, int divisions,
+			double nudgeWindow, double magnetism) {
+		
+		// All of the possible nudged locations of the current times
+		List<List<Integer>> nudgedTimes = new ArrayList<List<Integer>>();
+		nudgedTimes.add(getEvenTimes(times, divisions));
+		
+		// Nudge within each existing boundary
+		for (int i = 1; i < times.size(); i++) {
+			int initialIndex = (i - 1) * divisions;
+			
+			// Stores every possible version of times, nudged between the boundaries
+			Set<List<Integer>> nudgedTimesTmp = new HashSet<List<Integer>>();
+			
+			for (List<Integer> subBeats : nudgedTimes) {
+				nudgedTimesTmp.addAll(nudgeTimes(
+						subBeats, initialIndex + 1, initialIndex + divisions, nudgeWindow, magnetism));
+			}
+			
+			// Save each beat into the current List, to iterate through next beat
+			nudgedTimes = new ArrayList<List<Integer>>(nudgedTimesTmp);
+		}
+		
+		return nudgedTimes;
+	}
+
+	/**
+	 * Get evenly-spaced times, the next level down from the given times.
+	 * 
+	 * @param times The times of the pulses at some level of the hierarchy tree.
+	 * @param divisions The number of evenly-spaced divisions to make between each element in times.
+	 *  
+	 * @return A List of pulses at the next level down the hierarchy tree, where each value from
+	 * the given times List is interspersed with (divisions - 1) evenly-spaced times.
+	 */
+	private List<Integer> getEvenTimes(List<Integer> times, int divisions) {
+		List<Integer> evenTimes = new ArrayList<Integer>((times.size() - 1) * divisions + 1);
+		
+		// Go through each set of boundaries
+		for (int i = 1; i < times.size(); i++) {
+			evenTimes.addAll(getEvenTimes(times.get(i - 1), times.get(i), divisions));
+			
+			// Remove the last beat added (it will be added in the next loop)
+			evenTimes.remove(evenTimes.size() - 1);
+		}
+		// Add the final boundary
+		evenTimes.add(times.get(times.size() - 1));
+		
+		return evenTimes;
+	}
+
+	/**
+	 * Get a List of evenly-spaced times between the given first and last boundaries.
+	 * 
+	 * @param first The first boundary time. The first element in the returned List.
+	 * @param last The last boundary time. The last element in the returned List.
+	 * @param divisions The number of divisions to add into the returned List.
+	 * 
+	 * @return A List of evenly-spaced times. First, then (divisions - 1) evenly-spaced
+	 * times, then last.
+	 */
+	private List<Integer> getEvenTimes(int first, int last, int divisions) {
+		List<Integer> evenTimes = new ArrayList<Integer>(divisions + 1);
+		
+		evenTimes.add(first);
+		double diff = ((double) (last - first)) / divisions;
+		for (int i = 1; i < divisions; i++) {
+			evenTimes.add((int) Math.round(first + i * diff));
+		}
+		evenTimes.add(last);
+		
+		return evenTimes;
+	}
+
+	/**
+	 * Get a Set (so no duplicates) of all of the possible downbeat times within the given window.
+	 * For the given time, as well as each onset time of a note from {@link #unusedNotes} whose
+	 * onset lies within the given window size from the given time, we first get all possible nudges
+	 * from that time, using {@link #nudgeTime(int, double, double)}, with BEAT_MAGNETISM as
+	 * the magnetism, and nudgeWindow as the nudge window.
+	 * 
+	 * @param time The initial downbeat time. Returned values will be centered around this time.
+	 * @param window The maximum distance from the given time where a return should be.
+	 * @param nudgeWindow The window size to nudge any guesses.
+	 * 
+	 * @return A Set of all of the possible downbeat times with the given settings.
+	 */
+	private Set<Integer> getPossibleDownbeatTimes(double time, double window, double nudgeWindow) {
+		Set<Integer> times = new HashSet<Integer>();
+		times.addAll(nudgeTime((int) Math.round(time), nudgeWindow, params.MAGNETISM_BEAT));
+		
+		for (MidiNote note : unusedNotes) {
+			if (Math.abs(note.getOnsetTime() - time) <= window) {
+				times.addAll(nudgeTime((int) note.getOnsetTime(), nudgeWindow, params.MAGNETISM_BEAT));
+			}
+		}
+		
+		return times;
+	}
+
+	/**
+	 * Add a list of tatums as a new bar. This is used for all bars EXCEPT the initial one.
+	 * This method also calculates all probabilities and adds them to this state's {@link #logProb}.
+	 * 
+	 * @param tatumTimes The tatums of the new bar which we will add to {@link #tatums}.
+	 */
+	private void addBar(List<Integer> tatumTimes) {
+		// Helpful variables
+		Measure bar = hierarchyState.getMetricalMeasure();
+		int beatsPerBar = bar.getBeatsPerMeasure();
+		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
+		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();
+		int tatumsPerBeat = tatumsPerSubBeat * subBeatsPerBeat;
+		
+		// Add tatums into tatums list
+		tatums.addAll(tatumTimes.subList(1, tatumTimes.size()));
+		
+		// Get note probabilities and removed from unused notes list
+		Iterator<MidiNote> noteIterator = unusedNotes.iterator();
+		while (noteIterator.hasNext()) {
+			int time = (int) noteIterator.next().getOnsetTime();
+			
+			if (time < tatums.get(tatums.size() - 1)) {
+				addNoteError(time);
+				noteIterator.remove();
+				
+			} else {
+				break;
+			}
+		}
+		
+		// Beat spacings
+		List<Integer> beatTimes = new ArrayList<Integer>(beatsPerBar + 1);
+		for (int i = 0; i < beatsPerBar + 1; i++) {
+			beatTimes.add(tatumTimes.get(i * tatumsPerBeat));
+		}
+		addSpacingProbability(beatTimes);
+		
+		// Sub beat spacings
+		for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
+			List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsPerBeat + 1);
+			for (int i = 0; i < subBeatsPerBeat + 1; i++) {
+				subBeatTimes.add(tatumTimes.get(beatNum * tatumsPerBeat + i * tatumsPerSubBeat));
+			}
+			addSpacingProbability(subBeatTimes);
+		}
+		
+		// Tatum spacings
+		for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
+			for (int subBeatNum = 0; subBeatNum < subBeatsPerBeat; subBeatNum++) {
+				addSpacingProbability(tatumTimes.subList(beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat, beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat + tatumsPerSubBeat + 1));
+			}
+		}
+		
+		// Update downbeat and tempo probabilities
+		addDownbeatProbability(tatumTimes.get(tatumTimes.size() - 1));
+		updateTempoProbability(((double) (beatTimes.get(beatsPerBar) - beatTimes.get(0))) / beatsPerBar);
+		barCount++;
+	}
+
+	/**
+	 * Get the probability of a downbeat at the given time, using {@link #priors}.
+	 * 
+	 * @param time The time whose downbeat probability we want.
+	 */
 	private void addDownbeatProbability(int time) {
 		double maxProb = Double.NEGATIVE_INFINITY;
 		
@@ -687,21 +742,6 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			return;
 		}
 		
-		logProb += getSpacingLogProbability(times, params);
-	}
-	
-	/**
-	 * Get the log probability of the given spacing times.
-	 * 
-	 * @param times The times
-	 * @param params The parameters
-	 * @return The log probability.
-	 */
-	private static double getSpacingLogProbability(List<Integer> times, HmmBeatTrackingModelParameters params) {
-		if (times.size() <= 2) {
-			return 0.0;
-		}
-		
 		double std = 0.0;
 		
 		double sum = 0.0;
@@ -722,7 +762,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				MathUtils.getStandardNormal(0.0, 0.0, params.BEAT_SPACING_STD) :
 					MathUtils.getStandardNormal(params.BEAT_SPACING_MEAN, percentStd, params.BEAT_SPACING_STD);
 				
-		return Math.log(prob / params.BEAT_SPACING_NORM_FACTOR);
+		logProb += Math.log(prob / params.BEAT_SPACING_NORM_FACTOR);
 	}
 
 	/**
@@ -922,16 +962,16 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	
 	@Override
 	public int compareTo(MidiModelState other) {
+		int result = Double.compare(other.getScore(), getScore());
+		if (result != 0) {
+			return result;
+		}
+		
 		if (!(other instanceof HmmPriorBeatTrackingModelState)) {
 			return -1;
 		}
 		
 		HmmPriorBeatTrackingModelState o = (HmmPriorBeatTrackingModelState) other;
-		
-		int result = Double.compare(o.getScore(), getScore());
-		if (result != 0) {
-			return result;
-		}
 		
 		result = tatums.size() - o.tatums.size();
 		if (result != 0) {
@@ -968,16 +1008,16 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	
 	@Override
 	public int compareToNoRecurse(MidiModelState other) {
+		int result = Double.compare(other.getScore(), getScore());
+		if (result != 0) {
+			return result;
+		}
+		
 		if (!(other instanceof HmmPriorBeatTrackingModelState)) {
 			return -1;
 		}
 		
 		HmmPriorBeatTrackingModelState o = (HmmPriorBeatTrackingModelState) other;
-		
-		int result = Double.compare(o.getScore(), getScore());
-		if (result != 0) {
-			return result;
-		}
 		
 		result = tatums.size() - o.tatums.size();
 		if (result != 0) {
