@@ -139,4 +139,8 @@ public abstract class BeatTrackingModelState extends MidiModelState {
 		sb.append(' ').append(getScore());
 		return sb.toString();
 	}
+
+	public String getScoreString() {
+		return Double.toString(getScore());
+	}
 }

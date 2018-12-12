@@ -604,7 +604,7 @@ public class Main {
 						// Also print score for each
 						if (EVALUATOR != null) {
 							System.out.println("Voice prob: " + jms.getVoiceState().getScore());
-							System.out.println("Beats prob: " + jms.getBeatState().getScore());
+							System.out.println("Beats prob: " + jms.getBeatState().getScoreString());
 							System.out.println("Hierarchy: " + jms.getHierarchyState());
 							System.out.println(EVALUATOR.evaluate(jms));
 						}

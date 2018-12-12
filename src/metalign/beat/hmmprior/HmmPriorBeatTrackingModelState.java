@@ -18,10 +18,10 @@ import metalign.utils.MathUtils;
 import metalign.utils.MidiNote;
 
 public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
-	/**
-	 * The log probability of this sequence of beats having occurred.
-	 */
-	private double logProb;
+	private double downbeatLogProb;
+	private double evennessLogProb;
+	private double tempoLogProb;
+	private double noteLogProb;
 	
 	/**
 	 * The tatums which we have found so far.
@@ -54,7 +54,11 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	private final LinkedList<MidiNote> unusedNotes;
 	
 	public HmmPriorBeatTrackingModelState(HmmBeatTrackingModelParameters params, DownbeatPriors priors) {
-		logProb = 0.0;
+		downbeatLogProb = 0.0;
+		evennessLogProb = 0.0;
+		tempoLogProb = 0.0;
+		noteLogProb = 0.0;
+		
 		tatums = new ArrayList<Integer>();
 		unusedNotes = new LinkedList<MidiNote>();
 		previousTempo = 0;
@@ -65,8 +69,12 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	}
 	
 	public HmmPriorBeatTrackingModelState(HmmPriorBeatTrackingModelState state) {
+		downbeatLogProb = state.downbeatLogProb;
+		evennessLogProb = state.evennessLogProb;
+		tempoLogProb = state.tempoLogProb;
+		noteLogProb = state.noteLogProb;
+		
 		tatums = new ArrayList<Integer>(state.tatums);
-		logProb = state.logProb;
 		params = state.params;
 		priors = state.priors;
 		unusedNotes = new LinkedList<MidiNote>(state.unusedNotes);
@@ -188,7 +196,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		// Too short
 		if (timeDifference < minTimeUntilDownbeat) {
 			newStates.add(this);
-			logProb = Math.log(MathUtils.getStandardNormal(0.0, 0.0, params.INITIAL_TEMPO_STD));
+			tempoLogProb = Math.log(MathUtils.getStandardNormal(0.0, 0.0, params.INITIAL_TEMPO_STD));
 			return newStates;
 		}
 		
@@ -206,7 +214,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		double timePerSubBeat = timePerTatum * tatumsPerSubBeat;
 		double timePerBeat = timePerTatum * tatumsPerBeat;
 		
-		logProb = Math.log(MathUtils.getStandardNormal(timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
+		tempoLogProb = Math.log(MathUtils.getStandardNormal(timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
 		newStates.add(this.deepCopy());
 		
 		// Move beats to any note within 1 sub beat, then nudge
@@ -374,7 +382,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		
 		for (int i = 0; i < tatumTimesList.size(); i++) {
 			HmmPriorBeatTrackingModelState newState = this.deepCopy();
-			newState.logProb = 0.0;
+			newState.tempoLogProb = 0.0;
 			
 			List<Integer> tatumTimes = tatumTimesList.get(i);
 			
@@ -429,7 +437,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			newState.previousTempo = timePerBeat;
 			
 			if (timePerBeat >= params.MINIMUM_TEMPO && timePerBeat <= params.MAXIMUM_TEMPO) {
-				newState.logProb += Math.log(MathUtils.getStandardNormal(timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
+				newState.tempoLogProb += Math.log(MathUtils.getStandardNormal(timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
 				
 				if (beatsUntilDownbeat == beatsPerBar) {
 					newState.barCount = 1;
@@ -718,7 +726,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			}
 		}
 		
-		logProb += Math.log(maxProb == Double.NEGATIVE_INFINITY ? priors.getRestPrior() : maxProb);
+		downbeatLogProb += Math.log(maxProb == Double.NEGATIVE_INFINITY ? priors.getRestPrior() : maxProb);
 	}
 
 	/**
@@ -727,7 +735,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	 * @param newTempo The new tempo
 	 */
 	private void updateTempoProbability(double newTempo) {
-		logProb += Math.log(MathUtils.getStandardNormal(0.0, (newTempo - previousTempo) / previousTempo, params.TEMPO_PERCENT_CHANGE_STD));
+		tempoLogProb += Math.log(MathUtils.getStandardNormal(0.0, (newTempo - previousTempo) / previousTempo, params.TEMPO_PERCENT_CHANGE_STD));
 		
 		previousTempo = newTempo;
 	}
@@ -762,7 +770,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				MathUtils.getStandardNormal(0.0, 0.0, params.BEAT_SPACING_STD) :
 					MathUtils.getStandardNormal(params.BEAT_SPACING_MEAN, percentStd, params.BEAT_SPACING_STD);
 				
-		logProb += Math.log(prob / params.BEAT_SPACING_NORM_FACTOR);
+		evennessLogProb += Math.log(prob / params.BEAT_SPACING_NORM_FACTOR);
 	}
 
 	/**
@@ -787,12 +795,12 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			
 			// Go through each previous nudge hypothesis
 			for (int prevTimesIndex = 0; prevTimesIndex < nudgedTimes.size(); prevTimesIndex++) {
-				List<Integer> possibleNudgedTimes = nudgeTime(nudgedTimes.get(prevTimesIndex).get(toNudgeIndex), timePerTatum, strength);
+				Set<Integer> possibleNudgedTimes = nudgeTime(nudgedTimes.get(prevTimesIndex).get(toNudgeIndex), timePerTatum, strength);
 				
 				// Go through each resulting nudge location
-				for (int i = 0; i < possibleNudgedTimes.size(); i++) {
+				for (int time : possibleNudgedTimes) {
 					newNudgedTimes.add(new ArrayList<Integer>(nudgedTimes.get(prevTimesIndex)));
-					newNudgedTimes.get(newNudgedTimes.size() - 1).set(toNudgeIndex, possibleNudgedTimes.get(i));
+					newNudgedTimes.get(newNudgedTimes.size() - 1).set(toNudgeIndex, time);
 				}
 			}
 			
@@ -807,32 +815,32 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	 * all notes close enough, the closest note, or no notes.
 	 * 
 	 * @param time The tatum's original time.
-	 * @param timePerTatum The time per tatum.
+	 * @param window The time per tatum.
 	 * @param strength The strength of the nudge. A value from 0.0-1.0, representing the proportion.
 	 * @return The possible nudged times.
 	 */
-	private List<Integer> nudgeTime(int time, double timePerTatum, double strength) {
-		List<Integer> notes = getCloseNotes(time, timePerTatum);
-		List<Integer> nudgedTimes = new ArrayList<Integer>();
+	private Set<Integer> nudgeTime(int time, double window, double strength) {
+		List<Integer> notes = getCloseNotes(time, window);
+		Set<Integer> nudgedTimes = new HashSet<Integer>();
 		nudgedTimes.add(time);
 		
 		if (notes.isEmpty()) {
 			return nudgedTimes;
 		}
 		
+		// Nudge to each note within the window
 		// Get closest time
 		int smallestDiff = Integer.MAX_VALUE;
-		for (int i = 0; i < notes.size(); i++) {
-			int diff = notes.get(i) - time;
+		for (int noteTime : notes) {
+			int diff = noteTime - time;
 			
 			if (Math.abs(diff) < Math.abs(smallestDiff)) {
 				smallestDiff = diff;
 			}
 		}
 		int nudgedTime = (int) Math.round(time + smallestDiff * strength);
-		if (!nudgedTimes.contains(nudgedTime)) {
-			nudgedTimes.add(nudgedTime);
-		}
+		nudgedTimes.add(nudgedTime);
+		
 		
 		// Get average time of close notes
 		if (notes.size() > 1) {
@@ -844,14 +852,11 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		
 			double diff = avg - time;
 			
-			if (strength == 0.5) {
+			if (strength == params.MAGNETISM_SUB_BEAT) {
 				nudgedTimes.clear();
 			}
 			
-			nudgedTime = (int) Math.round(time + diff * strength);
-			if (!nudgedTimes.contains(nudgedTime)) {
-				nudgedTimes.add(nudgedTime);
-			}
+			nudgedTimes.add((int) Math.round(time + diff * strength));
 		}
 		
 		return nudgedTimes;
@@ -883,7 +888,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	private void addNoteError(int time) {
 		int closestTatum = getClosestTatumToTime(time, tatums);
 		
-		logProb += Math.log(MathUtils.getStandardNormal(0, Math.abs(closestTatum - time), params.NOTE_STD));
+		noteLogProb += Math.log(MathUtils.getStandardNormal(0, Math.abs(closestTatum - time), params.NOTE_STD));
 	}
 
 	/**
@@ -1053,7 +1058,36 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 
 	@Override
 	public double getScore() {
-		return logProb;
+		return tempoLogProb + evennessLogProb + downbeatLogProb + noteLogProb;
+	}
+	
+	@Override
+	public String getScoreString() {
+		StringBuilder sb = new StringBuilder();
+		
+		sb.append(" Tempo=").append(tempoLogProb);
+		sb.append(" Evenness=").append(evennessLogProb);
+		sb.append(" Downbeat=").append(downbeatLogProb);
+		sb.append(" Note=").append(noteLogProb);
+		
+		return sb.toString();
 	}
 
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder("[");
+		
+		for (Beat beat : getBeats()) {
+			sb.append(beat).append(',');
+		}
+		
+		sb.setCharAt(sb.length() - 1, ']');
+		
+		sb.append(" Tempo=").append(tempoLogProb);
+		sb.append(" Evenness=").append(evennessLogProb);
+		sb.append(" Downbeat=").append(downbeatLogProb);
+		sb.append(" Note=").append(noteLogProb);
+		return sb.toString();
+	}
 }
