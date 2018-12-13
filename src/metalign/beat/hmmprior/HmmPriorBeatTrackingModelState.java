@@ -155,7 +155,8 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		int anacrusisSubBeats = hierarchyState.getAnacrusis();
 		int anacrusisTatums = anacrusisSubBeats * tatumsPerSubBeat;
 		
-		int tatumsUntilDownbeat = anacrusisTatums == 0 ? beatsPerBar * subBeatsPerBeat * tatumsPerSubBeat : anacrusisTatums;
+		int tatumsUntilDownbeat = anacrusisTatums != 0 ? anacrusisTatums :
+				beatsPerBar * subBeatsPerBeat * tatumsPerSubBeat;
 		int subBeatsUntilDownbeat = tatumsUntilDownbeat / tatumsPerSubBeat;
 		int beatsUntilDownbeat = subBeatsUntilDownbeat / subBeatsPerBeat;
 		
@@ -163,12 +164,11 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		int tatumsUntilFirstSubBeat = tatumsUntilDownbeat - subBeatsUntilDownbeat * tatumsPerSubBeat;
 		int tatumsUntilFirstBeat = tatumsUntilDownbeat - beatsUntilDownbeat * tatumsPerBeat;
 		
-		double minTimeUntilDownbeat = params.MINIMUM_TEMPO * tatumsUntilDownbeat / tatumsPerSubBeat / subBeatsPerBeat;
-		double maxTimeUntilDownbeat = params.MAXIMUM_TEMPO * tatumsUntilDownbeat / tatumsPerSubBeat / subBeatsPerBeat;
+		double minTimeUntilDownbeat = params.MINIMUM_TEMPO * tatumsUntilDownbeat / tatumsPerBeat;
+		double maxTimeUntilDownbeat = params.MAXIMUM_TEMPO * tatumsUntilDownbeat / tatumsPerBeat;
 		
 		// Note timings
 		int firstNoteTime = (int) unusedNotes.get(0).getOnsetTime();
-		
 		int secondToLastNoteTime = (int) unusedNotes.getLast().getOnsetTime();
 		
 		Iterator<MidiNote> noteIterator = unusedNotes.descendingIterator();
@@ -181,30 +181,19 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			}
 		}
 		
-		int thirdToLastNoteTime = secondToLastNoteTime;
-		while (noteIterator.hasNext()) {
-			int tmpTime = (int) noteIterator.next().getOnsetTime();
-			
-			if (tmpTime != thirdToLastNoteTime) {
-				thirdToLastNoteTime = tmpTime;
-				break;
-			}
-		}
-		
 		int timeDifference = secondToLastNoteTime - firstNoteTime;
 		
 		// Too short
 		if (timeDifference < minTimeUntilDownbeat) {
 			newStates.add(this);
+			// We set this probability in case it will drop out of the beam already.
+			// This is the maximum possible initial tempo probability
 			tempoLogProb = Math.log(MathUtils.getStandardNormal(0.0, 0.0, params.INITIAL_TEMPO_STD));
 			return newStates;
 		}
 		
 		// Too long
 		if (timeDifference > maxTimeUntilDownbeat) {
-			// Perhaps there is no note on the first downbeat? Try lengths past the 3rd to last note...
-			// TODO: Find lengths between 3rd to last note and 2nd to last note.
-			
 			// Do not add this. We are too far already.
 			return newStates;
 		}
@@ -214,75 +203,40 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		double timePerSubBeat = timePerTatum * tatumsPerSubBeat;
 		double timePerBeat = timePerTatum * tatumsPerBeat;
 		
-		tempoLogProb = Math.log(MathUtils.getStandardNormal(timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
+		// We set this probability in case it will drop out of the beam already.
+		// This is its maximum possible initial tempo probability
+		tempoLogProb = Math.log(MathUtils.getStandardNormal(
+				timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
 		newStates.add(this.deepCopy());
 		
-		// Move beats to any note within 1 sub beat, then nudge
+		
+		
+		// Beats
 		Set<List<Integer>> beatTimesList = new HashSet<List<Integer>>();
 		
 		// Evenly spaced beats times
-		List<Integer> defaultBeatTimes = new ArrayList<Integer>(beatsUntilDownbeat + 1);
-		defaultBeatTimes.add((int) Math.round(firstNoteTime + timePerTatum * tatumsUntilFirstBeat));
-		for (int beat = 1; beat <= beatsUntilDownbeat; beat++) {
-			defaultBeatTimes.add((int) Math.round(defaultBeatTimes.get(0) + beat * timePerBeat));
-		}
-		beatTimesList.add(defaultBeatTimes);
-		
-		Set<List<Integer>> shiftedBeatTimesList = new HashSet<List<Integer>>();
-		// We can move the first beat
-		if (tatumsUntilFirstBeat != 0) {
-			for (int time : getCloseNotes(defaultBeatTimes.get(0), timePerSubBeat)) {
-				// Don't want to shift to first note
-				if (time == firstNoteTime) {
-					continue;
-				}
-				
-				// Shift and add
-				for (List<Integer> list : beatTimesList) {
-					if (time != list.get(0)) {
-						List<Integer> shiftedBeatTimesListTmp = new ArrayList<Integer>(list);
-						shiftedBeatTimesListTmp.set(0, time);
-						shiftedBeatTimesList.add(shiftedBeatTimesListTmp);
-					}
-				}
-			}
+		List<Integer> evenBeatTimes = new ArrayList<Integer>(beatsUntilDownbeat + 1);
+		double firstBeatTime = firstNoteTime + timePerTatum * tatumsUntilFirstBeat;
+		for (int beat = 0; beat <= beatsUntilDownbeat; beat++) {
+			evenBeatTimes.add((int) Math.round(firstBeatTime + beat * timePerBeat));
 		}
 		
-		// Add all shifted to final list
-		beatTimesList.addAll(shiftedBeatTimesList);
+		// Nudge beats, not including the first beat (if it is on the first note) or the last beat.
+		beatTimesList.addAll(nudgeTimes(evenBeatTimes, tatumsUntilFirstBeat == 0 ? 1 : 0,
+				evenBeatTimes.size() - 1, timePerTatum, params.MAGNETISM_BEAT));
 		
-		// Move the rest of the beats (except the last one)
-		for (int beat = 1; beat < beatsUntilDownbeat; beat++) {
-			shiftedBeatTimesList.clear();
-			for (int time : getCloseNotes(defaultBeatTimes.get(beat), timePerSubBeat)) {
-				// Shift and add
-				for (List<Integer> list : beatTimesList) {
-					if (time != list.get(beat)) {
-						List<Integer> shiftedBeatTimesListTmp = new ArrayList<Integer>(list);
-						shiftedBeatTimesListTmp.set(beat, time);
-						shiftedBeatTimesList.add(shiftedBeatTimesListTmp);
-					}
-				}
-			}
-			beatTimesList.addAll(shiftedBeatTimesList);
-		}
 		
-		// Nudge beats
-		Set<List<Integer>> nudgedBeatTimesList = new HashSet<List<Integer>>();
-		for (List<Integer> beatTimes : beatTimesList) {
-			nudgedBeatTimesList.addAll(nudgeTimes(beatTimes, 0, beatTimes.size(), timePerTatum, params.MAGNETISM_BEAT));
-		}
-		beatTimesList = new HashSet<List<Integer>>(nudgedBeatTimesList);
 		
+		// Sub beats
 		List<List<Integer>> subBeatTimesList = new ArrayList<List<Integer>>(beatTimesList.size());
-		List<List<Integer>> tatumTimesList = new ArrayList<List<Integer>>(beatTimesList.size());
 		
-		// Go through each beat placement hypothesis and place sub beats and tatums deterministically
+		// Go through each beat placement hypothesis and place sub beats evenly
 		for (List<Integer> beatTimes : beatTimesList) {
 			// Place sub beats
 			List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsUntilDownbeat + 1);
 			subBeatTimesList.add(subBeatTimes);
 			
+			// Add filler times (will be overwritten)
 			for (int i = 0; i <= subBeatsUntilDownbeat; i++) {
 				subBeatTimes.add(-1);
 			}
@@ -292,7 +246,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				subBeatTimes.set(subBeatsUntilFirstBeat + i * subBeatsPerBeat, beatTimes.get(i));
 			}
 			
-			// Add sub beat times
+			// Add sub beat times from any sub beats before the first beat
 			if (subBeatsUntilFirstBeat > 0) {
 				timePerTatum = (beatTimes.get(0) - firstNoteTime) / tatumsUntilFirstBeat;
 				timePerSubBeat = timePerTatum * tatumsPerSubBeat;
@@ -310,7 +264,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				int initialIndex = subBeatsUntilFirstBeat + i * subBeatsPerBeat;
 				int finalTime = beatTimes.get(i + 1);
 				
-				timePerTatum = (finalTime - initialTime) / tatumsPerBeat;
+				timePerTatum = ((double) (finalTime - initialTime)) / tatumsPerBeat;
 				timePerSubBeat = timePerTatum * tatumsPerSubBeat;
 				
 				for (int j = 1; j < subBeatsPerBeat; j++) {
@@ -320,31 +274,42 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			}
 		}
 		
+		// Nudge sub beats
 		Set<List<Integer>> nudgedSubBeatTimesList = new HashSet<List<Integer>>();
 		
-		// Handle first beat
+		// Nudge any sub beats before the first beat
 		if (subBeatsUntilFirstBeat > 0) {
 			for (List<Integer> subBeatTimes : subBeatTimesList) {
-				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, 0, subBeatsUntilFirstBeat, timePerTatum * 2, params.MAGNETISM_SUB_BEAT));
+				nudgedSubBeatTimesList.addAll(nudgeTimes(
+						subBeatTimes, 0, subBeatsUntilFirstBeat, timePerTatum * 2, params.MAGNETISM_SUB_BEAT));
 			}
 			subBeatTimesList = new ArrayList<List<Integer>>(nudgedSubBeatTimesList);
 		}
 		
-		// Handle remaining beats
+		// Nudge sub beats in remaining beats
 		for (int i = 0; i < beatsUntilDownbeat; i++) {
 			int initialIndex = subBeatsUntilFirstBeat + i * subBeatsPerBeat;
 			nudgedSubBeatTimesList = new HashSet<List<Integer>>();
 			
 			for (List<Integer> subBeatTimes : subBeatTimesList) {
-				nudgedSubBeatTimesList.addAll(nudgeTimes(subBeatTimes, initialIndex + 1, initialIndex + subBeatsPerBeat, timePerTatum * 2, params.MAGNETISM_SUB_BEAT));
+				nudgedSubBeatTimesList.addAll(nudgeTimes(
+						subBeatTimes,initialIndex + 1, initialIndex + subBeatsPerBeat, timePerTatum * 2,
+						params.MAGNETISM_SUB_BEAT));
 			}
 			subBeatTimesList = new ArrayList<List<Integer>>(nudgedSubBeatTimesList);
 		}
 		
+		
+		
+		// Tatums
+		List<List<Integer>> tatumTimesList = new ArrayList<List<Integer>>(beatTimesList.size());
+		
 		for (List<Integer> subBeatTimes : subBeatTimesList) {
-			// Place tatums
+			// Place tatums evenly
 			List<Integer> tatumTimes = new ArrayList<Integer>(tatumsUntilDownbeat + 1);
 			tatumTimesList.add(tatumTimes);
+			
+			// Add place-holders (will be overwritten)
 			for (int i = 0; i <= tatumsUntilDownbeat; i++) {
 				tatumTimes.add(-1);
 			}
@@ -354,7 +319,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				tatumTimes.set(tatumsUntilFirstSubBeat + i * tatumsPerSubBeat, subBeatTimes.get(i));
 			}
 			
-			// Add tatum times
+			// Add tatum times if they fall before the first sub beat
 			if (tatumsUntilFirstSubBeat > 0) {
 				timePerTatum = (subBeatTimes.get(0) - firstNoteTime) / tatumsUntilFirstSubBeat;
 				
@@ -371,7 +336,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				int initialIndex = tatumsUntilFirstSubBeat + i * tatumsPerSubBeat;
 				int finalTime = subBeatTimes.get(i + 1);
 				
-				timePerTatum = (finalTime - initialTime) / tatumsPerSubBeat;
+				timePerTatum = ((double) (finalTime - initialTime)) / tatumsPerSubBeat;
 				
 				for (int j = 1; j < tatumsPerSubBeat; j++) {
 					int time = (int) Math.round(initialTime + timePerTatum * j);
@@ -380,43 +345,74 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			}
 		}
 		
-		for (int i = 0; i < tatumTimesList.size(); i++) {
+		
+		
+		// Create new states
+		for (List<Integer> tatumTimes : tatumTimesList) {
 			HmmPriorBeatTrackingModelState newState = this.deepCopy();
-			newState.tempoLogProb = 0.0;
 			
-			List<Integer> tatumTimes = tatumTimesList.get(i);
+			// Set initial tempo
+			timePerTatum = ((double) (tatumTimes.get(tatumTimes.size() - 1) - tatumTimes.get(0))) /
+					(tatumTimes.size() - 1);
+			timePerBeat = timePerTatum * tatumsPerBeat;
+			newState.previousTempo = timePerBeat;
 			
+			// Ensure within valid range (again)
+			if (timePerBeat < params.MINIMUM_TEMPO || timePerBeat > params.MAXIMUM_TEMPO) {
+				continue;
+			}
+			
+			// Update tempo probability
+			newState.tempoLogProb = Math.log(MathUtils.getStandardNormal(
+					timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
+			
+			// Update completed bar count
+			if (anacrusisSubBeats == 0) {
+				newState.barCount = 1;
+			}
+			
+			// Beat spacing
 			List<Integer> beatTimes = new ArrayList<Integer>(beatsUntilDownbeat + 1);
 			for (int j = 0; j <= beatsUntilDownbeat; j++) {
 				beatTimes.add(tatumTimes.get(tatumsUntilFirstBeat + j * tatumsPerBeat));
 			}
+			newState.updateSpacingProbability(beatTimes);
 			
-			newState.addSpacingProbability(beatTimes);
-			
+			// Sub beat spacing
 			List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsUntilDownbeat + 1);
 			for (int j = 0; j <= subBeatsUntilDownbeat; j++) {
 				subBeatTimes.add(tatumTimes.get(tatumsUntilFirstSubBeat + j * tatumsPerSubBeat));
 			}
 			
-			newState.addSpacingProbability(subBeatTimes.subList(0, subBeatsUntilFirstBeat));
+			// Any pickup sub beats before the first beat
+			newState.updateSpacingProbability(subBeatTimes.subList(0, subBeatsUntilFirstBeat));
+			
+			// Additional sub beats
 			for (int j = 0; j < beatsUntilDownbeat; j++) {
 				int initialIndex = subBeatsUntilFirstBeat + j * subBeatsPerBeat;
-				newState.addSpacingProbability(subBeatTimes.subList(initialIndex, initialIndex + subBeatsPerBeat + 1));
+				newState.updateSpacingProbability(subBeatTimes.subList(
+						initialIndex, initialIndex + subBeatsPerBeat + 1));
 			}
 			
-			newState.addSpacingProbability(tatumTimes.subList(0, tatumsUntilFirstSubBeat));
+			// Tatum spacing
+			// Any tatum before the first sub beat
+			newState.updateSpacingProbability(tatumTimes.subList(0, tatumsUntilFirstSubBeat));
+			
+			// ADditional tatums
 			for (int j = 0; j < subBeatsUntilDownbeat; j++) {
 				int initialIndex = tatumsUntilFirstSubBeat + j * tatumsPerSubBeat;
-				newState.addSpacingProbability(tatumTimes.subList(initialIndex, initialIndex + tatumsPerSubBeat + 1));
+				newState.updateSpacingProbability(tatumTimes.subList(
+						initialIndex, initialIndex + tatumsPerSubBeat + 1));
 			}
 			
 			// Add tatum times into tatums
-			for (int j = 0; j < tatumTimes.size(); j++) {
-				int time = tatumTimes.get(j);
-				newState.tatums.add(time);
-			}
+			newState.tatums.addAll(tatumTimes);
 			
-			newState.addDownbeatProbability(tatumTimes.get(tatumTimes.size() - 1));
+			// Update probabilities
+			if (anacrusisSubBeats == 0) {
+				newState.updateDownbeatProbability(tatumTimes.get(0));
+			}
+			newState.updateDownbeatProbability(tatumTimes.get(tatumTimes.size() - 1));
 			
 			// Get note probabilities and removed from unused notes list
 			noteIterator = newState.unusedNotes.iterator();
@@ -424,7 +420,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				int time = (int) noteIterator.next().getOnsetTime();
 				
 				if (time < newState.tatums.get(newState.tatums.size() - 1)) {
-					newState.addNoteError(time);
+					newState.updateNoteProbability(time);
 					noteIterator.remove();
 					
 				} else {
@@ -432,22 +428,9 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 				}
 			}
 			
-			timePerTatum = ((double) (tatumTimes.get(tatumTimes.size() - 1) - tatumTimes.get(0))) / (tatumTimes.size() - 1);
-			timePerBeat = timePerTatum * tatumsPerBeat;
-			newState.previousTempo = timePerBeat;
-			
-			if (timePerBeat >= params.MINIMUM_TEMPO && timePerBeat <= params.MAXIMUM_TEMPO) {
-				newState.tempoLogProb += Math.log(MathUtils.getStandardNormal(timePerBeat, params.INITIAL_TEMPO_MEAN, params.INITIAL_TEMPO_STD));
-				
-				if (beatsUntilDownbeat == beatsPerBar) {
-					newState.barCount = 1;
-				}
-				newStates.add(newState);
-			}
+			// Add new state into tracking tree
+			newStates.add(newState);
 		}
-		
-		// TODO: Place downbeat between 3rd to last note and 2nd to last note
-		
 		
 		return newStates;
 	}
@@ -651,128 +634,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		
 		return times;
 	}
-
-	/**
-	 * Add a list of tatums as a new bar. This is used for all bars EXCEPT the initial one.
-	 * This method also calculates all probabilities and adds them to this state's {@link #logProb}.
-	 * 
-	 * @param tatumTimes The tatums of the new bar which we will add to {@link #tatums}.
-	 */
-	private void addBar(List<Integer> tatumTimes) {
-		// Helpful variables
-		Measure bar = hierarchyState.getMetricalMeasure();
-		int beatsPerBar = bar.getBeatsPerMeasure();
-		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
-		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();
-		int tatumsPerBeat = tatumsPerSubBeat * subBeatsPerBeat;
-		
-		// Add tatums into tatums list
-		tatums.addAll(tatumTimes.subList(1, tatumTimes.size()));
-		
-		// Get note probabilities and removed from unused notes list
-		Iterator<MidiNote> noteIterator = unusedNotes.iterator();
-		while (noteIterator.hasNext()) {
-			int time = (int) noteIterator.next().getOnsetTime();
-			
-			if (time < tatums.get(tatums.size() - 1)) {
-				addNoteError(time);
-				noteIterator.remove();
-				
-			} else {
-				break;
-			}
-		}
-		
-		// Beat spacings
-		List<Integer> beatTimes = new ArrayList<Integer>(beatsPerBar + 1);
-		for (int i = 0; i < beatsPerBar + 1; i++) {
-			beatTimes.add(tatumTimes.get(i * tatumsPerBeat));
-		}
-		addSpacingProbability(beatTimes);
-		
-		// Sub beat spacings
-		for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
-			List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsPerBeat + 1);
-			for (int i = 0; i < subBeatsPerBeat + 1; i++) {
-				subBeatTimes.add(tatumTimes.get(beatNum * tatumsPerBeat + i * tatumsPerSubBeat));
-			}
-			addSpacingProbability(subBeatTimes);
-		}
-		
-		// Tatum spacings
-		for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
-			for (int subBeatNum = 0; subBeatNum < subBeatsPerBeat; subBeatNum++) {
-				addSpacingProbability(tatumTimes.subList(beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat, beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat + tatumsPerSubBeat + 1));
-			}
-		}
-		
-		// Update downbeat and tempo probabilities
-		addDownbeatProbability(tatumTimes.get(tatumTimes.size() - 1));
-		updateTempoProbability(((double) (beatTimes.get(beatsPerBar) - beatTimes.get(0))) / beatsPerBar);
-		barCount++;
-	}
-
-	/**
-	 * Get the probability of a downbeat at the given time, using {@link #priors}.
-	 * 
-	 * @param time The time whose downbeat probability we want.
-	 */
-	private void addDownbeatProbability(int time) {
-		double maxProb = Double.NEGATIVE_INFINITY;
-		
-		for (MidiNote note : unusedNotes) {
-			if (Math.abs(note.getOnsetTime() - time) < 35000) {
-				maxProb = Math.max(maxProb, priors.getPrior(note));
-			}
-		}
-		
-		downbeatLogProb += Math.log(maxProb == Double.NEGATIVE_INFINITY ? priors.getRestPrior() : maxProb);
-	}
-
-	/**
-	 * Update tempo and add tempo probability.
-	 * 
-	 * @param newTempo The new tempo
-	 */
-	private void updateTempoProbability(double newTempo) {
-		tempoLogProb += Math.log(MathUtils.getStandardNormal(0.0, (newTempo - previousTempo) / previousTempo, params.TEMPO_PERCENT_CHANGE_STD));
-		
-		previousTempo = newTempo;
-	}
-
-	/**
-	 * Measure the evenness of the given list of times and add that probability into {@link #logProb}.
-	 * 
-	 * @param times The List of times whose evenness we want to measure.
-	 */
-	private void addSpacingProbability(List<Integer> times) {
-		if (times.size() <= 2) {
-			return;
-		}
-		
-		double std = 0.0;
-		
-		double sum = 0.0;
-		double sumSquared = 0.0;
-			
-		for (int i = 1; i < times.size(); i++) {
-			double element = times.get(i) - times.get(i - 1);
-			sum += element;
-			sumSquared += element * element;
-		}
-			
-		double mean = sum / (times.size() - 1);
-		double variance = sumSquared / (times.size() - 1) - mean * mean;
-		std = Math.sqrt(variance);
-		
-		double percentStd = std / mean;
-		double prob = percentStd < params.BEAT_SPACING_MEAN ?
-				MathUtils.getStandardNormal(0.0, 0.0, params.BEAT_SPACING_STD) :
-					MathUtils.getStandardNormal(params.BEAT_SPACING_MEAN, percentStd, params.BEAT_SPACING_STD);
-				
-		evennessLogProb += Math.log(prob / params.BEAT_SPACING_NORM_FACTOR);
-	}
-
+	
 	/**
 	 * Nudge the times in the given List towards notes from {@link #unusedNoteTimes}.
 	 * 
@@ -881,11 +743,136 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 	}
 
 	/**
+	 * Add a list of tatums as a new bar. This is used for all bars EXCEPT the initial one.
+	 * This method also calculates all probabilities and adds them to this state's {@link #logProb}.
+	 * 
+	 * @param tatumTimes The tatums of the new bar which we will add to {@link #tatums}.
+	 */
+	private void addBar(List<Integer> tatumTimes) {
+		// Helpful variables
+		Measure bar = hierarchyState.getMetricalMeasure();
+		int beatsPerBar = bar.getBeatsPerMeasure();
+		int subBeatsPerBeat = bar.getSubBeatsPerBeat();
+		int tatumsPerSubBeat = hierarchyState.getSubBeatLength();
+		int tatumsPerBeat = tatumsPerSubBeat * subBeatsPerBeat;
+		
+		// Add tatums into tatums list
+		tatums.addAll(tatumTimes.subList(1, tatumTimes.size()));
+		
+		// Get note probabilities and removed from unused notes list
+		Iterator<MidiNote> noteIterator = unusedNotes.iterator();
+		while (noteIterator.hasNext()) {
+			int time = (int) noteIterator.next().getOnsetTime();
+			
+			if (time < tatums.get(tatums.size() - 1)) {
+				updateNoteProbability(time);
+				noteIterator.remove();
+				
+			} else {
+				break;
+			}
+		}
+		
+		// Beat spacings
+		List<Integer> beatTimes = new ArrayList<Integer>(beatsPerBar + 1);
+		for (int i = 0; i < beatsPerBar + 1; i++) {
+			beatTimes.add(tatumTimes.get(i * tatumsPerBeat));
+		}
+		updateSpacingProbability(beatTimes);
+		
+		// Sub beat spacings
+		for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
+			List<Integer> subBeatTimes = new ArrayList<Integer>(subBeatsPerBeat + 1);
+			for (int i = 0; i < subBeatsPerBeat + 1; i++) {
+				subBeatTimes.add(tatumTimes.get(beatNum * tatumsPerBeat + i * tatumsPerSubBeat));
+			}
+			updateSpacingProbability(subBeatTimes);
+		}
+		
+		// Tatum spacings
+		for (int beatNum = 0; beatNum < beatsPerBar; beatNum++) {
+			for (int subBeatNum = 0; subBeatNum < subBeatsPerBeat; subBeatNum++) {
+				updateSpacingProbability(tatumTimes.subList(beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat, beatNum * tatumsPerBeat + subBeatNum * tatumsPerSubBeat + tatumsPerSubBeat + 1));
+			}
+		}
+		
+		// Update downbeat and tempo probabilities
+		updateDownbeatProbability(tatumTimes.get(tatumTimes.size() - 1));
+		updateTempoProbability(((double) (beatTimes.get(beatsPerBar) - beatTimes.get(0))) / beatsPerBar);
+		barCount++;
+	}
+
+	/**
+	 * Get the probability of a downbeat at the given time, using {@link #priors}.
+	 * 
+	 * @param time The time whose downbeat probability we want.
+	 */
+	private void updateDownbeatProbability(int time) {
+		if (priors == null) {
+			return;
+		}
+		
+		double maxProb = Double.NEGATIVE_INFINITY;
+		
+		for (MidiNote note : unusedNotes) {
+			if (Math.abs(note.getOnsetTime() - time) < 35000) {
+				maxProb = Math.max(maxProb, priors.getPrior(note));
+			}
+		}
+		
+		downbeatLogProb += Math.log(maxProb == Double.NEGATIVE_INFINITY ? priors.getRestPrior() : maxProb);
+	}
+
+	/**
+	 * Update tempo and add tempo probability.
+	 * 
+	 * @param newTempo The new tempo
+	 */
+	private void updateTempoProbability(double newTempo) {
+		tempoLogProb += Math.log(MathUtils.getStandardNormal(0.0, (newTempo - previousTempo) / previousTempo, params.TEMPO_PERCENT_CHANGE_STD));
+		
+		previousTempo = newTempo;
+	}
+
+	/**
+	 * Measure the evenness of the given list of times and add that probability into {@link #logProb}.
+	 * 
+	 * @param times The List of times whose evenness we want to measure.
+	 */
+	private void updateSpacingProbability(List<Integer> times) {
+		if (times.size() <= 2) {
+			return;
+		}
+		
+		double std = 0.0;
+		
+		double sum = 0.0;
+		double sumSquared = 0.0;
+			
+		for (int i = 1; i < times.size(); i++) {
+			double element = times.get(i) - times.get(i - 1);
+			sum += element;
+			sumSquared += element * element;
+		}
+			
+		double mean = sum / (times.size() - 1);
+		double variance = sumSquared / (times.size() - 1) - mean * mean;
+		std = Math.sqrt(variance);
+		
+		double percentStd = std / mean;
+		double prob = percentStd < params.BEAT_SPACING_MEAN ?
+				MathUtils.getStandardNormal(0.0, 0.0, params.BEAT_SPACING_STD) :
+					MathUtils.getStandardNormal(params.BEAT_SPACING_MEAN, percentStd, params.BEAT_SPACING_STD);
+				
+		evennessLogProb += Math.log(prob / params.BEAT_SPACING_NORM_FACTOR);
+	}
+	
+	/**
 	 * Add the note error to {@link #logProb} for a note at the given time.
 	 * 
 	 * @param time The time for which to add the note error.
 	 */
-	private void addNoteError(int time) {
+	private void updateNoteProbability(int time) {
 		int closestTatum = getClosestTatumToTime(time, tatums);
 		
 		noteLogProb += Math.log(MathUtils.getStandardNormal(0, Math.abs(closestTatum - time), params.NOTE_STD));

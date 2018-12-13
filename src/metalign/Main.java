@@ -625,7 +625,7 @@ public class Main {
 	}
 
 	/**
-	 * Ensure that the given model class Strings are valid. This method will halt exectution of the code if
+	 * Ensure that the given model class Strings are valid. This method will halt execution of the code if
 	 * the any of them are not valid.
 	 * 
 	 * @param voiceClass The voice class String.
@@ -639,7 +639,7 @@ public class Main {
 	}
 
 	/**
-	 * Ensure that the given voice class String is valid. This method will halt exectution of the code if
+	 * Ensure that the given voice class String is valid. This method will halt execution of the code if
 	 * it is not valid.
 	 * 
 	 * @param voiceClass The voice class String.
@@ -652,7 +652,7 @@ public class Main {
 	}
 
 	/**
-	 * Ensure that the given beat class String is valid. This method will halt exectution of the code if
+	 * Ensure that the given beat class String is valid. This method will halt execution of the code if
 	 * it is not valid.
 	 * 
 	 * @param beatClass The beat class String.
@@ -665,7 +665,7 @@ public class Main {
 	}
 
 	/**
-	 * Ensure that the given hierarchy class String is valid. This method will halt exectution of the code if
+	 * Ensure that the given hierarchy class String is valid. This method will halt execution of the code if
 	 * it is not valid.
 	 * 
 	 * @param hierarchyClass The hierarchy class String.
@@ -678,8 +678,8 @@ public class Main {
 	}
 	
 	/**
-	 * Get a joint model given the model class Strings (alread validated with {@link #validateModelClasses(String, String, String)}),
-	 * an event parser, and a time tracker.
+	 * Get a joint model given the model class Strings (already validated with
+	 * {@link #validateModelClasses(String, String, String)}), an event parser, and a time tracker.
 	 * 
 	 * @param voiceClass The voice class String.
 	 * @param beatClass The beat class String.
@@ -731,7 +731,7 @@ public class Main {
 		if ("Hmm".equalsIgnoreCase(beatClass)) {
 			return new HmmBeatTrackingModelState(new HmmBeatTrackingModelParameters());
 		} else if ("HmmPrior".equalsIgnoreCase(beatClass)) {
-			return new HmmPriorBeatTrackingModelState(new HmmBeatTrackingModelParameters(), DownbeatPriors.fromFile(priorFile, nlg));
+			return new HmmPriorBeatTrackingModelState(new HmmBeatTrackingModelParameters(), priorFile == null? null : DownbeatPriors.fromFile(priorFile, nlg));
 		}
 		
 		NUM_FROM_FILE++;
