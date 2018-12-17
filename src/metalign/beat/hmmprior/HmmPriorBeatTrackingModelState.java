@@ -18,9 +18,24 @@ import metalign.utils.MathUtils;
 import metalign.utils.MidiNote;
 
 public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
+	/**
+	 * The downbeat probability.
+	 */
 	private double downbeatLogProb;
+	
+	/**
+	 * The probability of how evenly-spaced the tatums are at each level.
+	 */
 	private double evennessLogProb;
+	
+	/**
+	 * The probability of the tempo curve.
+	 */
 	private double tempoLogProb;
+	
+	/**
+	 * The probability of the notes' alignment with the tatums.
+	 */
 	private double noteLogProb;
 	
 	/**
@@ -471,6 +486,12 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 		TreeSet<HmmPriorBeatTrackingModelState> newStates = new TreeSet<HmmPriorBeatTrackingModelState>();
 		
 		for (int downbeatTime : getPossibleDownbeatTimes(estimatedDownbeatTime, previousTempo, timePerTatum)) {
+			// Ensure this bar falls within the acceptable tempo range
+			if (((double) downbeatTime - lastTatumTime) / beatsPerBar < params.MINIMUM_TEMPO ||
+					((double) downbeatTime - lastTatumTime) / beatsPerBar > params.MAXIMUM_TEMPO) {
+				continue;
+			}
+			
 			for (List<Integer> times : getNudgedTimes(lastTatumTime, downbeatTime)) {
 				HmmPriorBeatTrackingModelState newState = this.deepCopy();
 				newState.addBar(times);
@@ -820,7 +841,7 @@ public class HmmPriorBeatTrackingModelState extends BeatTrackingModelState {
 			}
 		}
 		
-		downbeatLogProb += Math.log(maxProb == Double.NEGATIVE_INFINITY ? priors.getRestPrior() : maxProb);
+		downbeatLogProb += maxProb == Double.NEGATIVE_INFINITY ? priors.getRestPrior() : maxProb;
 	}
 
 	/**

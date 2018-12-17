@@ -308,7 +308,7 @@ public class MidiNote implements Comparable<MidiNote> {
 
 	@Override
 	public String toString() {
-		return String.format("(K:%s  V:%d  [%d-%d] %d)", MidiNote.getNoteName(pitch), velocity, onsetTime, offsetTime, correctVoice);
+		return String.format("(K:%s  V:%d  [%d-%d] %d)", pitch, velocity, onsetTime, offsetTime, correctVoice);
 	}
 	
 	@Override

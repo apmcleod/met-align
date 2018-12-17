@@ -14,12 +14,12 @@ import metalign.utils.MidiNote;
 public class DownbeatPriors {
 	
 	/**
-	 * The probability of a downbeat not occurring on a note.
+	 * The log probability of a downbeat not occurring on a note.
 	 */
 	private final double restPrior;
 	
 	/**
-	 * A map containing, for each note, the probability of it being on a downbeat.
+	 * A map containing, for each note, the log probability of it being on a downbeat.
 	 */
 	private final Map<MidiNote, Double> notePriors;
 	
@@ -27,9 +27,10 @@ public class DownbeatPriors {
 	 * Create a new prior object with the given prior.
 	 * 
 	 * @param restPrior The probability of a downbeat not occurring on a note.
+	 * (NOT the log probability).
 	 */
 	public DownbeatPriors(double restPrior) {
-		this.restPrior = restPrior;
+		this.restPrior = Math.log(restPrior);
 		notePriors = new HashMap<MidiNote, Double>();
 	}
 	
@@ -37,7 +38,7 @@ public class DownbeatPriors {
 	 * Add a note to this prior.
 	 * 
 	 * @param note The note to add.
-	 * @param prior The probability of a downbeat being on the given note.
+	 * @param prior The probability of a downbeat being on the given note. (NOT the log probability).
 	 * @throws IOException The note already has a prior probability.
 	 */
 	public void addNote(MidiNote note, double prior) throws IOException {
@@ -45,11 +46,11 @@ public class DownbeatPriors {
 			throw new IOException("Warning: note added twice");
 		}
 		
-		notePriors.put(note, prior);
+		notePriors.put(note, Math.log(prior));
 	}
 	
 	/**
-	 * Get the probability of a downbeat being on a rest.
+	 * Get the log probability of a downbeat being on a rest.
 	 * 
 	 * @return {@link #restPrior}
 	 */
@@ -58,17 +59,16 @@ public class DownbeatPriors {
 	}
 	
 	/**
-	 * Get the probability of a downbeat being on a given note.
+	 * Get the log probability of a downbeat being on a given note.
 	 * 
 	 * @param note The note whose downbeat probability we want.
-	 * @return The probability of a downbeat being on the given note. Returns 0 if the note
-	 * is not found.
+	 * @return The log probability of a downbeat being on the given note. Returns -INF.
 	 */
 	public double getPrior(MidiNote note) {
 		try {
 			return notePriors.get(note) * (1 - restPrior);
 		} catch (NullPointerException e) {
-			return 0.0;
+			return Double.NEGATIVE_INFINITY;
 		}
 	}
 
@@ -119,7 +119,7 @@ public class DownbeatPriors {
 	 * @param prior The prior downbeat probability, parsed from the python output.
 	 * 
 	 * @throws IOException If a matching note was not found. Probably this is due to using
-	 * a differend MIDI file to generate the python output vs. parsing it here with Java.
+	 * a different MIDI file to generate the python output vs. parsing it here with Java.
 	 */
 	private void addNote(double start, double end, int pitch, List<MidiNote> notes, double prior) throws IOException {
 		// Start and end are given in seconds, but we measure them in microseconds
