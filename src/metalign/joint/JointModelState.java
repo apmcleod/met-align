@@ -2,6 +2,7 @@ package metalign.joint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
@@ -288,34 +289,36 @@ public class JointModelState extends MidiModelState {
 	 * @param newStatesTmp The TreeSet to add this to.
 	 */
 	private void addWithDuplicateCheck(HierarchyModelState hms, TreeSet<JointModelState> newStatesTmp) {
-		JointModelState jms = new JointModelState(jointModel, hms);
-		JointModelState duplicate = null;
+		JointModelState state = new JointModelState(jointModel, hms);
 		
-		for (JointModelState state : newStatesTmp) {
+		// Duplicate checking
+		Iterator<JointModelState> beamIterator = newStatesTmp.iterator();
+		
+		while (beamIterator.hasNext()) {
+			JointModelState jms = beamIterator.next();
+			
 			if (state.isDuplicateOf(jms)) {
-				duplicate = state;
-				break;
-			}
-		}
-		
-		if (duplicate != null) {
-			if (duplicate.getScore() < jms.getScore()) {
-				newStatesTmp.add(jms);
-				newStatesTmp.remove(duplicate);
+				// Duplicate found
 				
-				if (Main.SUPER_VERBOSE && Main.TESTING) {
-					System.out.println("ELIMINATING (Duplicate): " + duplicate);
+				if (state.getScore() <= jms.getScore()) {
+					// The new state is less likely than its duplicate
+					if (Main.SUPER_VERBOSE && Main.TESTING) {
+						System.out.println("ELIMINATING (Duplicate): " + state);
+					}
+					return;
 				}
 				
-			} else {
+				// The duplicate is less likely than the new state
 				if (Main.SUPER_VERBOSE && Main.TESTING) {
 					System.out.println("ELIMINATING (Duplicate): " + jms);
 				}
+				
+				// Remove from the beam and the startedBeam
+				beamIterator.remove();
 			}
-			
-		} else {
-			newStatesTmp.add(jms);
 		}
+		
+		newStatesTmp.add(state);
 	}
 	
 	/**
