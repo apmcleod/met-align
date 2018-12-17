@@ -99,7 +99,7 @@ public class OutputParser {
 		if (voices.length() <= 1) {
 			return new ArrayList<Voice>(0);
 		}
-		Pattern notePattern = Pattern.compile("\\(K:([A-G]#?[0-9])  V:([0-9]+)  \\[([0-9]+)\\-([0-9]+)\\] ([0-9]+)\\)");
+		Pattern notePattern = Pattern.compile("\\(K:([A-G]#?[0-9]|[0-9]+)  V:([0-9]+)  \\[([0-9]+)\\-([0-9]+)\\] ([0-9]+)\\)");
 		String[] splitVoices = voices.split("\\], ?\\[");
 		splitVoices[0] = splitVoices[0].replace("[[", "");
 		splitVoices[splitVoices.length - 1] = splitVoices[splitVoices.length - 1].substring(0, splitVoices[splitVoices.length - 1].lastIndexOf(')') + 1);
@@ -117,7 +117,12 @@ public class OutputParser {
 				Matcher noteMatcher = notePattern.matcher(noteString);
 				if (noteMatcher.matches()) {
 					String pitchString = noteMatcher.group(1);
-					int pitch = MidiNote.getPitch(pitchString);
+					int pitch = 0;
+					try {
+						pitch = Integer.parseInt(pitchString);
+					} catch (NumberFormatException e) {
+						pitch = MidiNote.getPitch(pitchString);
+					}
 					
 					int velocity = Integer.parseInt(noteMatcher.group(2));
 					int onsetTime = Integer.parseInt(noteMatcher.group(3));

@@ -1094,7 +1094,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		MetricalLpcfgHierarchyModelState lpcfg = (MetricalLpcfgHierarchyModelState) state;
 		
-		return measure.equals(lpcfg.measure) && subBeatLength == lpcfg.subBeatLength && anacrusisLength == lpcfg.anacrusisLength;
+		return measure.equals(lpcfg.measure) && subBeatLength == lpcfg.subBeatLength;
 	}
 
 	@Override

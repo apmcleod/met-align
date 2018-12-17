@@ -1,6 +1,7 @@
 package metalign.joint;
 
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 
@@ -92,7 +93,7 @@ public class JointBeam {
 			
 			// Move to beam
 			for (JointModelState jms : orderedJointStates) {
-				addWithoutStarted(jms);
+				beam.add(jms);
 			}
 		}
 	}
@@ -112,20 +113,45 @@ public class JointBeam {
 	}
 	
 	/**
-	 * Add the given state to the beam, and DO NOT add it to the started beam.
-	 * 
-	 * @param state The state to add to the beam.
-	 */
-	public void addWithoutStarted(JointModelState state) {
-		beam.add(state);
-	}
-	
-	/**
-	 * Add the given state to the beam.
+	 * Add the given state to the beam, with duplicate checking. That is,
+	 * if there is a more-likely duplicate in the beam, do not add the new state.
+	 * Otherwise, add the new state and remove any less likely duplicates from
+	 * the beam.
 	 * 
 	 * @param state The state to add to the beam.
 	 */
 	public void add(JointModelState state) {
+		// Duplicate checking
+		Iterator<JointModelState> beamIterator = beam.iterator();
+		
+		while (beamIterator.hasNext()) {
+			JointModelState jms = beamIterator.next();
+			
+			if (state.isDuplicateOf(jms)) {
+				// Duplicate found
+				
+				if (state.getScore() <= jms.getScore()) {
+					// The new state is less likely than its duplicate
+					if (Main.SUPER_VERBOSE && Main.TESTING) {
+						System.out.println("ELIMINATING (Duplicate): " + state);
+					}
+					return;
+				}
+				
+				// The duplicate is less likely than the new state
+				if (Main.SUPER_VERBOSE && Main.TESTING) {
+					System.out.println("ELIMINATING (Duplicate): " + jms);
+				}
+				
+				// Remove from the beam and the startedBeam
+				beamIterator.remove();
+				if (jms.isStarted()) {
+					startedBeam.remove(jms);
+				}
+			}
+		}
+		
+		// No more likely duplicate. We want to add the new state.
 		beam.add(state);
 	
 		if (state.isStarted()) {

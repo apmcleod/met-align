@@ -360,7 +360,7 @@ public class JointModelState extends MidiModelState {
 	 * @param state The state we want to check for a duplicate.
 	 * @return True if the states are duplicates. False otherwise.
 	 */
-	private boolean isDuplicateOf(JointModelState state) {
+	public boolean isDuplicateOf(JointModelState state) {
 		if (Main.NUM_FROM_FILE == 0) {
 			return beatState.isDuplicateOf(state.beatState) && hierarchyState.isDuplicateOf(state.hierarchyState);
 		}
