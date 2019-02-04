@@ -12,6 +12,8 @@ This is the code and data from my 2018 ISMIR paper. If you use it, please cite i
 }
 ```
 
+If you would like to use the code from the 2019 ICASSP paper, see the branch [icassp2019](https://github.com/apmcleod/met-align/tree/icassp2019).
+
 ## Project Overview
 This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and pre-trained grammars are found in the `grammars` directory.
 
