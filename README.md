@@ -1,4 +1,17 @@
 # Metrical Alignment
+This is the code and data from my 2019 ICASSP paper. If you use it, please cite it:
+
+```
+@inproceedings{McLeod:19,
+  title={Improved metrical alignment of {MIDI} performance based on a repetition-aware online-adapted grammar},
+  author={McLeod, Andrew and Nakamura, Eita and Yoshii, Kazuyoshi},
+  booktitle={{IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP)}},
+  year={2019, to appear}
+}
+```
+
+If you are looking for the code from the 2018 ISMIR paper, see the branch [ismir2018](https://github.com/apmcleod/met-align/tree/ismir2018).
+
 ## Project Overview
 This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and a pre-trained grammar can be found in the `grammars` directory.
 
