@@ -664,7 +664,7 @@ public class Main {
 	 * @return A joint model which can be used to perform inference jointly.
 	 * @throws InvalidMidiDataException 
 	 */
-	private static JointModel getJointModel(String voiceClass, String beatClass, String hierarchyClass, EventParser ep, TimeTracker tt, MetricalLpcfg grammar)
+	public static JointModel getJointModel(String voiceClass, String beatClass, String hierarchyClass, EventParser ep, TimeTracker tt, MetricalLpcfg grammar)
 			throws InvalidMidiDataException {
 		VoiceSplittingModelState vs = getVoiceState(voiceClass, ep);
 		BeatTrackingModelState bs = getBeatState(beatClass, tt);

@@ -21,7 +21,6 @@ import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.Measure;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.hierarchy.lpcfg.MetricalLpcfg;
-import metalign.hierarchy.lpcfg.MetricalLpcfgElementNotFoundException;
 import metalign.hierarchy.lpcfg.MetricalLpcfgGenerator;
 import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.hierarchy.lpcfg.MetricalLpcfgHierarchyModelState;
@@ -29,6 +28,7 @@ import metalign.hierarchy.lpcfg.MetricalLpcfgHierarchyModelState.MetricalLpcfgMa
 import metalign.hierarchy.lpcfg.MetricalLpcfgTree;
 import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
+import metalign.parsing.MidiWriter;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.time.FromOutputTimeTracker;
@@ -36,6 +36,8 @@ import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.voice.Voice;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
+import metalign.voice.hmm.HmmVoiceSplittingModel;
+import metalign.voice.hmm.HmmVoiceSplittingModelParameters;
 
 /**
  * The <code>Evaluation</code> can be used to perform global evaluation on some output file.
@@ -80,9 +82,11 @@ public class Evaluation {
 		boolean useChannel = true;
 		File groundTruth = null;
 		boolean joint = false;
+		boolean mlm = false;
 		List<File> grammarFiles = new ArrayList<File>();
 		MetricalLpcfg grammar = new MetricalLpcfg();
 		File xmlFile = null;
+		File beatFile = null;
 		
 		// No args given
 		if (args.length == 0) {
@@ -193,6 +197,18 @@ public class Evaluation {
 							}
 							break;
 							
+						// MIDI file to derive barline and beats from, for use with -J
+						case 'B':
+							i++;
+							if (args.length <= i) {
+								argumentError("No MIDI file given for -B option.");
+							}
+							beatFile = new File(args[i]);
+							if (!beatFile.exists()) {
+								argumentError("Beat MIDI file " + beatFile + " does not exist.");
+							}
+							break;
+							
 						// Load grammar (for -J)
 						case 'g':
 							i++;
@@ -240,7 +256,7 @@ public class Evaluation {
 				if (grammarFiles.isEmpty()) {
 					argumentError("No grammar (-g) given with -J option.");
 				}
-				calculateJointGroundTruth(groundTruth, anacrusisFiles, useChannel, grammar, xmlFile);
+				calculateJointGroundTruth(groundTruth, anacrusisFiles, useChannel, grammar, xmlFile, beatFile);
 				
 			} else {
 				evaluateGroundTruth(groundTruth, anacrusisFiles, useChannel);
@@ -261,16 +277,52 @@ public class Evaluation {
 	 * @throws ParserConfigurationException 
 	 * @throws IOException 
 	 */
-	private static void calculateJointGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel, MetricalLpcfg grammar, File xmlFile) throws IOException, ParserConfigurationException, SAXException, InvalidMidiDataException, InterruptedException {
+	private static void calculateJointGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel,
+			MetricalLpcfg grammar, File xmlFile, File beatFile) throws IOException, ParserConfigurationException, SAXException, InvalidMidiDataException, InterruptedException {
 		Evaluator evaluator = new Evaluator(groundTruth, anacrusisFiles, useChannel);
 		
+		Evaluator beatEval = null;
+		if (beatFile != null) {
+			beatEval = new Evaluator(beatFile, anacrusisFiles, useChannel);
+		}
+		
 		MetricalLpcfg groundTruthGrammar = null;
-		List<Beat> groundTruthTatums = evaluator.getTatums();
-		Measure groundTruthMeasure = evaluator.getHierarchy();
+		List<Beat> groundTruthTatums = beatEval == null ? evaluator.getTatums() : beatEval.getTatums();
+		Measure groundTruthMeasure = beatEval == null ? evaluator.getHierarchy() : beatEval.getHierarchy();
 		
 		TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
-		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
+		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(beatFile == null ? groundTruth : beatFile, anacrusisFiles));
 		NoteListGenerator nlg = new NoteListGenerator(tt);
+		
+		// Perform voice separation, if needed (with -B beatFile)
+		if (beatFile != null) {
+			TimeTracker beatTt = new TimeTracker(Main.SUB_BEAT_LENGTH);
+			beatTt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(beatFile == null ? groundTruth : beatFile, anacrusisFiles));
+			NoteListGenerator beatNlg = new NoteListGenerator(tt);
+			Runner.parseFile(beatFile, beatNlg, beatTt, useChannel);
+			
+			
+			TimeTracker gtTt = new TimeTracker(Main.SUB_BEAT_LENGTH);
+			gtTt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(beatFile == null ? groundTruth : beatFile, anacrusisFiles));
+			NoteListGenerator gtNlg = new NoteListGenerator(tt);
+			Runner.parseFile(groundTruth, gtNlg, gtTt, useChannel);
+			
+			HmmVoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters(true));
+			Runner.performInference(model, gtNlg);
+			
+			int i = 0;
+			groundTruth = new File("TMP_" + System.currentTimeMillis());
+			MidiWriter writer = new MidiWriter(groundTruth, beatTt);
+			for (Voice voice : model.getHypotheses().first().getVoices()) {
+				for (MidiNote note : voice.getNotes()) {
+					note.setCorrectVoice(i);
+					writer.addMidiNote(note);
+				}
+				i++;
+			}
+			
+			writer.write();
+		}
 		
 		// PARSE!
 		EventParser ep = null;
@@ -319,11 +371,16 @@ public class Evaluation {
 			
 			Runner.performInference(jm, nlg);
 			
+			if (beatFile != null && groundTruth.getName().startsWith("TMP_")) {
+				groundTruth.delete();
+			}
+			
 			// GRAMMARIZE
 			MetricalLpcfgGenerator generator = new MetricalLpcfgGenerator();
 			generator.parseSong(jm, tt);
 			
 			groundTruthGrammar = generator.getGrammar();
+			/*
 			for (MetricalLpcfgTree tree : groundTruthGrammar.getTrees()) {
 				try {
 					grammar.extractTree(tree);
@@ -331,26 +388,34 @@ public class Evaluation {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}
+			}*/
 		}
 		
 		double grammarLogProb = 0.0;
 		double localLogProb = 0.0;
 		
 		MetricalLpcfg localGrammar = new MetricalLpcfg();
+		
 		for (MetricalLpcfgTree tree : groundTruthGrammar.getTrees()) {
-			System.out.println(tree.toStringPretty(" "));
+			if (VERBOSE) {
+				System.out.println(tree.toStringPretty(" "));
+			}
 			double logProb = grammar.getTreeLogProbability(tree);
 			grammarLogProb += logProb;
-			System.out.println("Global log probability = " + logProb);
+			if (VERBOSE) {
+				System.out.println("Global log probability = " + logProb);
+			}
 			if (!localGrammar.getTrees().isEmpty()) {
 				logProb = localGrammar.getTreeLogProbability(tree);
 				localLogProb += logProb;
-				System.out.println("Local log probability = " + logProb);
+				if (VERBOSE) {
+					System.out.println("Local log probability = " + logProb);
+				}
 			}
 			localGrammar.addTree(tree);
 		}
 		System.out.println("Hierarchy log probability: global = " + grammarLogProb + " local = " + localLogProb);
+		System.out.println("Averages: global = " + grammarLogProb / groundTruthGrammar.getTrees().size() + " local = " + localLogProb / localGrammar.getTrees().size());
 		
 		// TODO: For beats, go through each bar, create a static method in HmmBeatTracker to calculate prob of tatums in beat (given previous tempo)
 		//HmmBeatTrackingModelState.printProbabilities(groundTruthTatums, groundTruthMeasure, nlg);
