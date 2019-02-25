@@ -1,6 +1,5 @@
 package metalign.joint;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -227,59 +226,5 @@ public class JointModel extends MidiModel {
 	@Override
 	public TreeSet<JointModelState> getHypotheses() {
 		return hypothesisStates;
-	}
-	
-	/**
-	 * Get an ordered List of the {@link VoiceSplittingModelState}s which are currently the top hypotheses
-	 * for this joint model. These may not be sorted in order by their own scores, but they are given in
-	 * order of the underlying {@link JointModelState}'s scores.
-	 * 
-	 * @return An ordered List of the {@link VoiceSplittingModelState}s which are currently the top hypotheses
-	 * for this joint model.
-	 */
-	public List<? extends VoiceSplittingModelState> getVoiceHypotheses() {
-		List<VoiceSplittingModelState> voiceHypotheses = new ArrayList<VoiceSplittingModelState>(hypothesisStates.size());
-		
-		for (JointModelState jointState : hypothesisStates) {
-			voiceHypotheses.add(jointState.getVoiceState());
-		}
-		
-		return voiceHypotheses;
-	}
-	
-	/**
-	 * Get an ordered List of the {@link BeatTrackingModelState}s which are currently the top hypotheses
-	 * for this joint model. These may not be sorted in order by their own scores, but they are given in
-	 * order of the underlying {@link JointModelState}'s scores.
-	 * 
-	 * @return An ordered List of the {@link BeatTrackingModelState}s which are currently the top hypotheses
-	 * for this joint model.
-	 */
-	public List<? extends BeatTrackingModelState> getBeatHypotheses() {
-		List<BeatTrackingModelState> beatHypotheses = new ArrayList<BeatTrackingModelState>(hypothesisStates.size());
-		
-		for (JointModelState jointState : hypothesisStates) {
-			beatHypotheses.add(jointState.getBeatState());
-		}
-		
-		return beatHypotheses;
-	}
-	
-	/**
-	 * Get an ordered List of the {@link HierarchyModelState}s which are currently the top hypotheses
-	 * for this joint model. These may not be sorted in order by their own scores, but they are given in
-	 * order of the underlying {@link JointModelState}'s scores.
-	 * 
-	 * @return An ordered List of the {@link HierarchyModelState}s which are currently the top hypotheses
-	 * for this joint model.
-	 */
-	public List<? extends HierarchyModelState> getHierarchyHypotheses() {
-		List<HierarchyModelState> hierarchyHypotheses = new ArrayList<HierarchyModelState>(hypothesisStates.size());
-		
-		for (JointModelState jointState : hypothesisStates) {
-			hierarchyHypotheses.add(jointState.getHierarchyState());
-		}
-		
-		return hierarchyHypotheses;
 	}
 }

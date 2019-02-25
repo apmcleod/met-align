@@ -21,7 +21,6 @@ import metalign.hierarchy.lpcfg.MetricalLpcfg;
 import metalign.hierarchy.lpcfg.MetricalLpcfgElementNotFoundException;
 import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.hierarchy.lpcfg.MetricalLpcfgHierarchyModelState;
-import metalign.hierarchy.lpcfg.MetricalLpcfgTreeFactory;
 import metalign.joint.JointModel;
 import metalign.joint.JointModelState;
 import metalign.parsing.EventParser;
@@ -65,6 +64,8 @@ public class Main {
 	public static int MIN_NOTE_LENGTH = -1;
 	
 	public static int NUM_FROM_FILE = 0;
+	
+	public static int SUB_BEAT_LENGTH = 4;
 	
 	/**
 	 * The main method for running this program.
@@ -275,11 +276,6 @@ public class Main {
 							} catch (NumberFormatException e) {
 								argumentError("Exception reading beam size. Must be an integer: " + args[i]);
 							}
-							break;
-							
-						// Use only length 4 sub beats
-						case '4':
-							MetricalLpcfgTreeFactory.SPLITS = new int[] {4};
 							break;
 							
 						// Error
