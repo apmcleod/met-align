@@ -206,13 +206,11 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 		}
 		
 		if (children.size() == 1 && children.get(0) instanceof MetricalLpcfgTerminal) {
-			head = children.get(0).getHead();
-			return head;
+			return head = children.get(0).getHead();
 		}
 		
 		// Head is either a head of a child, or some head overlapping a boundary
-		head = MetricalLpcfgTerminal.generateHead(getQuantum(), getLength());
-		return head;
+		return head = MetricalLpcfgTerminal.generateHead(getQuantum(), level == MetricalLpcfgLevel.BEAT ? 1 : children.size(), 1);
 	}
 	
 	@Override
@@ -231,6 +229,10 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	 * a terminal node, do nothing to it.
 	 */
 	public void fixChildrenTypes() {
+		if (children.size() == 1) {
+			return;
+		}
+		
 		MetricalLpcfgHead min = MetricalLpcfgHead.MAX_HEAD;
 		MetricalLpcfgHead max = MetricalLpcfgHead.MIN_HEAD;
 		
@@ -259,11 +261,6 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 							MetricalLpcfgType.STRONG : MetricalLpcfgType.WEAK);
 			}
 		}
-	}
-	
-	@Override
-	public int getLength() {
-		return children.get(0).getLength() * children.size();
 	}
 	
 	@Override

@@ -26,13 +26,6 @@ public interface MetricalLpcfgNode {
 	public MetricalLpcfgHead getHead();
 	
 	/**
-	 * Get the length of this node, measured in sub beats.
-	 * 
-	 * @return The length of this node in sub beats.
-	 */
-	public int getLength();
-	
-	/**
 	 * Get if this node is empty or not.
 	 * 
 	 * @return True if this node contains no notes. False otherwise.

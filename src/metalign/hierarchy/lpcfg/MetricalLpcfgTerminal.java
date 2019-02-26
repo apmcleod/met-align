@@ -2,7 +2,6 @@ package metalign.hierarchy.lpcfg;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -27,29 +26,13 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	/**
 	 * The base length of this terminal, used to normalize in {@link #getHead()}.
 	 */
-	private final int baseLength;
+	private final int baseLengthNumerator;
+	private final int baseLengthDenominator;
 	
 	/**
 	 * The head of this terminal.
 	 */
 	private final MetricalLpcfgHead head;
-	
-	/**
-	 * Create a new terminal with just a single rest.
-	 */
-	public MetricalLpcfgTerminal() {
-		this(Arrays.asList(new MetricalLpcfgQuantum[] {MetricalLpcfgQuantum.REST}));
-	}
-	
-	/**
-	 * Create a new MetricalGrammarTerminal with the given pattern and {@link #baseLength} of 1. This
-	 * will convert the given pattern into reduced form before saving it.
-	 * 
-	 * @param subBeatQuantum The given pattern, in non-reduced form.
-	 */
-	public MetricalLpcfgTerminal(List<MetricalLpcfgQuantum> subBeatQuantum) {
-		this(subBeatQuantum, 1);
-	}
 
 	/**
 	 * Create a new MetricalGrammarTerminal with the given pattern and base length. This will convert
@@ -58,15 +41,16 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	 * @param beatQuantum The given pattern, in non-reduced form.
 	 * @param baseLength {@link #baseLength}
 	 */
-	public MetricalLpcfgTerminal(List<MetricalLpcfgQuantum> beatQuantum, int baseLength) {
+	public MetricalLpcfgTerminal(List<MetricalLpcfgQuantum> beatQuantum, int baseLengthNum, int baseLengthDenom) {
 		if (!MetricalLpcfgGeneratorRunner.TESTING) {
 			quantums = new ArrayList<MetricalLpcfgQuantum>(beatQuantum);
 		} else {
 			quantums = beatQuantum;
 		}
 
-		this.baseLength = baseLength;
-		head = generateHead(quantums, baseLength);
+		this.baseLengthNumerator = baseLengthNum;
+		this.baseLengthDenominator = baseLengthDenom;
+		head = generateHead(quantums, baseLengthNum, baseLengthDenom);
 	}
 	
 	/**
@@ -74,18 +58,25 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	 */
 	private MetricalLpcfgTerminal(MetricalLpcfgTerminal terminal) {
 		quantums = terminal.quantums;
-		baseLength = terminal.baseLength;
+		baseLengthNumerator = terminal.baseLengthNumerator;
+		baseLengthDenominator = terminal.baseLengthDenominator;
 		head = terminal.head;
 	}
 	
 	/**
 	 * Get whether this terminal contains any notes or not.
 	 * 
-	 * @return True if this terminal constins no notes (is all RESTS). False otherwise.
+	 * @return True if this terminal contains no notes (is all RESTS). False otherwise.
 	 */
 	@Override
 	public boolean isEmpty() {
-		return equals(new MetricalLpcfgTerminal());
+		for (MetricalLpcfgQuantum quantum : quantums) {
+			if (quantum != MetricalLpcfgQuantum.REST) {
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	@Override
@@ -107,7 +98,7 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 	 * 
 	 * @return The head of this terminal.
 	 */
-	public static MetricalLpcfgHead generateHead(List<MetricalLpcfgQuantum> quantum, int baseLength) {
+	public static MetricalLpcfgHead generateHead(List<MetricalLpcfgQuantum> quantum, int baseLengthNum, int baseLengthDenom) {
 		int maxNoteLength = 0;
 		int maxNoteIndex = 0;
 		
@@ -147,14 +138,8 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 			maxNoteIndex = currentNoteIndex;
 		}
 		
-		double length = ((double) maxNoteLength) / quantum.size() * baseLength;
-		
-		return new MetricalLpcfgHead(length, ((double) maxNoteIndex) / quantum.size() * baseLength, quantum.get(maxNoteIndex) == MetricalLpcfgQuantum.TIE);
-	}
-	
-	@Override
-	public int getLength() {
-		return baseLength;
+		return new MetricalLpcfgHead(baseLengthNum * maxNoteLength, baseLengthDenom * quantum.size(),
+				baseLengthNum * maxNoteIndex, baseLengthDenom * quantum.size(), quantum.get(maxNoteIndex) == MetricalLpcfgQuantum.TIE);
 	}
 	
 	/**
@@ -169,21 +154,7 @@ public class MetricalLpcfgTerminal implements MetricalLpcfgNode, Comparable<Metr
 			return true;
 		}
 		
-		// Starts ONSET TIE or TIE TIE or REST REST
-		if ((quantums.get(0) == MetricalLpcfgQuantum.ONSET && quantums.get(1) == MetricalLpcfgQuantum.TIE) ||
-				(quantums.get(0) == quantums.get(1) && quantums.get(0) != MetricalLpcfgQuantum.ONSET)) {
-			
-			// Check if the rest are all equal
-			for (int i = 2; i < quantums.size(); i++) {
-				if (quantums.get(i) != quantums.get(i - 1)) {
-					return false;
-				}
-			}
-			
-			return true;
-		}
-		
-		return false;
+		return MetricalLpcfgTerminal.reducesToOne(quantums);
 	}
 	
 	public static boolean reducesToOne(List<MetricalLpcfgQuantum> quantums) {

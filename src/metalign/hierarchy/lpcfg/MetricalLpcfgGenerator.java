@@ -78,12 +78,13 @@ public class MetricalLpcfgGenerator {
 	private Iterable<MetricalLpcfgTree> parseVoice(List<MidiNote> voice, List<Beat> beats, List<Integer> downbeatIndices, TimeTracker tt) {
 		List<MetricalLpcfgTree> trees = new ArrayList<MetricalLpcfgTree>(downbeatIndices.size());
 		
-		ListIterator<MidiNote> onsetIterator = voice.listIterator(); // Note onset times
 		ListIterator<MidiNote> offsetIterator = voice.listIterator(); // Note offset times
 		
 		
-		// Time of the last tatum of the previous bar
-		double prevTime = Double.NEGATIVE_INFINITY;
+		// Time of the last tatum of the previous bar.
+		// In a list so Factory.makeTree can edit this value.
+		List<Long> prevTime = new ArrayList<Long>(1);
+		prevTime.add(Long.MIN_VALUE);
 		if (downbeatIndices.get(0) != 0) {
 			double downbeatTime = beats.get(downbeatIndices.get(0)).getTime();
 			Beat previousBeat = beats.get(downbeatIndices.get(0) - 1);
@@ -99,7 +100,7 @@ public class MetricalLpcfgGenerator {
 				divisor *= tt.getNodeAtTime(previousBeat.getTime()).getTimeSignature().getMeasure().getBeatsPerBar();
 			}
 			
-			prevTime = downbeatTime - (downbeatTime - previousBeat.getTime()) / divisor;
+			prevTime.set(0, Math.round(downbeatTime - (downbeatTime - previousBeat.getTime()) / divisor));
 		}
 		
 		
@@ -110,7 +111,7 @@ public class MetricalLpcfgGenerator {
 			int endIndex = barNum < downbeatIndices.size() - 1 ? downbeatIndices.get(barNum + 1) : beats.size();
 			List<Beat> barBeats = beats.subList(startIndex, endIndex);
 			
-			double nextTime = endIndex < beats.size() ? beats.get(endIndex).getTime() : Double.POSITIVE_INFINITY;
+			long nextTime = endIndex < beats.size() ? beats.get(endIndex).getTime() : Long.MAX_VALUE;
 			
 			Measure measure = tt.getNodeAtTime(barBeats.get(0).getTime()).getTimeSignature().getMeasure();
 			
@@ -120,30 +121,25 @@ public class MetricalLpcfgGenerator {
 			}
 			
 			// Get notes
-			while (onsetIterator.hasNext() && onsetIterator.next().getOnsetTime() < nextTime);
-			while (offsetIterator.hasNext() && offsetIterator.next().getOffsetTime() <= prevTime);
-			List<MidiNote> notes = voice.subList(offsetIterator.previousIndex(), onsetIterator.previousIndex());
+			while (offsetIterator.hasNext() && offsetIterator.next().getOffsetTime() <= prevTime.get(0));
+			List<MidiNote> notes = voice.subList(offsetIterator.previousIndex(), voice.size());
 			
-			// Rewind iterators for next bar
-			onsetIterator.previous();
+			// Rewind iterator for next bar
 			offsetIterator.previous();
 			
 			if (!notes.isEmpty()) {
-				MetricalLpcfgTree tree = MetricalLpcfgTreeFactory.makeTree(measure, prevTime, barBeats, nextTime, notes);
+				try {
+					MetricalLpcfgTree tree = MetricalLpcfgTreeFactory.makeTree(measure, prevTime, barBeats, nextTime, notes);
 			
-				if (!tree.isEmpty()) {
-					// hasStarted OR startsWithNoteOrTie
-					if (voice.get(0).getOnsetTime() < barBeats.get(0).getTime() || !tree.startsWithRest()) {
-						trees.add(tree);
+					if (!tree.isEmpty()) {
+						// hasStarted OR startsWithNoteOrTie
+						if (voice.get(0).getOnsetTime() < barBeats.get(0).getTime() || !tree.startsWithRest()) {
+							trees.add(tree);
+						}
 					}
-					
-					// prevTime need not be updated if previous tree is empty. -INF (or whatever) is good enough.
-					if (endIndex != beats.size()) {
-						Beat lastAnchor = barBeats.get(barBeats.size() - 1);
-						int numTatums = MetricalLpcfgTreeFactory.getNumTatumsAfter(tree, lastAnchor);
-					
-						prevTime = nextTime - (nextTime - lastAnchor.getTime()) / numTatums;
-					}
+				} catch(MalformedTreeException e) {
+					System.err.println("Error creating tree. Skipping: ");
+					System.err.println(e.getMessage());
 				}
 			}
 		}

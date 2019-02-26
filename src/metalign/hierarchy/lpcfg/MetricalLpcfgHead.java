@@ -2,6 +2,8 @@ package metalign.hierarchy.lpcfg;
 
 import java.io.Serializable;
 
+import metalign.utils.MathUtils;
+
 /**
  * A <code>MetricalLpcfgHead</code> represents the head of a node in our lexicalized pcfg.
  * It contains information about the longest note lying under a node, that note's location
@@ -17,14 +19,15 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public static final MetricalLpcfgHead MAX_HEAD = new MetricalLpcfgHead(Double.MAX_VALUE, 0, false);
+	public static final MetricalLpcfgHead MAX_HEAD = new MetricalLpcfgHead(Integer.MAX_VALUE, 1, 0, 1, false);
 	public static final MetricalLpcfgHead MIN_HEAD = new MetricalLpcfgHead();
 
 	/**
-	 * The length of this head, normalized so that a value of <code>1.0</code> represents
-	 * the sub beat length.
+	 * The length of this head, normalized so that a value of <code>1</code> represents
+	 * the beat length.
 	 */
-	private final double length;
+	private final int lengthNumerator;
+	private final int lengthDenominator;
 	
 	/**
 	 * True if this head starts with a TIE. False otherwise.
@@ -34,16 +37,17 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 	
 	/**
 	 * The offset of the quantum which begins the first occurrence of a note of this head's length
-	 * in the current node, normalized so that a value of <code>1.0</code> represents
-	 * the sub beat length.
+	 * in the current node, normalized so that a value of <code>1</code> represents
+	 * the beat length.
 	 */
-	private final double startQuantum;
+	private final int startQuantumNumerator;
+	private final int startQuantumDenominator;
 	
 	/**
 	 * Create a new empty head with {@link #length} 0, {@link #startQuantum} 0, and {@link #tiesIn} false.
 	 */
 	public MetricalLpcfgHead() {
-		this(0.0, 0.0, false);
+		this(0, 1, 0, 1, false);
 	}
 	
 	/**
@@ -53,16 +57,24 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 	 * @param startQuantum {@link #startQuantum}
 	 * @param tiesIn {@link #tiesIn}
 	 */
-	public MetricalLpcfgHead(double length, double startQuantum, boolean tiesIn) {
+	public MetricalLpcfgHead(int lengthNum, int lengthDenom, int startQuantumNum, int startQuantumDenom, boolean tiesIn) {
 		if (!MetricalLpcfgGeneratorRunner.LEXICALIZATION) {
-			this.length = 0;
-			this.startQuantum = 0;
+			this.lengthNumerator = 0;
+			this.lengthDenominator = 1;
+			this.startQuantumNumerator = 0;
+			this.startQuantumDenominator = 1;
 			this.tiesIn = false;
 			return;
 		}
 		
-		this.length = length;
-		this.startQuantum = startQuantum;
+		int gcf = MathUtils.getGCF(lengthNum, lengthDenom);
+		this.lengthNumerator = lengthNum / gcf;
+		this.lengthDenominator = lengthDenom / gcf;
+		
+		gcf = MathUtils.getGCF(startQuantumNum, startQuantumDenom);
+		this.startQuantumNumerator = startQuantumNum / gcf;
+		this.startQuantumDenominator = startQuantumDenom / gcf;
+		
 		this.tiesIn = tiesIn;
 	}
 	
@@ -72,7 +84,11 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 	 * @return {@link #length}
 	 */
 	public double getLength() {
-		return length;
+		return ((double) lengthNumerator) / lengthDenominator;
+	}
+	
+	public double getStartQuantum() {
+		return ((double) startQuantumNumerator) / startQuantumDenominator;
 	}
 	
 	@Override
@@ -81,12 +97,12 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 			return -1;
 		}
 		
-		int result = Double.compare(other.length, length);
+		int result = Double.compare(other.getLength(), getLength());
 		if (result != 0) {
 			return result;
 		}
 		
-		result = Double.compare(startQuantum, other.startQuantum);
+		result = Double.compare(getStartQuantum(), other.getStartQuantum());
 		if (result != 0) {
 			return result;
 		}
@@ -102,16 +118,16 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 		
 		MetricalLpcfgHead head = (MetricalLpcfgHead) other;
 		
-		return length == head.length && startQuantum == head.startQuantum && tiesIn == head.tiesIn;
+		return getLength() == head.getLength() && getStartQuantum() == head.getStartQuantum() && tiesIn == head.tiesIn;
 	}
 	
 	@Override
 	public int hashCode() {
-		return Double.hashCode(length + startQuantum * 4 * (tiesIn ? -1 : 1));
+		return Double.hashCode(getLength() + getStartQuantum() * 4 * (tiesIn ? -1 : 1));
 	}
 	
 	@Override
 	public String toString() {
-		return length + "," + startQuantum + (tiesIn ? "t" : "");
+		return lengthNumerator + "/" + lengthDenominator + "," + startQuantumNumerator + "/" + startQuantumDenominator + (tiesIn ? "t" : "");
 	}
 }

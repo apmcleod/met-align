@@ -22,16 +22,15 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 	private final Measure measure;
 	
 	/**
-	 * Create a new measure node with the given beats per measure and sub beats per beat.
+	 * Create a new MetricalLpcfgMeasure node from the given Measure type.
 	 * 
-	 * @param beatsPerMeasure The beats per measure for {@link #measure}.
-	 * @param subBeatsPerBeat The sub beats per beat for {@link #measure}.
+	 * @param measure {@link #measure}
 	 */
-	public MetricalLpcfgMeasure(int beatsPerMeasure, int subBeatsPerBeat) {
+	public MetricalLpcfgMeasure(Measure measure) {
 		super(MetricalLpcfgLevel.MEASURE);
-		
 		setType(MetricalLpcfgType.MEASURE);
-		measure = new Measure(beatsPerMeasure, subBeatsPerBeat);
+		
+		this.measure = measure;
 	}
 
 	/**
@@ -43,27 +42,6 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 		super(measure);
 		
 		this.measure = new Measure(measure.measure.getBeatsPerBar(), measure.measure.getSubBeatsPerBeat());
-	}
-	
-	/**
-	 * Get the head of this non-terminal. This is calculated recursively as the max of the heads
-	 * of all of its children, or a length 0 head if it has no children.
-	 * 
-	 *  @return The head of this non-terminal.
-	 *
-	@Override
-	public MetricalLpcfgHead getHead() {
-		MetricalLpcfgHead head = new MetricalLpcfgHead();
-		
-		for (MetricalLpcfgNode child : getChildren()) {
-			MetricalLpcfgHead childHead = child.getHead();
-			
-			if (childHead.compareTo(head) < 0) {
-				head = childHead;
-			}
-		}
-		
-		return head;
 	}
 	
 	/**
