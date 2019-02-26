@@ -22,6 +22,7 @@ import metalign.parsing.EventParser;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.time.FromOutputTimeTracker;
+import metalign.time.MidiTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
@@ -42,7 +43,7 @@ public class Temperley {
 	public static void generateFromTemperley(File inputFile) throws IOException, InvalidMidiDataException, InterruptedException {
 		long firstNoteTime = -1L;
 		
-		TimeTracker tt = new TimeTracker();
+		TimeTracker tt = new MidiTimeTracker();
 		NoteEventParser nep = new NoteListGenerator(tt);
 		EventParser ep = Runner.parseFile(inputFile, nep, tt, true);
 		firstNoteTime = ep.getFirstNoteTime();
@@ -69,7 +70,7 @@ public class Temperley {
 	 * @throws InterruptedException If some interrupt occurred while parsing.
 	 */
 	public static String getNoteFileString(File file) throws InterruptedException {
-		TimeTracker tt = new TimeTracker();
+		TimeTracker tt = new MidiTimeTracker();
 		NoteListGenerator nlg = new NoteListGenerator(tt);
 			
 		try {

@@ -25,6 +25,7 @@ import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.parsing.OutputParser;
+import metalign.time.MidiTimeTracker;
 import metalign.time.TimeTracker;
 import metalign.voice.Voice;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
@@ -246,7 +247,7 @@ public class Evaluation {
 	private static void calculateJointGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel, MetricalLpcfg grammar) throws IOException, ParserConfigurationException, SAXException, InvalidMidiDataException, InterruptedException {
 		MetricalLpcfg groundTruthGrammar = null;
 		
-		TimeTracker tt = new TimeTracker();
+		TimeTracker tt = new MidiTimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
 		NoteListGenerator nlg = new NoteListGenerator(tt);
 		

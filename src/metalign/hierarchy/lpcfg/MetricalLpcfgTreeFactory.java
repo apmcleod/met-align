@@ -75,8 +75,10 @@ public class MetricalLpcfgTreeFactory {
 			// Rewind iterators for next beat
 			offsetIterator.previous();
 			
-			root.addChild(makeBeat(measure, prevTimeReturn, beatBeats, nextBeatTime, beatNotes, root.isEmpty()));
+			root.addChild(makeBeat(measure, prevTimeReturn, beatBeats, nextBeatTime, beatNotes, !root.isEmpty()));
 		}
+		
+		root.fixChildrenTypes();
 		
 		return new MetricalLpcfgTree(root);
 	}
@@ -182,7 +184,7 @@ public class MetricalLpcfgTreeFactory {
 		// Get beats
 		List<Integer> subBeatIndices = new ArrayList<Integer>();
 		for (int i = 0; i < beatBeats.size(); i++) {
-			if (beatBeats.get(i).isBeat()) {
+			if (beatBeats.get(i).isSubBeat()) {
 				subBeatIndices.add(i);
 			}
 		}
@@ -278,7 +280,7 @@ public class MetricalLpcfgTreeFactory {
 			}
 			
 			// Fill remainder with ties
-			Collections.fill(quantums.subList(onsetIndex, Main.EXTEND_NOTES ? quantums.size() : offsetIndex), MetricalLpcfgQuantum.TIE);
+			Collections.fill(quantums.subList(onsetIndex, Main.EXTEND_NOTES ? quantums.size() : offsetIndex - 1), MetricalLpcfgQuantum.TIE);
 		}
 		
 		// Here, quantums array is full and correct.
@@ -292,7 +294,10 @@ public class MetricalLpcfgTreeFactory {
 		// Can't reduce to 1. Make each sub-beat individually.
 		int numSubBeats = quantums.size() / Main.SUB_BEAT_LENGTH;
 		for (int subBeatIndex = 0; subBeatIndex < quantums.size(); subBeatIndex += Main.SUB_BEAT_LENGTH) {
-			beat.addChild(new MetricalLpcfgTerminal(quantums.subList(subBeatIndex, subBeatIndex + Main.SUB_BEAT_LENGTH), 1, numSubBeats));
+			MetricalLpcfgNonterminal subBeat = new MetricalLpcfgNonterminal(MetricalLpcfgLevel.SUB_BEAT);
+			subBeat.addChild(new MetricalLpcfgTerminal(quantums.subList(subBeatIndex, subBeatIndex + Main.SUB_BEAT_LENGTH), 1, numSubBeats));
+			
+			beat.addChild(subBeat);
 		}
 		
 		beat.fixChildrenTypes();

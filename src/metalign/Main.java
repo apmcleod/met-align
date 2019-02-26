@@ -26,6 +26,7 @@ import metalign.joint.JointModelState;
 import metalign.parsing.EventParser;
 import metalign.parsing.MidiWriter;
 import metalign.parsing.NoteListGenerator;
+import metalign.time.MidiTimeTracker;
 import metalign.time.TimeTracker;
 import metalign.utils.Evaluator;
 import metalign.utils.MidiNote;
@@ -349,7 +350,7 @@ public class Main {
 			for (File file : files) {
 				System.out.println("File: " + file);
 				
-				TimeTracker tt = new TimeTracker();
+				TimeTracker tt = new MidiTimeTracker();
 				NoteListGenerator nlg = new NoteListGenerator(tt);
 				EventParser ep;
 				
@@ -413,7 +414,7 @@ public class Main {
 						
 					voiceWriter.write();
 					
-					TimeTracker newTt = new TimeTracker();
+					TimeTracker newTt = new MidiTimeTracker();
 					NoteListGenerator newNlg = new NoteListGenerator(newTt);
 					EventParser newEp;
 					
@@ -479,7 +480,7 @@ public class Main {
 			for (File file : files) {
 				System.out.println("File: " + file);
 				
-				TimeTracker tt = new TimeTracker();
+				TimeTracker tt = new MidiTimeTracker();
 				tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
 				NoteListGenerator nlg = new NoteListGenerator(tt);
 				EventParser ep;

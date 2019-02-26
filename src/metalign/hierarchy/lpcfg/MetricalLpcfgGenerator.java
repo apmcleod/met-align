@@ -97,7 +97,7 @@ public class MetricalLpcfgGenerator {
 			}
 			
 			if (previousBeat.isBeat()) {
-				divisor *= tt.getNodeAtTime(previousBeat.getTime()).getTimeSignature().getMeasure().getBeatsPerBar();
+				divisor *= tt.getTimeSignatureAtTime(previousBeat.getTime()).getMeasure().getBeatsPerBar();
 			}
 			
 			prevTime.set(0, Math.round(downbeatTime - (downbeatTime - previousBeat.getTime()) / divisor));
@@ -113,7 +113,7 @@ public class MetricalLpcfgGenerator {
 			
 			long nextTime = endIndex < beats.size() ? beats.get(endIndex).getTime() : Long.MAX_VALUE;
 			
-			Measure measure = tt.getNodeAtTime(barBeats.get(0).getTime()).getTimeSignature().getMeasure();
+			Measure measure = tt.getTimeSignatureAtTime(barBeats.get(0).getTime()).getMeasure();
 			
 			// Quick exit check
 			if (voice.get(voice.size() - 1).getOffsetTime() <= barBeats.get(barBeats.size() - 1).getTime()) {

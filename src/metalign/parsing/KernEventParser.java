@@ -11,8 +11,8 @@ import java.util.regex.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
 
+import metalign.time.MidiTimeTracker;
 import metalign.time.TimeSignature;
-import metalign.time.TimeTracker;
 import metalign.utils.MidiNote;
 
 /**
@@ -47,7 +47,7 @@ public class KernEventParser implements EventParser {
 	/**
 	 * The TimeTracker which will handle timing information for this song.
 	 */
-	private TimeTracker timeTracker;
+	private MidiTimeTracker timeTracker;
 	
 	/**
 	 * The NoteTracker which will keep track of the notes for this song.
@@ -76,7 +76,7 @@ public class KernEventParser implements EventParser {
 	 * @param noteEventParser The NoteEventParser to pass events to when we run this parser.
 	 * @param timeTracker {@link #timeTracker}
 	 */
-	public KernEventParser(File kernFile, NoteEventParser noteEventParser, TimeTracker timeTracker) {
+	public KernEventParser(File kernFile, NoteEventParser noteEventParser, MidiTimeTracker timeTracker) {
 		this.timeTracker = timeTracker;
 		this.noteEventParser = noteEventParser;
 		song = kernFile;

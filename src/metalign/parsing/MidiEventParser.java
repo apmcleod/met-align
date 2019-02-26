@@ -15,7 +15,7 @@ import javax.sound.midi.Sequence;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
-import metalign.time.TimeTracker;
+import metalign.time.MidiTimeTracker;
 import metalign.utils.MidiNote;
 
 /**
@@ -55,7 +55,7 @@ public class MidiEventParser implements EventParser {
 	/**
 	 * The TimeTracker which will handle timing information for this song.
 	 */
-	private TimeTracker timeTracker;
+	private MidiTimeTracker timeTracker;
 	
 	/**
 	 * The NoteTracker which will keep track of the notes for this song.
@@ -92,7 +92,7 @@ public class MidiEventParser implements EventParser {
 	 * @throws IOException If an I/O error occurred when reading the given file. 
 	 * @throws InvalidMidiDataException If the given file was is not in a valid MIDI format.
 	 */
-    public MidiEventParser(File midiFile, NoteEventParser noteEventParser, TimeTracker timeTracker, boolean useChannel)
+    public MidiEventParser(File midiFile, NoteEventParser noteEventParser, MidiTimeTracker timeTracker, boolean useChannel)
     		throws InvalidMidiDataException, IOException{
     	song = MidiSystem.getSequence(midiFile);
     	

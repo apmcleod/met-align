@@ -128,6 +128,7 @@ public class MetricalLpcfgHead implements Comparable<MetricalLpcfgHead>, Seriali
 	
 	@Override
 	public String toString() {
-		return lengthNumerator + "/" + lengthDenominator + "," + startQuantumNumerator + "/" + startQuantumDenominator + (tiesIn ? "t" : "");
+		return lengthNumerator + (lengthDenominator == 1 ? "" : ("/" + lengthDenominator)) + "," + startQuantumNumerator +
+				(startQuantumDenominator == 1 ? "" : ("/" + startQuantumDenominator)) + (tiesIn ? "t" : "");
 	}
 }

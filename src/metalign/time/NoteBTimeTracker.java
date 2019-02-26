@@ -2,6 +2,7 @@ package metalign.time;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import metalign.beat.Beat;
@@ -10,8 +11,10 @@ import metalign.hierarchy.Measure;
 public class NoteBTimeTracker extends TimeTracker {
 	
 	private final List<Beat> beats;
-	private TimeSignature timeSig;
 	private int anacrusisSubBeats;
+	
+	private List<TimeSignature> timeSignatures;
+	private List<Long> timeSignatureTimes;
 	
 	private int barNum;
 	private int beatNum;
@@ -32,9 +35,15 @@ public class NoteBTimeTracker extends TimeTracker {
 		downBeatLevel = 0;
 		minimumForBeat = 0;
 		minimumForSubBeat = 0;
+		
+		timeSignatures = new ArrayList<TimeSignature>();
+		timeSignatureTimes = new ArrayList<Long>();
 	}
 
 	public void addBeat(long time, int level) throws IOException {
+		TimeSignature timeSig = getTimeSignatureAtTime(time);
+		setTimeSignature(timeSig);
+		
 		if (level == 0) {
 			// Skip level 0. Extrapolate.
 			return;
@@ -75,8 +84,32 @@ public class NoteBTimeTracker extends TimeTracker {
 		}
 	}
 	
-	public void setTimeSignature(TimeSignature ts) {
-		timeSig = ts;
+	public void addTimeSignature(TimeSignature ts) {
+		addTimeSignature(ts, 0);
+	}
+	
+	public void addTimeSignature(TimeSignature ts, long time) {
+		if (timeSignatures.isEmpty()) {
+			timeSignatures.add(ts);
+			timeSignatureTimes.add(time);
+			return;
+		}
+		
+		int index = Collections.binarySearch(timeSignatureTimes, time);
+		
+		if (index >= 0) {
+			timeSignatures.set(index, ts);
+			timeSignatureTimes.set(index, time);
+			
+		} else {
+			index = -(index + 1);
+			
+			timeSignatures.add(index, ts);
+			timeSignatureTimes.add(index, time);
+		}
+	}
+	
+	private void setTimeSignature(TimeSignature ts) {
 		Measure measure = ts.getMeasure();
 		
 		if ((measure.getBeatsPerBar() == 4) || (measure.getBeatsPerBar() == 2 && measure.getSubBeatsPerBeat() == 3)) {
@@ -122,11 +155,7 @@ public class NoteBTimeTracker extends TimeTracker {
      * @return A List of all of the time signatures of this TimeTracker, excluding the dummy one.
      */
     public List<TimeSignature> getAllTimeSignatures() {
-		List<TimeSignature> meters = new ArrayList<TimeSignature>();
-		
-		meters.add(timeSig);
-		
-		return meters;
+		return timeSignatures;
 	}
     
     /**
@@ -146,7 +175,7 @@ public class NoteBTimeTracker extends TimeTracker {
      * dummy TimeSignature if there is none.
      */
     public TimeSignature getFirstTimeSignature() {
-    	return timeSig;
+    	return timeSignatures.get(0);
     }
     
     /**
@@ -179,6 +208,7 @@ public class NoteBTimeTracker extends TimeTracker {
      * @param length The anacrusis length of this song, measured in ticks.
      */
     public void setAnacrusisSubBeats(int length) {
+    	TimeSignature timeSig = getFirstTimeSignature();
 		anacrusisSubBeats = length;
 		
 		if (anacrusisSubBeats != 0) {
@@ -190,6 +220,20 @@ public class NoteBTimeTracker extends TimeTracker {
 	@Override
 	public String toString() {
 		return beats.toString();
+	}
+
+	@Override
+	public TimeSignature getTimeSignatureAtTime(long time) {
+		int index = Collections.binarySearch(timeSignatureTimes, time);
+		
+		if (index >= 0) {
+			return timeSignatures.get(index);
+			
+		} else {
+			index = -(index + 1) - 1;
+			
+			return timeSignatures.get(index);
+		}
 	}
 
 }

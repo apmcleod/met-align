@@ -25,6 +25,7 @@ import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
 import metalign.parsing.NoteBParser;
 import metalign.parsing.NoteListGenerator;
+import metalign.time.MidiTimeTracker;
 import metalign.time.NoteBTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
@@ -258,7 +259,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
-			TimeTracker tt = new TimeTracker();
+			TimeTracker tt = new MidiTimeTracker();
 			tt.setAnacrusis(getAnacrusisLength(file, anacrusisFiles));
 			NoteListGenerator nlg = new NoteListGenerator(tt);
 			

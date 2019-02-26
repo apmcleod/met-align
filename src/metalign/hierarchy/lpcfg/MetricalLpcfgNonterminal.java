@@ -248,13 +248,8 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 			}
 		}
 		
-		if (max.equals(min)) {
-			// EVEN
-			for (MetricalLpcfgNode child : children) {
-				((MetricalLpcfgNonterminal) child).setType(MetricalLpcfgType.EVEN);
-			}
-			
-		} else {
+		// EVEN is default. No need to change for those.
+		if (!max.equals(min)) {
 			// Strong (max) and weak (other)
 			for (MetricalLpcfgNode child : children) {
 				((MetricalLpcfgNonterminal) child).setType(child.getHead().equals(max) ?

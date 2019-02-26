@@ -23,6 +23,7 @@ import metalign.parsing.MatchParser;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.parsing.XMLParser;
+import metalign.time.MidiTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.voice.Voice;
@@ -87,7 +88,7 @@ public class Evaluator {
 		hasTimeChange = false;
 
 		// Parse ground truth file
-		TimeTracker tt = new TimeTracker();
+		TimeTracker tt = new MidiTimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
 		XMLParser xml = null;
 		NoteEventParser nep = new NoteListGenerator(tt);
@@ -145,7 +146,7 @@ public class Evaluator {
 			int subBeatsPerBeat = 2;
 			
 			if (xml == null) {
-				TimeSignature timeSig = tt.getNodeAtTime(time).getTimeSignature();
+				TimeSignature timeSig = tt.getTimeSignatureAtTime(time);
 				Measure tmpMeasure = timeSig.getMeasure();
 				subBeatsPerBeat = tmpMeasure.getSubBeatsPerBeat();
 				

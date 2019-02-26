@@ -15,6 +15,7 @@ import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Track;
 
 import metalign.time.KeySignature;
+import metalign.time.MidiTimeTracker;
 import metalign.time.Tempo;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
@@ -81,7 +82,12 @@ public class MidiWriter {
 	 * @throws InvalidMidiDataException If the TimeTracker contained invalid Midi data. 
 	 */
 	private void writeTimeTracker() throws InvalidMidiDataException {
-		LinkedList<TimeTrackerNode> nodes = timeTracker.getNodes();
+		if (!(timeTracker instanceof MidiTimeTracker)) {
+			System.err.println("Warning: Time tracker data not written to MIDI file. Unsupported.");
+			return;
+		}
+		
+		LinkedList<TimeTrackerNode> nodes = ((MidiTimeTracker) timeTracker).getNodes();
 		ListIterator<TimeTrackerNode> iterator = nodes.listIterator();
     	
     	TimeTrackerNode node = iterator.next();

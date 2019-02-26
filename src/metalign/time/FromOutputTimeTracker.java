@@ -126,4 +126,9 @@ public class FromOutputTimeTracker extends TimeTracker {
 	public String toString() {
 		return beats.toString();
 	}
+
+	@Override
+	public TimeSignature getTimeSignatureAtTime(long time) {
+		return timeSig;
+	}
 }

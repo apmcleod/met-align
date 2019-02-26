@@ -63,7 +63,7 @@ public class NoteBParser implements EventParser {
 					numerator *= 3;
 					denominator = 8; 
 				}
-				tt.setTimeSignature(new TimeSignature(numerator, denominator));
+				tt.addTimeSignature(new TimeSignature(numerator, denominator));
 				tt.setAnacrusisSubBeats(anacrusis);
 				
 			} else if (beatMatcher.matches()) {

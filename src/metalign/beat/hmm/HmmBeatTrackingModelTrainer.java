@@ -16,6 +16,7 @@ import metalign.beat.Beat;
 import metalign.parsing.NoteBParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.parsing.XMLParser;
+import metalign.time.MidiTimeTracker;
 import metalign.time.NoteBTimeTracker;
 import metalign.time.TimeTracker;
 import metalign.utils.MidiNote;
@@ -174,7 +175,7 @@ public class HmmBeatTrackingModelTrainer {
 				beats = parser.getBeats();
 				
 			} else {
-				TimeTracker tt = new TimeTracker();
+				TimeTracker tt = new MidiTimeTracker();
 				nlg = new NoteListGenerator(tt);
 				
 				try {
