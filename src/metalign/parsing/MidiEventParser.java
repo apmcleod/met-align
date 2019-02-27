@@ -188,7 +188,7 @@ public class MidiEventParser implements EventParser {
 		                velocity = sm.getData2();
 		                       
 		                if (velocity != 0) {
-		                   	MidiNote note = noteEventParser.noteOn(key, velocity, event.getTick(), correctVoice);
+		                   	MidiNote note = noteEventParser.noteOn(key, velocity, timeTracker.getTimeAtTick(event.getTick()), correctVoice);
 		                   	firstNoteTime = Long.min(firstNoteTime, note.getOnsetTime());
 		                   	while (goldStandard.size() <= correctVoice) {
 		                   		goldStandard.add(new ArrayList<MidiNote>());
@@ -203,7 +203,7 @@ public class MidiEventParser implements EventParser {
 		                		
 		           		key = sm.getData1();
 		                		
-		                noteEventParser.noteOff(key, event.getTick(), correctVoice);
+		                noteEventParser.noteOff(key, timeTracker.getTimeAtTick(event.getTick()), correctVoice);
 		                break;
 		                        
 		            default:

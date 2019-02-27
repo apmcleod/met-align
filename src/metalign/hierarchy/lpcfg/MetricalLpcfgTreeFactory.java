@@ -107,7 +107,7 @@ public class MetricalLpcfgTreeFactory {
 	private static MetricalLpcfgNode makeBeat(Measure measure, List<Long> prevTimeReturn, List<Beat> beatBeats,
 			long nextTime, List<MidiNote> beatNotes, boolean hasStarted) throws MalformedTreeException {
 		
-		if (beatBeats.size() == 1) {
+		if (beatBeats.size() == measure.getBeatsPerBar()) {
 			// No sub-beats given, try splitting into both 2 and 3.
 			
 			// Try in 2
@@ -134,7 +134,7 @@ public class MetricalLpcfgTreeFactory {
 			}
 			
 			for (int i = 0; i < Main.SUB_BEAT_LENGTH * 3; i++) {
-				timesIn2.add(Math.round(beatBeats.get(0).getTime() + i * diff));
+				timesIn3.add(Math.round(beatBeats.get(0).getTime() + i * diff));
 			}
 			MetricalLpcfgNode in3 = makeBeat(prevTimeReturn.get(0), timesIn3, nextTime, beatNotes, hasStarted);
 			
@@ -167,8 +167,8 @@ public class MetricalLpcfgTreeFactory {
 			// Get best (assume in2, it's more common)
 			List<Long> bestTimes = timesIn2;
 			MetricalLpcfgNode bestNode = in2;
-			if ((measure.getSubBeatsPerBeat() == 2 && avgDiff3 < avgDiff2 - 100) ||
-				(measure.getSubBeatsPerBeat() == 3 && avgDiff3 - 100 > avgDiff2)) {
+			if ((measure.getSubBeatsPerBeat() == 3 && avgDiff2 < 0.5 * avgDiff3) ||
+				(measure.getSubBeatsPerBeat() == 2 && avgDiff3 < 0.5 * avgDiff2)) {
 				
 				// 3 splits is the best choice
 				bestTimes = timesIn3;

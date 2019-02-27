@@ -116,7 +116,7 @@ public class MetricalLpcfgGenerator {
 			Measure measure = tt.getTimeSignatureAtTime(barBeats.get(0).getTime()).getMeasure();
 			
 			// Quick exit check
-			if (voice.get(voice.size() - 1).getOffsetTime() <= barBeats.get(barBeats.size() - 1).getTime()) {
+			if (voice.get(voice.size() - 1).getOffsetTime() <= barBeats.get(0).getTime()) {
 				break;
 			}
 			
@@ -138,7 +138,7 @@ public class MetricalLpcfgGenerator {
 						}
 					}
 				} catch(MalformedTreeException e) {
-					System.err.println("Error creating tree. Skipping: ");
+					System.err.println("Error creating tree in bar " + barNum + "/" + (downbeatIndices.size() - 1) + ". Skipping: ");
 					System.err.println(e.getMessage());
 				}
 			}
