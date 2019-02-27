@@ -49,7 +49,7 @@ public class NoteBTimeTracker extends TimeTracker {
 			return;
 		}
 		
-		Beat beat = new Beat(barNum, beatNum, subBeatNum, 0, time , time);
+		Beat beat = new Beat(barNum, beatNum, subBeatNum, 0, time);
 		if (level == downBeatLevel) {
 			if (beatNum != 0 || subBeatNum != 0) {
 				throw new IOException("Unexpected downbeat.");
@@ -130,26 +130,6 @@ public class NoteBTimeTracker extends TimeTracker {
 	}
     
     /**
-     * Returns the time in microseconds of a given tick number.
-     * 
-     * @param tick The tick number to calculate the time of
-     * @return The time of the given tick number, measured in microseconds since the most recent epoch.
-     */
-    public long getTimeAtTick(long tick) {
-    	return tick;
-    }
-    
-    /**
-     * Gets the tick number at the given time, measured in microseconds.
-     * 
-     * @param time The time in microseconds whose tick number we want.
-     * @return The tick number which corresponds to the given time.
-     */
-    public long getTickAtTime(long time) {
-    	return time;
-    }
-    
-    /**
      * Get a List of all of the time signatures of this TimeTracker, excluding the dummy one.
      * 
      * @return A List of all of the time signatures of this TimeTracker, excluding the dummy one.
@@ -181,7 +161,7 @@ public class NoteBTimeTracker extends TimeTracker {
     /**
      * Get the anacrusis length of this TimeTracker, in sub beats.
      * 
-     * @return {@link #anacrusisLength}, in sub beats
+     * @return {@link #anacrusisLengthTicks}, in sub beats
      */
     public int getAnacrusisSubBeats() {
     	return anacrusisSubBeats;
@@ -190,7 +170,7 @@ public class NoteBTimeTracker extends TimeTracker {
     /**
      * Get the anacrusis length of this TimeTracker, in ticks.
      * 
-     * @return {@link #anacrusisLength}
+     * @return {@link #anacrusisLengthTicks}
      */
     public int getAnacrusisTicks() {
 		for (Beat beat : beats) {

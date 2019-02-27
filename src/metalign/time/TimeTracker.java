@@ -13,9 +13,7 @@ import metalign.beat.Beat;
  */
 public abstract class TimeTracker {
 	
-	protected double PPQ = 120.0;
-	
-	protected int anacrusisLength = 0;
+	protected int anacrusisLengthTicks = 0;
 	
 	protected long lastTick = 0;
 	
@@ -23,8 +21,6 @@ public abstract class TimeTracker {
 	 * The onset time of the first note in this piece.
 	 */
 	protected long firstNoteTime = 0;
-	
-	public abstract long getTimeAtTick(long tick);
 	
 	public abstract List<TimeSignature> getAllTimeSignatures();
 	
@@ -57,10 +53,10 @@ public abstract class TimeTracker {
 	/**
      * Get the anacrusis length of this TimeTracker, in ticks.
      * 
-     * @return {@link #anacrusisLength}
+     * @return {@link #anacrusisLengthTicks}
      */
     public int getAnacrusisTicks() {
-		return anacrusisLength;
+		return anacrusisLengthTicks;
 	}
     
     /**
@@ -69,26 +65,8 @@ public abstract class TimeTracker {
      * @param length The anacrusis length of this song, measured in ticks.
      */
     public void setAnacrusis(int length) {
-		anacrusisLength = length;
+		anacrusisLengthTicks = length;
 	}
-	
-	/**
-     * Set the PPQ for this TimeTracker.
-     * 
-     * @param ppq {@link #PPQ}
-     */
-    public void setPPQ(double ppq) {
-    	PPQ = ppq;
-    }
-    
-    /**
-     * Get the PPQ of this TimeTracker.
-     * 
-     * @return {@link #PPQ}
-     */
-    public double getPPQ() {
-    	return PPQ;
-    }
     
     /**
      * Set the last tick for this song to the given value.

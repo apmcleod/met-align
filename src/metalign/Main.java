@@ -351,11 +351,11 @@ public class Main {
 				System.out.println("File: " + file);
 				
 				TimeTracker tt = new MidiTimeTracker();
-				NoteListGenerator nlg = new NoteListGenerator(tt);
+				NoteListGenerator nlg = new NoteListGenerator();
 				EventParser ep;
 				
 				try {
-					ep = Runner.parseFile(file, nlg, tt, useChannel);
+					ep = Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
 					
 				} catch (IOException | InvalidMidiDataException e) {
 					System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
@@ -402,12 +402,12 @@ public class Main {
 					
 					// Write file
 					File newFile = new File("tmp." + voiceState.hashCode() + ".mid");
-					MidiWriter voiceWriter = new MidiWriter(newFile, tt);
+					MidiWriter voiceWriter = new MidiWriter(newFile, (MidiTimeTracker) tt);
 					
 					for (int i = 0; i < voiceState.getVoices().size(); i++) {
 						for (MidiNote note : voiceState.getVoices().get(i).getNotes()) {
-							MidiNote newNote = new MidiNote(note.getPitch(), note.getVelocity(), note.getOnsetTime(), note.getOnsetTick(), i, 0);
-							newNote.close(note.getOffsetTime(), note.getOffsetTick());
+							MidiNote newNote = new MidiNote(note.getPitch(), note.getVelocity(), note.getOnsetTime(), i, 0);
+							newNote.close(note.getOffsetTime());
 							voiceWriter.addMidiNote(newNote);
 						}
 					}
@@ -415,11 +415,11 @@ public class Main {
 					voiceWriter.write();
 					
 					TimeTracker newTt = new MidiTimeTracker();
-					NoteListGenerator newNlg = new NoteListGenerator(newTt);
+					NoteListGenerator newNlg = new NoteListGenerator();
 					EventParser newEp;
 					
 					try {
-						newEp = Runner.parseFile(newFile, newNlg, newTt, useChannel);
+						newEp = Runner.parseMidiFile(newFile, newNlg, (MidiTimeTracker) newTt, useChannel);
 						
 					} catch (IOException | InvalidMidiDataException e) {
 						System.err.println("Error parsing file " + newFile + " during incremental of " + file + ":\n" + e.getLocalizedMessage());
@@ -482,11 +482,11 @@ public class Main {
 				
 				TimeTracker tt = new MidiTimeTracker();
 				tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
-				NoteListGenerator nlg = new NoteListGenerator(tt);
+				NoteListGenerator nlg = new NoteListGenerator();
 				EventParser ep;
 				
 				try {
-					ep = Runner.parseFile(file, nlg, tt, useChannel);
+					ep = Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
 					
 				} catch (IOException | InvalidMidiDataException e) {
 					System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());

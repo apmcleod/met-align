@@ -756,7 +756,7 @@ public class HmmBeatTrackingModelState extends BeatTrackingModelState {
 		}
 		
 		for (int time : tatums) {
-			beats.add(new Beat(barNum, beatNum, subBeatNum, 0, time, time));
+			beats.add(new Beat(barNum, beatNum, subBeatNum, 0, time));
 			
 			subBeatNum++;
 			if (subBeatNum >= subBeatsPerBeat) {

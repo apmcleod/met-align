@@ -44,8 +44,8 @@ public class Temperley {
 		long firstNoteTime = -1L;
 		
 		TimeTracker tt = new MidiTimeTracker();
-		NoteEventParser nep = new NoteListGenerator(tt);
-		EventParser ep = Runner.parseFile(inputFile, nep, tt, true);
+		NoteEventParser nep = new NoteListGenerator();
+		EventParser ep = Runner.parseMidiFile(inputFile, nep, (MidiTimeTracker) tt, true);
 		firstNoteTime = ep.getFirstNoteTime();
 		
 		tt = getTimeTrackerFromTemperleyOutput(new Scanner(System.in), firstNoteTime);
@@ -70,11 +70,11 @@ public class Temperley {
 	 * @throws InterruptedException If some interrupt occurred while parsing.
 	 */
 	public static String getNoteFileString(File file) throws InterruptedException {
-		TimeTracker tt = new MidiTimeTracker();
-		NoteListGenerator nlg = new NoteListGenerator(tt);
+		MidiTimeTracker tt = new MidiTimeTracker();
+		NoteListGenerator nlg = new NoteListGenerator();
 			
 		try {
-			Runner.parseFile(file, nlg, tt, false);
+			Runner.parseMidiFile(file, nlg, tt, false);
 				
 		} catch (IOException | InvalidMidiDataException e) {	
 			System.err.println(e.getLocalizedMessage());
@@ -164,7 +164,6 @@ public class Temperley {
 			denominator = 8; 
 		}
 		tt.setTimeSignature(new TimeSignature(numerator, denominator));
-		tt.setAnacrusisSubBeats(anacrusisLengthSubBeats);
 		
 		// -1 is needed here because we increment subBeat in the level == 2 case
 		int subBeat = (-anacrusisLengthSubBeats + subBeatsPerBeat * beatsPerBar) % subBeatsPerBeat - 1;
@@ -190,7 +189,7 @@ public class Temperley {
 				subBeat++;
 			}
 			
-			tt.addBeat(new Beat(bar, beat, subBeat, 0, time , time));
+			tt.addBeat(new Beat(bar, beat, subBeat, 0, time));
 		}
 		
 		return tt;

@@ -249,10 +249,10 @@ public class Evaluation {
 		
 		TimeTracker tt = new MidiTimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
-		NoteListGenerator nlg = new NoteListGenerator(tt);
+		NoteListGenerator nlg = new NoteListGenerator();
 		
 		// PARSE!
-		EventParser ep = Runner.parseFile(groundTruth, nlg, tt, useChannel);
+		EventParser ep = Runner.parseMidiFile(groundTruth, nlg, (MidiTimeTracker) tt, useChannel);
 			
 		// RUN!
 		JointModel jm = new JointModel(

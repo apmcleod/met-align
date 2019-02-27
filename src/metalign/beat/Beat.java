@@ -34,15 +34,10 @@ public class Beat implements Comparable<Beat> {
 	private final long time;
 	
 	/**
-	 * The tick at which this Beat lies.
-	 */
-	private final long tick;
-	
-	/**
 	 * Create a new default Beat, at time, tick, and measure 0 and beat 0.
 	 */
 	public Beat() {
-		this(0, 0, 0, 0, 0, 0);
+		this(0, 0, 0, 0, 0);
 	}
 	
 	/**
@@ -52,15 +47,13 @@ public class Beat implements Comparable<Beat> {
 	 * @param beat {@link #beat}
 	 * @param tatum {@link #tatum}
 	 * @param time {@link #time}
-	 * @param tick {@link #tick}
 	 */
-	public Beat(int bar, int beat, int subBeat, int tatum, long time, long tick) {
+	public Beat(int bar, int beat, int subBeat, int tatum, long time) {
 		this.bar = bar;
 		this.beat = beat;
 		this.subBeat = subBeat;
 		this.tatum = tatum;
 		this.time = time;
-		this.tick = tick;
 	}
 	
 	/**
@@ -133,15 +126,6 @@ public class Beat implements Comparable<Beat> {
 	 */
 	public long getTime() {
 		return time;
-	}
-	
-	/**
-	 * Get this Beat's tick.
-	 * 
-	 * @return {@link #tick}
-	 */
-	public long getTick() {
-		return tick;
 	}
 	
 	@Override

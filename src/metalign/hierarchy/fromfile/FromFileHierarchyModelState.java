@@ -3,6 +3,7 @@ package metalign.hierarchy.fromfile;
 import java.util.List;
 import java.util.TreeSet;
 
+import metalign.beat.Beat;
 import metalign.generic.MidiModelState;
 import metalign.hierarchy.HierarchyModelState;
 import metalign.hierarchy.Measure;
@@ -64,7 +65,15 @@ public class FromFileHierarchyModelState extends HierarchyModelState {
 	
 	@Override
 	public int getAnacrusis() {
-		return tt.getAnacrusisSubBeats();
+		List<Beat> tatums = tt.getTatums();
+		
+		for (int i = 0; i < tatums.size(); i++) {
+			if (tatums.get(i).isDownbeat()) {
+				return i;
+			}
+		}
+		
+		return tatums.size();
 	}
 	
 	@Override

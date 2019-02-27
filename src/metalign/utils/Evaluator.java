@@ -91,7 +91,7 @@ public class Evaluator {
 		TimeTracker tt = new MidiTimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
 		XMLParser xml = null;
-		NoteEventParser nep = new NoteListGenerator(tt);
+		NoteEventParser nep = new NoteListGenerator();
 		
 		if (groundTruth.toString().endsWith(".xml")) {
 			File deviationFile = new File(groundTruth.getParentFile() + File.separator + "deviation_nodoctype.xml");
@@ -117,7 +117,7 @@ public class Evaluator {
 			subBeatsPerBeat = match.getMeasure().getSubBeatsPerBeat();
 			
 		} else {
-			groundTruthVoices = Runner.parseFile(groundTruth, nep, tt, useChannel).getGoldStandardVoices();
+			groundTruthVoices = Runner.parseMidiFile(groundTruth, nep, (MidiTimeTracker) tt, useChannel).getGoldStandardVoices();
 			
 			tt.setFirstNoteTime(((NoteListGenerator) nep).getNoteList().get(0).getOnsetTime());
 			

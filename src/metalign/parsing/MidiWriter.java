@@ -40,7 +40,7 @@ public class MidiWriter {
 	/**
 	 * The TimeTracker for this Midi data.
 	 */
-	private TimeTracker timeTracker;
+	private MidiTimeTracker timeTracker;
 	
 	/**
 	 * The Sequence containing the Midi data we are going to write out.
@@ -60,17 +60,19 @@ public class MidiWriter {
 	 * 
 	 * @throws InvalidMidiDataException If somehow the TimeTracker has an invalid PPQ value. 
 	 */
-	public MidiWriter(File outFile, TimeTracker tt) throws InvalidMidiDataException {
+	public MidiWriter(File outFile, MidiTimeTracker tt) throws InvalidMidiDataException {
 		this.outFile = outFile;
 		timeTracker = tt;
 		
+		double ppq = tt.getPPQ();
+		
 		offsetLength = 0;
 		if (tt.getAnacrusisTicks() != 0) {
-			offsetLength = tt.getFirstTimeSignature().getNotes32PerBar() * ((int) tt.getPPQ() / 8);
+			offsetLength = tt.getFirstTimeSignature().getNotes32PerBar() * ((int) ppq / 8);
 			offsetLength -= tt.getAnacrusisTicks();
 		}
 		
-		sequence = new Sequence(Sequence.PPQ, (int) timeTracker.getPPQ());
+		sequence = new Sequence(Sequence.PPQ, (int) ppq);
 		sequence.createTrack();
 		
 		writeTimeTracker();
@@ -213,8 +215,8 @@ public class MidiWriter {
 	 */
 	public void addMidiNote(MidiNote note) throws InvalidMidiDataException {
 		int correctVoice = note.getCorrectVoice();
-		long onsetTick = note.getOnsetTick() + offsetLength;
-		long offsetTick = note.getOffsetTick() + offsetLength;
+		long onsetTick = timeTracker.getTickAtTime(note.getOnsetTime()) + offsetLength;
+		long offsetTick = timeTracker.getTickAtTime(note.getOffsetTime()) + offsetLength;
 		
 		// Pad with enough tracks
 		while (sequence.getTracks().length <= correctVoice) {

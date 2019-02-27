@@ -224,7 +224,7 @@ public class XMLParser {
 				}
 				
 				beatNum = beatNumTmp;
-				beats.add(new Beat(measureNumber, beatNum, 0, 0, Math.round(nextBeatTime), 0L));
+				beats.add(new Beat(measureNumber, beatNum, 0, 0, Math.round(nextBeatTime)));
 				beatTimes.add(nextBeatTime);
 				tempoDeviation = 1.0;
 			}
@@ -249,7 +249,7 @@ public class XMLParser {
 			
 			for (int i = pickupCount - 1; i >= 0; i--) {
 				Beat oldBeat = beats.get(i);
-				beats.set(i, new Beat(oldBeat.getBar(), maxBeatNum--, oldBeat.getSubBeat(), oldBeat.getTatum(), oldBeat.getTime(), oldBeat.getTick()));
+				beats.set(i, new Beat(oldBeat.getBar(), maxBeatNum--, oldBeat.getSubBeat(), oldBeat.getTatum(), oldBeat.getTime()));
 			}
 		}
 		

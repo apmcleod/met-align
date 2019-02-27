@@ -9,7 +9,6 @@ import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
 
-import metalign.time.TimeTracker;
 import metalign.utils.MidiNote;
 
 /**
@@ -30,27 +29,16 @@ public class NoteListGenerator implements NoteEventParser {
 	private List<MidiNote> completedNotes;
 	
 	/**
-	 * The TimeTracker for this NoteListGenerator.
+	 * Creates a new NoteListGenerator.
 	 */
-	protected TimeTracker timeTracker;
-	
-	/**
-	 * Creates a new NoteListGenerator with the given TimeTracker.
-	 * 
-	 * @param timeTracker
-	 */
-	public NoteListGenerator(TimeTracker timeTracker) {
+	public NoteListGenerator() {
 		activeNotes = new LinkedList<MidiNote>();
 		completedNotes = new ArrayList<MidiNote>();
-		
-		this.timeTracker = timeTracker;
 	}
 	
 	@Override
-	public MidiNote noteOn(int key, int velocity, long tick, int channel) {
-		long time = timeTracker.getTimeAtTick(tick);
-		
-		MidiNote note = new MidiNote(key, velocity, time, tick, channel, -1);
+	public MidiNote noteOn(int key, int velocity, long time, int channel) {
+		MidiNote note = new MidiNote(key, velocity, time, channel, -1);
 		
 		activeNotes.add(note);
 		
@@ -58,8 +46,7 @@ public class NoteListGenerator implements NoteEventParser {
 	}
 
 	@Override
-	public void noteOff(int key, long tick, int channel) throws InvalidMidiDataException {
-		long time = timeTracker.getTimeAtTick(tick);
+	public void noteOff(int key, long time, int channel) throws InvalidMidiDataException {
 		Iterator<MidiNote> iterator = activeNotes.iterator();
 		
 		while (iterator.hasNext()) {
@@ -67,7 +54,7 @@ public class NoteListGenerator implements NoteEventParser {
 			
 			if (note.getPitch() == key && note.getCorrectVoice() == channel) {
 				iterator.remove();
-				note.close(time, tick);
+				note.close(time);
 				completedNotes.add(note);
 				return;
 			}

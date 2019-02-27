@@ -124,8 +124,8 @@ public class OutputParser {
 					int offsetTime = Integer.parseInt(noteMatcher.group(4));
 					int correctVoice = Integer.parseInt(noteMatcher.group(5));
 					
-					MidiNote note = new MidiNote(pitch, velocity, onsetTime, onsetTime, correctVoice, -1);
-					note.close(offsetTime, offsetTime);
+					MidiNote note = new MidiNote(pitch, velocity, onsetTime, correctVoice, -1);
+					note.close(offsetTime);
 					voice = new Voice(note, voice);
 					
 				} else {
@@ -167,7 +167,7 @@ public class OutputParser {
 				int tatum = Integer.parseInt(beatMatcher.group(4));
 				int time = Integer.parseInt(beatMatcher.group(5));
 				
-				Beat beat = new Beat(bar, beatNum, subBeat, tatum, time, time);
+				Beat beat = new Beat(bar, beatNum, subBeat, tatum, time);
 				beatsList.add(beat);
 				
 			} else {

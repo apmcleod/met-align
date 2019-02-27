@@ -259,9 +259,8 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
-			TimeTracker tt = new MidiTimeTracker();
-			tt.setAnacrusis(getAnacrusisLength(file, anacrusisFiles));
-			NoteListGenerator nlg = new NoteListGenerator(tt);
+			TimeTracker tt;
+			NoteListGenerator nlg = new NoteListGenerator();
 			
 			// PARSE!
 			EventParser ep = null;
@@ -269,13 +268,14 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				if (file.toString().endsWith(".nb")) {
 					// NoteB
 					tt = new NoteBTimeTracker();
-					nlg = new NoteListGenerator(tt);
 					ep = new NoteBParser(file, nlg, (NoteBTimeTracker) tt);
 					ep.run();
 					
 				} else {
-					// Midi or krn
-					ep = Runner.parseFile(file, nlg, tt, useChannel);
+					// Midi
+					tt = new MidiTimeTracker();
+					tt.setAnacrusis(getAnacrusisLength(file, anacrusisFiles));
+					ep = Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
 				}
 				
 			} catch (InvalidMidiDataException | IOException e) {

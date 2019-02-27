@@ -26,7 +26,6 @@ import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.time.MidiTimeTracker;
-import metalign.time.TimeTracker;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
 
 /**
@@ -330,12 +329,12 @@ public class MetricalLpcfg implements Serializable {
 	 * @throws MetricalLpcfgElementNotFoundException 
 	 */
 	public void extract(File file, List<File> anacrusisFiles, boolean useChannel) throws IOException, InvalidMidiDataException, InterruptedException, MetricalLpcfgElementNotFoundException {
-		TimeTracker tt = new MidiTimeTracker();
+		MidiTimeTracker tt = new MidiTimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
-		NoteListGenerator nlg = new NoteListGenerator(tt);
+		NoteListGenerator nlg = new NoteListGenerator();
 		
 		// PARSE!
-		EventParser ep = Runner.parseFile(file, nlg, tt, useChannel);
+		EventParser ep = Runner.parseMidiFile(file, nlg, tt, useChannel);
 		
 		// RUN!
 		JointModel jm = new JointModel(
@@ -363,12 +362,12 @@ public class MetricalLpcfg implements Serializable {
 	 * @throws IOException 
 	 */
 	public void unextract(File file, List<File> anacrusisFiles, boolean useChannel) throws IOException, InvalidMidiDataException, InterruptedException {
-		TimeTracker tt = new MidiTimeTracker();
+		MidiTimeTracker tt = new MidiTimeTracker();
 		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
-		NoteListGenerator nlg = new NoteListGenerator(tt);
+		NoteListGenerator nlg = new NoteListGenerator();
 		
 		// PARSE!
-		EventParser ep = Runner.parseFile(file, nlg, tt, useChannel);
+		EventParser ep = Runner.parseMidiFile(file, nlg, tt, useChannel);
 		
 		// RUN!
 		JointModel jm = new JointModel(

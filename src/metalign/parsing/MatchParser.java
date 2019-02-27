@@ -103,7 +103,7 @@ public class MatchParser {
 					double tick = Double.parseDouble(note[4]);
 					long time = versionFive ? Math.round(tick * 1000) : Math.round(tick * tickToTimeMultiplier);
 					
-					Beat beat = new Beat(bar, 0, 0, tatum, time, Math.round(tick));
+					Beat beat = new Beat(bar, 0, 0, tatum, time);
 					tatums.add(beat);
 				}
 			}
@@ -127,7 +127,7 @@ public class MatchParser {
 			Beat beat = tatums.get(i);
 			if (beat.getBar() != bar || beat.getTatum() != tatum) {
 				long time = Math.round(((double) sumTimes) / numMatches);
-				deduplicated.add(new Beat(bar, 0, 0, tatum, time, (long) (((double) sumTimes) / numMatches / tickToTimeMultiplier)));
+				deduplicated.add(new Beat(bar, 0, 0, tatum, time));
 				
 				bar = beat.getBar();
 				tatum = beat.getTatum();
@@ -141,7 +141,7 @@ public class MatchParser {
 		}
 		
 		long time = Math.round(((double) sumTimes) / numMatches);
-		deduplicated.add(new Beat(bar, 0, 0, tatum, time, (long) (((double) sumTimes) / numMatches / tickToTimeMultiplier)));
+		deduplicated.add(new Beat(bar, 0, 0, tatum, time));
 		
 		// Interpolate between tatums
 		int tatumsPerBeat = measure.getSubBeatsPerBeat() * 12;
@@ -156,11 +156,9 @@ public class MatchParser {
 			bar = previous.getBar();
 			tatum = previous.getTatum();
 			time = previous.getTime();
-			long tick = previous.getTick();
 			
 			int tatumsBetween = tatumsPerBar * (beat.getBar() - bar) + beat.getTatum() - tatum;
 			double timeDelta = ((double) beat.getTime() - time) / tatumsBetween;
-			double tickDelta = ((double) beat.getTick() - tick) / tatumsBetween;
 			
 			for (int tatumNum = 1; tatumNum < tatumsBetween; tatumNum++) {
 				tatum++;
@@ -174,7 +172,7 @@ public class MatchParser {
 				int tatumNumber = (tatum % tatumsPerBeat) % 12;
 				
 				if (tatumNumber == 0) {
-					tatums.add(new Beat(bar, beatNum, subBeatNum, tatumNumber, (long) (time + tatumNum * timeDelta), (long) (tick + tatumNum * tickDelta)));
+					tatums.add(new Beat(bar, beatNum, subBeatNum, tatumNumber, (long) (time + tatumNum * timeDelta)));
 				}
 			}
 			

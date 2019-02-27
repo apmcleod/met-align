@@ -10,14 +10,12 @@ public class FromOutputTimeTracker extends TimeTracker {
 	private final List<Beat> beats;
 	private final List<Beat> beatsOnly;
 	private TimeSignature timeSig;
-	private int anacrusisSubBeats;
 	private int firstDownBeatTime;
 	
 	public FromOutputTimeTracker() {
 		beats = new ArrayList<Beat>();
 		beatsOnly = new ArrayList<Beat>();
 		
-		anacrusisSubBeats = 0;
 		firstDownBeatTime = -1;
 	}
 
@@ -94,32 +92,13 @@ public class FromOutputTimeTracker extends TimeTracker {
     	return timeSig;
     }
     
-    // TODO: is this necessary?
-    /**
-     * Get the anacrusis length of this TimeTracker, in sub beats.
-     * 
-     * @return {@link #anacrusisLength}, in sub beats
-     */
-    public int getAnacrusisSubBeats() {
-    	return anacrusisSubBeats;
-	}
-    
     /**
      * Get the anacrusis length of this TimeTracker, in ticks.
      * 
-     * @return {@link #anacrusisLength}
+     * @return {@link #anacrusisLengthTicks}
      */
     public int getAnacrusisTicks() {
 		return firstDownBeatTime;
-	}
-    
-    /**
-     * Set the anacrusis length of this song to the given number of ticks.
-     * 
-     * @param length The anacrusis length of this song, measured in ticks.
-     */
-    public void setAnacrusisSubBeats(int length) {
-		anacrusisSubBeats = length;
 	}
 	
 	@Override

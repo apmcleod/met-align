@@ -26,19 +26,9 @@ public class MidiNote implements Comparable<MidiNote> {
 	private long onsetTime;
 	
 	/**
-	 * The onset tick of this note.
-	 */
-	private long onsetTick;
-	
-	/**
 	 * The offset time of this note, measured in microseconds, or 0 if it is still active.
 	 */
 	private long offsetTime;
-	
-	/**
-	 * The offset tick of this note, or 0 if it is still active.
-	 */
-	private long offsetTick;
 	
 	/**
 	 * The velocity of this note.
@@ -61,18 +51,15 @@ public class MidiNote implements Comparable<MidiNote> {
 	 * @param key {@link #pitch}
 	 * @param velocity {@link #velocity}
 	 * @param onsetTime {@link #onsetTime}
-	 * @param onsetTick {@link #onsetTick}
 	 * @param correctVoice {@link #correctVoice}
 	 * @param guessedVoice {@link #guessedVoice}
 	 */
-	public MidiNote(int key, int velocity, long onsetTime, long onsetTick, int correctVoice, int guessedVoice) {
+	public MidiNote(int key, int velocity, long onsetTime, int correctVoice, int guessedVoice) {
 		this.pitch = key;
 		this.velocity = velocity;
 		this.onsetTime = onsetTime;
-		this.onsetTick = onsetTick;
 		this.correctVoice = correctVoice;
 		offsetTime = 0;
-		offsetTick = 0;
 		this.guessedVoice = guessedVoice;
 	}
 	
@@ -80,22 +67,18 @@ public class MidiNote implements Comparable<MidiNote> {
 	 * Move this note's onset to the given location.
 	 * 
 	 * @param onsetTime {@link #onsetTime}
-	 * @param onsetTick {@link #onsetTick}
 	 */
-	public void setOnset(long onsetTime, long onsetTick) {
+	public void setOnset(long onsetTime) {
 		this.onsetTime = onsetTime;
-		this.onsetTick = onsetTick;
 	}
 	
 	/**
 	 * Move this note's offset to the given location.
 	 * 
 	 * @param offsetTime {@link #offsetTime}
-	 * @param offsetTick {@link #offsetTick}
 	 */
-	public void setOffset(long offsetTime, long offsetTick) {
+	public void setOffset(long offsetTime) {
 		this.offsetTime = offsetTime;
-		this.offsetTick = offsetTick;
 	}
 	
 	/**
@@ -113,8 +96,8 @@ public class MidiNote implements Comparable<MidiNote> {
 	 * @param offsetTime {@link #offsetTime}
 	 * @param offsetTick {@link #offsetTick}
 	 */
-	public void close(long offsetTime, long offsetTick) {
-		setOffset(offsetTime, offsetTick);
+	public void close(long offsetTime) {
+		setOffset(offsetTime);
 	}
 
 	/**
@@ -129,7 +112,7 @@ public class MidiNote implements Comparable<MidiNote> {
 			return false;
 		}
 		
-		if (onsetTick < other.getOffsetTick() && offsetTick > other.getOnsetTick()) {
+		if (onsetTime < other.getOffsetTime() && offsetTime > other.getOnsetTime()) {
 			// We start before the other finishes, and finish after it starts.
 			return true;
 		}
@@ -145,15 +128,6 @@ public class MidiNote implements Comparable<MidiNote> {
 	public long getOnsetTime() {
 		return onsetTime;
 	}
-	
-	/**
-	 * Gets the onset tick of this note.
-	 * 
-	 * @return {@link #onsetTick}
-	 */
-	public long getOnsetTick() {
-		return onsetTick;
-	}
 
 	/**
 	 * Gets the offset time of this note.
@@ -162,15 +136,6 @@ public class MidiNote implements Comparable<MidiNote> {
 	 */
 	public long getOffsetTime() {
 		return offsetTime;
-	}
-	
-	/**
-	 * Gets the offset tick of this note.
-	 * 
-	 * @return {@link #offsetTick}
-	 */
-	public long getOffsetTick() {
-		return offsetTick;
 	}
 	
 	/**

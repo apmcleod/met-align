@@ -176,18 +176,17 @@ public class HmmBeatTrackingModelTrainer {
 				
 			} else {
 				TimeTracker tt = new MidiTimeTracker();
-				nlg = new NoteListGenerator(tt);
+				nlg = new NoteListGenerator();
 				
 				try {
 					if (file.toString().endsWith(".nb")) {
 						// NoteB
 						tt = new NoteBTimeTracker();
-						nlg = new NoteListGenerator(tt);
 						new NoteBParser(file, nlg, (NoteBTimeTracker) tt).run();
 						
 					} else {
 						// Midi or krn
-						Runner.parseFile(file, nlg, tt, useChannel);
+						Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
 					}
 					
 				} catch (IOException | InvalidMidiDataException | InterruptedException e) {
@@ -291,15 +290,24 @@ public class HmmBeatTrackingModelTrainer {
 					deviationSumSquared += deviation * deviation;
 				}
 				
-			} else if (tatums != null && nlg != null) {
+			} else if (tatums != null && !tatums.isEmpty() && nlg != null) {
 				for (List<MidiNote> noteList : nlg.getIncomingLists()) {
 					for (MidiNote note : noteList) {
-						Beat closestTatum = note.getOnsetSubBeat(tatums);
 						
-						double diff = Math.abs(closestTatum.getTime() - note.getOnsetTime());
+						double minDiff = Math.abs(tatums.get(0).getTime() - note.getOnsetTime());
+						for (int i = 0; i < tatums.size(); i++) {
+							double diff = Math.abs(tatums.get(i).getTime() - note.getOnsetTime());
+							
+							if (diff < minDiff) {
+								minDiff = diff;
+							} else {
+								break;
+							}
+						}
+						
 						deviationCount++;
-						deviationSum += diff;
-						deviationSumSquared += diff * diff;
+						deviationSum += minDiff;
+						deviationSumSquared += minDiff * minDiff;
 					}
 				}
 			}
