@@ -1,6 +1,6 @@
 # Metrical Alignment
 
-This is the code and data from my 2018 ISMIR paper. If you use it, please cite it:
+This is the code and data from my 2018 ISMIR paper (branch ismir2018) and my 2019 ICASSP paper (branch icassp2019). If you use either, please cite it:
 
 ```
 @inproceedings{McLeod:18b,
@@ -9,6 +9,15 @@ This is the code and data from my 2018 ISMIR paper. If you use it, please cite i
   booktitle={{ISMIR}},
   year={2018},
   pages={113--119}
+}
+```
+
+```
+@inproceedings{McLeod:19,
+  title={Improved metrical alignment of {MIDI} performance based on a repetition-aware online-adapted grammar},
+  author={McLeod, Andrew and Nakamura, Eita and Yoshii, Kazuyoshi},
+  booktitle={{IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP)}},
+  year={2019, to appear}
 }
 ```
 
