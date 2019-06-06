@@ -6,7 +6,7 @@ This is the code and data from my 2018 ISMIR paper (branch ismir2018) and my 201
 @inproceedings{McLeod:18b,
   title={Meter detection and alignment of {MIDI} performance},
   author={McLeod, Andrew and Steedman, Mark},
-  booktitle={{ISMIR}},
+  booktitle={International Society for Music Information Retrieval Conference (ISMIR)},
   year={2018},
   pages={113--119}
 }
@@ -16,8 +16,9 @@ This is the code and data from my 2018 ISMIR paper (branch ismir2018) and my 201
 @inproceedings{McLeod:19,
   title={Improved metrical alignment of {MIDI} performance based on a repetition-aware online-adapted grammar},
   author={McLeod, Andrew and Nakamura, Eita and Yoshii, Kazuyoshi},
-  booktitle={{IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP)}},
-  year={2019, to appear}
+  booktitle={IEEE International Conference on Acoustics, Speech, and Signal Processing (ICASSP)},
+  year={2019},
+  pages={186--190}
 }
 ```
 
