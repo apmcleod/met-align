@@ -52,7 +52,7 @@ public class FromFileBeatTrackingModelState extends BeatTrackingModelState {
 	 * @param timeTracker The TimeTracker which will generate {@link #beats}.
 	 */
 	public FromFileBeatTrackingModelState(TimeTracker timeTracker) {
-		beats = timeTracker.getBeats();
+		beats = timeTracker.getTatums();
 		
 		beatTimes = new ArrayList<Integer>(beats.size());
 		for (Beat beat : beats) {

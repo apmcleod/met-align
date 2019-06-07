@@ -1,7 +1,6 @@
 package metalign.joint;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,13 +31,13 @@ public class JointModel extends MidiModel {
 	 */
 	private boolean started;
 	
-	public static Map<VoiceSplittingModelState, List<VoiceSplittingModelState>> newVoiceStates;
+	public Map<VoiceSplittingModelState, List<VoiceSplittingModelState>> newVoiceStates;
 	
-	public static Map<BeatTrackingModelState, Map<List<MidiNote>, TreeSet<BeatTrackingModelState>>> newBeatStates;
+	public Map<BeatTrackingModelState, Map<List<MidiNote>, TreeSet<BeatTrackingModelState>>> newBeatStates;
 	
-	public static TreeSet<JointModelState> startedStates;
+	public TreeSet<JointModelState> startedStates;
 	
-	private static long previousTime = System.currentTimeMillis();
+	private long previousTime = System.currentTimeMillis();
 	
 	/**
 	 * Create a new JointModel based on a state with the given constituent states.
@@ -49,13 +48,13 @@ public class JointModel extends MidiModel {
 	 */
 	public JointModel(VoiceSplittingModelState voice, BeatTrackingModelState beat, HierarchyModelState hierarchy) {
 		hypothesisStates = new TreeSet<JointModelState>();
-		hypothesisStates.add(new JointModelState(voice, beat, hierarchy));
+		hypothesisStates.add(new JointModelState(this, voice, beat, hierarchy));
 		started = false;
 	}
 
 	@Override
 	public void handleIncoming(List<MidiNote> notes) {
-		setGlobalStaticVariables();
+		setGlobalVariables();
 		
 		if (!started) {
 			started = true;
@@ -81,8 +80,6 @@ public class JointModel extends MidiModel {
 			fixForBeam(newStates);
 		}
 		
-		fixForVoiceBeam(newStates);
-		
 		if (((Main.VERBOSE && Main.TESTING) || (MetricalLpcfgGeneratorRunner.VERBOSE && MetricalLpcfgGeneratorRunner.TESTING))) {
 			System.out.println(notes + ": ");
 			for (JointModelState jms : newStates) {
@@ -102,7 +99,7 @@ public class JointModel extends MidiModel {
 	
 	@Override
 	public void close() {
-		setGlobalStaticVariables();
+		setGlobalVariables();
 		
 		if (Main.LOG_STATUS) {
 			printLog(null);
@@ -124,8 +121,6 @@ public class JointModel extends MidiModel {
 			fixForBeam(newStates);
 		}
 		
-		fixForVoiceBeam(newStates);
-		
 		hypothesisStates = newStates;
 	}
 	
@@ -133,7 +128,7 @@ public class JointModel extends MidiModel {
 	 * Set the global static variables to new blank objects. They are: {@link #newVoiceStates},
 	 * {@link #newBeatStates}, and {@link #startedStates}.
 	 */
-	private static void setGlobalStaticVariables() {
+	private void setGlobalVariables() {
 		newVoiceStates = new TreeMap<VoiceSplittingModelState, List<VoiceSplittingModelState>>();
 		newBeatStates = new TreeMap<BeatTrackingModelState, Map<List<MidiNote>, TreeSet<BeatTrackingModelState>>>();
 		startedStates = new TreeSet<JointModelState>();
@@ -167,60 +162,6 @@ public class JointModel extends MidiModel {
 			if (startedStates.size() == Main.BEAM_SIZE) {
 				newStates.tailSet(startedStates.last(), false).clear();
 			}
-		}
-	}
-	
-	/**
-	 * Comparator used to remove down to voice beam.
-	 */
-	private static final Comparator<JointModelState> orderJointStatesByVoiceStateFirst = new Comparator<JointModelState>() {
-		@Override
-		public int compare(JointModelState o1, JointModelState o2) {
-			int result = o1.getVoiceState().compareTo(o2.getVoiceState());
-			if (result != 0) {
-				return result;
-			}
-			
-			return o1.compareTo(o2);
-		}
-	};
-
-	/**
-	 * Remove those hypotheses outside of the top {@link Main#VOICE_BEAM_SIZE} voiceState scores
-	 * which are also outside of the top {@link Main#BEAM_SIZE} overall scores. (Ties are kept in)
-	 * 
-	 * @param newStates The ordered set of hypotheses.
-	 */
-	private void fixForVoiceBeam(TreeSet<JointModelState> newStates) {
-		// Remove those outside of voice beam if we are still at least 2 * normal beam
-		if (Main.VOICE_BEAM_SIZE != -1 && Main.BEAM_SIZE != -1 && newStates.size() > Main.BEAM_SIZE) {
-			TreeSet<VoiceSplittingModelState> voiceStatesSet = new TreeSet<VoiceSplittingModelState>();
-			TreeSet<JointModelState> orderedJointStates = new TreeSet<JointModelState>(orderJointStatesByVoiceStateFirst);
-			
-			// Add all voice states into an ordered list
-			for (JointModelState jms : newStates) {
-				voiceStatesSet.add(jms.getVoiceState());
-				orderedJointStates.add(jms);
-			}
-			
-			// No beam necessary
-			if (voiceStatesSet.size() <= Main.VOICE_BEAM_SIZE) {
-				return;
-			}
-			
-			// Remove down voice states to voice beam size
-			while (voiceStatesSet.size() > Main.VOICE_BEAM_SIZE) {
-				voiceStatesSet.pollLast();
-			}
-			
-			// Removed down joint states
-			while (orderedJointStates.last().getVoiceState() != voiceStatesSet.last() && orderedJointStates.size() > Main.BEAM_SIZE) {
-				orderedJointStates.pollLast();
-			}
-			
-			// Move to newStates
-			newStates.clear();
-			newStates.addAll(orderedJointStates);
 		}
 	}
 

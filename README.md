@@ -1,5 +1,4 @@
 # Metrical Alignment
-
 This is the code and data from my 2018 ISMIR paper ([ismir2018](https://github.com/apmcleod/met-align/releases/tag/ismir2018)) and my 2019 ICASSP paper ([icassp2019](https://github.com/apmcleod/met-align/releases/tag/icassp2019)). The master branch currently contains the icassp code. If you use either, please cite it:
 
 ```
@@ -23,7 +22,7 @@ This is the code and data from my 2018 ISMIR paper ([ismir2018](https://github.c
 ```
 
 ## Project Overview
-This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and pre-trained grammars are found in the `grammars` directory.
+This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and a pre-trained grammar can be found in the `grammars` directory.
 
 ## Documentation
 This document contains some basic examples and a general overview of how to use
@@ -36,98 +35,105 @@ included with the project with the following command: `$ make`.
 
 ## Running
 Once the class files are installed in the bin directory, the project can be run.
-Run the project from the command line as follows:
+Run the project from the command line as follows (with default settings):
 
-`$ java -cp bin metalign.Main ARGS Files` 
+`$ java -cp bin metalign.Main -g grammar FILES`
 
- Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -s 4 -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid`
+`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). YOu may include `-g` multiple times with different grammar files to create a joint grammar.
+`FILES` should be a list of 1 or more music files (MIDI/krn) or directories containing only music files. Any directory entered will be searched recursively for files.
 
-Files should be a list of 1 or more music files (MIDI/krn) or directories containing only music
-files. Any directory entered will be searched recursively for files.
+Arguments to change settings:
+ * `-f` = DO NOT extend each note within each voice to the next note's onset. Default extends, as in the paper.
+ * `-m INT` = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended. Defaults to 100000, as in the paper.
+ * `-s INT` = Use INT as the sub beat length. Defaults to 4, as in the paper. The value here should be the same as the one given when training the grammar and the beat tracking HMM, and when running evaluation.
+ * `-b INT` = Use INT as the beam size. Defaults to 200, as in the paper.
+ * `-L DOUBLE` = Set the local grammar weight alpha. Defaults to 2/3, as in the paper.
 
-ARGS:
- * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
+Arguments important for special case of leave-one-out cross validation:
+ * `-x` = Extract the trees of the song for testing from the loaded grammar when testing.
+ * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
+
+Arguments to help debugging:
  * `-p` = Use verbose printing.
  * `-P` = Use super verbose printing.
  * `-l` = Print logging (time, hypothesis count, and notes at each step).
- * `-J` = Run with incremental joint processing.
- * `-VClass` = Use the given class for voice separation. (FromFile (default) or Hmm)
- * `-BClass` = Use the given class for beat tracking. (FromFile (default) or Hmm). See [Training](#training-the-beat-tracking-hmm) for information on how to train the HMM parameters.
- * `-HClass` = Use the given class for hierarchy detection. (FromFile (default) or lpcfg).
- * `-g FILE` = Load a grammar in from the given file. Used only with -Hlpcfg. See [Generating](#generating-an-lpcfg-grammar-file), or use a pretrained one from the grammars directory.
- * `-x` = Extract the trees of the song for testing from the loaded grammar when testing. Used only with -Hlpcfg.
- * `-e` = Extend each note within each voice to the next note's onset.
- * `-m INT` = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended.
- * `-s INT` = Use INT as the sub beat length.
- * `-b INT` = Use INT as the beam size.
- * `-v INT` = Use INT as the voice beam size.
+ 
+Arguments to use ground truth beats, or to perform beat tracking only:
+ * `-BClass` = Use the given class for beat tracking. (FromFile or Hmm (default)). See [Training](#training-the-beat-tracking-hmm) for information on how to train the HMM parameters.
+ * `-HClass` = Use the given class for hierarchy detection. (FromFile or lpcfg (default)).
+
+Other arguments:
+ * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-E FILE` = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
  
- Usage examples:
  
- Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -s 4 -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid -l`
- 
- Incremental joint: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -s 4 -e -m 100000 -x -a anacrusis -b 200 -v 5 corpora/WTCInv/bach-0846-fugue.mid -l`
- 
- 
-### Generating an LPCFG Grammar File
-Grammars for the LPCFG can be generated as follows:
+### Training a grammar
+Grammars for the LPCFG can be trained as follows:
 
-`$ java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner ARGS Files`
+`$ java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner -g grammar.lpcfg Files`
 
-Files should be a list of 1 or more music files (MIDI/krn/[noteB](#temperley-file-modifications)) or directories containing only music
-files. Any directory entered will be searched recursively for files.
+For example: `$ java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner -g grammar.lpcfg corpora/misc/quant`
 
-ARGS:
- * `-g FILE` = Write the grammar out to the given FILE.
+The trained grammar will be saved in the file `grammar.lpcfg`.
+
+`Files` should be a list of 1 or more music files (MIDI/krn/[noteB](#temperley-file-modifications)) or directories containing only music files. Any directory entered will be searched recursively for files.
+
+Important arguments:
+ * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
+
+Arguments to change settings:
+ * `-l` = Do NOT use lexicalisation.
+ * `-f` = Do NOT extend each note within each voice to the next note's onset. (default extends, as in the paper)
+ * `-m INT` = Throw out notes whose length is shorter than INT microseconds, once extended. (defaults to 100000, as in the paper)
+ * `-s INT` = Use INT as the sub beat length. (defaults to 4, as in the paper).
+
+Additional arguments:
+ * `-p INT` = Run in parallel with INT processes.
+ * `-x` = Do NOT save trees in the grammar file. Saves memory, but makes extracting the trees at test time (for cross-validation) impossible.
  * `-v` = Use verbose printing.
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
- * `-l` = Do NOT use lexicalisation.
- * `-e` = Extend each note within each voice to the next note's onset.
- * `-m INT` = Throw out notes whose length is shorter than INT microseconds, once extended.
- * `-s INT` = Use INT as the sub beat length.
- * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
  
- Usage example:
+ #### Pre-trained grammars
+ Some pre-trained grammars are included in the grammars directory:
  
- `$ java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner -g grammars/WTCInvMiscq4e.m100000.lpcfg -a anacrusis -e -m 100000 -s 4 -v corpora/misc/quant corpora/WTCInv`
-
+  * `misc.lpcfg`: Trained on corpora/misc/perf
+  * `WTCInv.lpcfg`: Trained on corpora/WTCInv with -a anacrusis.
 
 ### Training the Beat Tracking HMM
 The parameters for the beat tracking HMM must be set manually after an automatic training run. It can be trained as follows:  
 
-`$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer [ARGS] Files`
+`$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer Files`
 
 Files should be a list of 1 or more music files (MIDI/krn/[noteB](#temperley-file-modifications)) or directories containing only music
 files. Any directory entered will be searched recursively for files.  
 
-ARGS:
+Arguments:
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
- * `-s` INT = Use INT as the sub beat length.
+ * `-s` INT = Use INT as the sub beat length. Defaults to 4, as in the paper.
  * `-X` = Input files are xml directories from CrestMusePEDB.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
- 
-Usage examples:  
 
-NoteB Training: `$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer -s 4 corpora/misc/perf`  
-
-XML Training: `$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer -s 4 -X corpora/CrestMusePEDB-xml`  
+NoteB Training example: `$ java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer corpora/misc/perf`  
 
 Once the program is run, the parameter values should be written into the file `src/metalign/beat/hmm/HmmBeatTrackingModelParameters` on line 71, and then the files should be re-compiled by running `$ make`.
 
 ### Evaluating Performance
 Performance can be evaluated as follows:  
 
-`$ java -cp bin metalign.utils.Evaluation ARGS`
+`$ java -cp bin metalign.utils.Evaluation -E groundtruth.midi <out.txt`
 
 ARGS:
  * `-E FILE` = Evaluate the Main output (from std in) given the ground truth FILE.
- * `-F` = Calculate means and standard deviations of the -E FILE results (read from std in).
  * `-w INT` = Use the given INT as the window length for accepted grouping matches, in microseconds. (Default = 70000).
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
- * `-s INT` = Use INT as the sub beat length.
+ * `-s INT` = Use INT as the sub beat length. Defaults to 4.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
+ 
+To calculate means of multiple evaluations:
+`$ java -cp bin metalign.utils.Evaluation -F <eval*.txt`
+
+ * `-F` = Calculate means and standard deviations of the -E FILE results (read from std in).
  
 Usage examples:  
 

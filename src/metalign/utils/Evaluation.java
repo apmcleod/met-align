@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -16,6 +13,7 @@ import org.xml.sax.SAXException;
 import metalign.Main;
 import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
+import metalign.parsing.OutputParser;
 import metalign.voice.Voice;
 
 /**
@@ -29,23 +27,11 @@ public class Evaluation {
 	 * The accepted error for a beat location to be considered correct
 	 */
 	public static long BEAT_EPSILON = 70000;
+	
+	public static boolean VERBOSE = false;
 
 	/**
-	 * The main method for evaluating results.
-	 * <p>
-	 * Usage: <code>java -cp bin metalign.utils.Evaluation ARGS</code>
-	 * <p>
-	 * <blockquote>
-	 * ARGS:
-	 * <ul>
-	 *  <li><code>-E FILE</code> = Evaluate the Main output (from std in) given the ground truth FILE.</li>
-	 *  <li><code>-F</code> = Calculate means and standard deviations of the -E FILE results (read from std in).</li>
-	 *  <li><code>-w INT</code> = Use the given INT as the window length for accepted grouping matches, in microseconds.</li>
-	 *  <li><code>-T</code> = Use tracks as correct voice (instead of channels) *Only used for MIDI files.</li>
-	 *  <li><code>-s INT</code> = Use INT as the sub beat length.</li>
-	 *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
-	 * </ul>
-	 * </blockquote>
+	 * The main method for evaluating results. Run with no arguments to print help.
 	 * 
 	 * @param args The arguments, described above.
 	 * @throws InterruptedException
@@ -58,6 +44,7 @@ public class Evaluation {
 		List<File> anacrusisFiles = new ArrayList<File>();
 		boolean useChannel = true;
 		File groundTruth = null;
+		File file = null;
 		
 		// No args given
 		if (args.length == 0) {
@@ -92,8 +79,8 @@ public class Evaluation {
 							
 						// Check Full
 						case 'F':
-							checkFull();
-							break;
+							OutputParser.checkFull();
+							return;
 							
 						case 's':
 							i++;
@@ -122,17 +109,51 @@ public class Evaluation {
 							}
 							break;
 							
+						case 'v':
+							VERBOSE = true;
+							break;
+							
 						// Anacrusis files
 						case 'a':
 							if (args.length <= ++i) {
 								argumentError("No Anacrusis Files given after -a");
 							}
-							File file = new File(args[i]);
+							file = new File(args[i]);
 							if (!file.exists()) {
 								argumentError("Anacrusis File " + args[i] + " not found");
 							}
 							anacrusisFiles.addAll(Main.getAllFilesRecursive(file));
 							break;
+							
+						// Generate Temperley
+						case 'G':
+							i++;
+							if (args.length <= i) {
+								argumentError("No file given for -G option.");
+							}
+							
+							file = new File(args[i]);
+							if (!file.exists()) {
+								argumentError("File " + args[i] + " not found");
+							}
+							
+							Temperley.generateFromTemperley(file);
+							return;
+							
+						// Notefile generation
+						case 'n':
+							i++;
+							if (args.length <= i) {
+								argumentError("No file given for -n option.");
+							}
+							
+							file = new File(args[i]);
+							if (!file.exists()) {
+								argumentError("File " + args[i] + " not found");
+							}
+							
+							System.out.println(Temperley.getNoteFileString(file));
+							return;
 							
 						// Error
 						default:
@@ -148,85 +169,9 @@ public class Evaluation {
 		
 		if (groundTruth != null) {
 			evaluateGroundTruth(groundTruth, anacrusisFiles, useChannel);
+		} else {
+			argumentError("No options given:");
 		}
-	}
-	
-	/**
-	 * Calculate mean and standard deviation of Voice, Beat, Downbeat, and Meter scores as produced by
-	 * Evaluation -E, read from std in.
-	 */
-	private static void checkFull() {
-		int voiceCount = 0;
-		double voiceSum = 0.0;
-		double voiceSumSquared = 0.0;
-		
-		int beatCount = 0;
-		double beatSum = 0.0;
-		double beatSumSquared = 0.0;
-		
-		int downBeatCount = 0;
-		double downBeatSum = 0.0;
-		double downBeatSumSquared = 0.0;
-		
-		int meterCount = 0;
-		double meterSum = 0.0;
-		double meterSumSquared = 0.0;
-		
-		Scanner input = new Scanner(System.in);
-		while (input.hasNextLine()) {
-			String line = input.nextLine();
-			
-			int breakPoint = line.indexOf(": ");
-			if (breakPoint == -1) {
-				continue;
-			}
-			
-			String prefix = line.substring(0, breakPoint);
-			
-			// Check for matching prefixes
-			if (prefix.equalsIgnoreCase("Voice Score")) {
-				double score = Double.parseDouble(line.substring(breakPoint + 2));
-				voiceSum += score;
-				voiceSumSquared += score * score;
-				voiceCount++;
-				
-			} else if (prefix.equalsIgnoreCase("Beat Score")) {
-				double score = Double.parseDouble(line.substring(breakPoint + 2));
-				beatSum += score;
-				beatSumSquared += score * score;
-				beatCount++;
-				
-			} else if (prefix.equalsIgnoreCase("Downbeat Score")) {
-				double score = Double.parseDouble(line.substring(breakPoint + 2));
-				downBeatSum += score;
-				downBeatSumSquared += score * score;
-				downBeatCount++;
-				
-			} else if (prefix.equalsIgnoreCase("Meter Score")) {
-				double score = Double.parseDouble(line.substring(breakPoint + 2));
-				meterSum += score;
-				meterSumSquared += score * score;
-				meterCount++;
-			}
-		}
-		input.close();
-		
-		double voiceMean = voiceSum / voiceCount;
-		double voiceVariance = voiceSumSquared / voiceCount - voiceMean * voiceMean;
-		
-		double beatMean = beatSum / beatCount;
-		double beatVariance = beatSumSquared / beatCount - beatMean * beatMean;
-		
-		double downBeatMean = downBeatSum / downBeatCount;
-		double downBeatVariance = downBeatSumSquared / downBeatCount - downBeatMean * downBeatMean;
-		
-		double meterMean = meterSum / meterCount;
-		double meterVariance = meterSumSquared / meterCount - meterMean * meterMean;
-		
-		System.out.println("Voice: mean=" + voiceMean + " stdev=" + Math.sqrt(voiceVariance));
-		System.out.println("Beat: mean=" + beatMean + " stdev=" + Math.sqrt(beatVariance));
-		System.out.println("Downbeat: mean=" + downBeatMean + " stdev=" + Math.sqrt(downBeatVariance));
-		System.out.println("Meter: mean=" + meterMean + " stdev=" + Math.sqrt(meterVariance));
 	}
 
 	/**
@@ -245,340 +190,48 @@ public class Evaluation {
 	private static void evaluateGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel) throws IOException, InvalidMidiDataException, InterruptedException, ParserConfigurationException, SAXException {
 		Evaluator evaluator = new Evaluator(groundTruth, anacrusisFiles, useChannel);
 		
-		// Parse input
-		String voices = null;
-		String beats = null;
-		String hierarchy = null;
-		int found = 0;
-		
-		Scanner input = new Scanner(System.in);
-		while (input.hasNextLine()) {
-			String line = input.nextLine();
-			
-			int breakPoint = line.indexOf(": ");
-			if (breakPoint == -1) {
-				continue;
-			}
-			
-			String prefix = line.substring(0, breakPoint);
-			
-			// Check for matching prefixes
-			if (voices == null && prefix.equalsIgnoreCase("Voices")) {
-				voices = line.substring(breakPoint + 2);
-				found++;
-				if (found == 3) {
-					break;
-				}
-				
-			} else if (beats == null && prefix.equalsIgnoreCase("Beats")) {
-				beats = line.substring(breakPoint + 2);
-				found++;
-				if (found == 3) {
-					break;
-				}
-				
-			} else if (hierarchy == null && prefix.equalsIgnoreCase("Hierarchy")) {
-				hierarchy = line.substring(breakPoint + 2);
-				found++;
-				if (found == 3) {
-					break;
-				}
-			}
-		}
-		input.close();
-		
-		if (found != 3) {
-			throw new IOException("Input malformed");
+		if (evaluator.getHasTimeChange()) {
+			System.err.println("Meter change detected. Skipping song " + groundTruth);
+			return;
 		}
 		
-		// Parse string
-		List<Voice> voiceList = parseVoices(voices);
-		List<Beat> beatList = parseBeats(beats);
-		Measure measure = parseHierarchy(hierarchy);
+		if (evaluator.getHierarchy().getBeatsPerMeasure() < 2 || evaluator.getHierarchy().getBeatsPerMeasure() > 4 ||
+				evaluator.getHierarchy().getSubBeatsPerBeat() < 2 || evaluator.getHierarchy().getSubBeatsPerBeat() > 3) {
+			System.err.println("Irregular meter detected (" + evaluator.getHierarchy().getBeatsPerMeasure() + "," +
+				evaluator.getHierarchy().getSubBeatsPerBeat() + "). Skipping song " + groundTruth);
+			return;
+		}
+		
+		OutputParser op = new OutputParser();
+		
+		List<Voice> voiceList = op.getVoices();
+		List<Beat> beatList = op.getBeats();
+		Measure measure = op.getMeasure();
 		
 		// Get scores
 		System.out.println(evaluator.evaluate(voiceList, beatList, measure));
+		
+		if (VERBOSE) {
+			System.out.println("Average tatum length transcribed: " +
+					((beatList.get(beatList.size() - 1).getTime() - beatList.get(0).getTime()) / (beatList.size() / 1)));
+			System.out.println("Average beat length gt: " +
+					((evaluator.getTatums().get(evaluator.getTatums().size() - 1).getTime() -
+							evaluator.getTatums().get(0).getTime()) / (evaluator.getTatums().size() / 1)));
+			System.out.println("First downbeat time transcribed: " + getFirstDownbeatTime(beatList));
+			System.out.println("First downbeat time gt: " + getFirstDownbeatTime(evaluator.getTatums()));
+			System.out.println("Hierarchy transcribed: " + measure);
+			System.out.println("Hierarchy gt: " + evaluator.getHierarchy());
+		}
 	}
 
-	/**
-	 * Parse the given voice result String into a List of Voices.
-	 * 
-	 * @param voices The output voice string.
-	 * @return A List of Voices.
-	 * @throws IOException
-	 */
-	private static List<Voice> parseVoices(String voices) throws IOException {
-		if (voices.length() <= 1) {
-			return new ArrayList<Voice>(0);
-		}
-		Pattern notePattern = Pattern.compile("\\(K:([A-G]#?[0-9])  V:([0-9]+)  \\[([0-9]+)\\-([0-9]+)\\] ([0-9]+)\\)");
-		String[] splitVoices = voices.split("\\], ?\\[");
-		splitVoices[0] = splitVoices[0].replace("[[", "");
-		splitVoices[splitVoices.length - 1] = splitVoices[splitVoices.length - 1].substring(0, splitVoices[splitVoices.length - 1].lastIndexOf(')') + 1);
-		
-		List<Voice> voicesList = new ArrayList<Voice>(splitVoices.length);
-		
-		// Parsing
-		for (String voiceString : splitVoices) {
-			Voice voice = null;
-			
-			// Parse each note
-			String[] noteStrings = voiceString.split(", ");
-			for (String noteString : noteStrings) {
-				
-				Matcher noteMatcher = notePattern.matcher(noteString);
-				if (noteMatcher.matches()) {
-					String pitchString = noteMatcher.group(1);
-					int pitch = MidiNote.getPitch(pitchString);
-					
-					int velocity = Integer.parseInt(noteMatcher.group(2));
-					int onsetTime = Integer.parseInt(noteMatcher.group(3));
-					int offsetTime = Integer.parseInt(noteMatcher.group(4));
-					int correctVoice = Integer.parseInt(noteMatcher.group(5));
-					
-					MidiNote note = new MidiNote(pitch, velocity, onsetTime, onsetTime, correctVoice, -1);
-					note.close(offsetTime, offsetTime);
-					voice = new Voice(note, voice);
-					
-				} else {
-					throw new IOException("Voice separation results malformed: " + noteString);
-				}
-			}
-			
-			voicesList.add(voice);
-		}
-		
-		return voicesList;
-	}
-
-	/**
-	 * Parse the given beats String into a List of Beats.
-	 * 
-	 * @param beats The Beat output String to parse.
-	 * @return A List of Beats.
-	 * @throws IOException
-	 */
-	private static List<Beat> parseBeats(String beats) throws IOException {
-		if (beats.length() <= 1) {
-			return new ArrayList<Beat>(0);
-		}
-		Pattern beatPattern = Pattern.compile("(-?[0-9]+)\\.([0-9]+),(-?[0-9]+)");
-		String[] splitBeats = beats.split("\\),\\(");
-		splitBeats[0] = splitBeats[0].replace("[(", "");
-		splitBeats[splitBeats.length - 1] = splitBeats[splitBeats.length - 1].substring(0, splitBeats[splitBeats.length - 1].indexOf(')'));
-		
-		List<Beat> beatsList = new ArrayList<Beat>(splitBeats.length);
-		
-		for (String beatString : splitBeats) {
-			Matcher beatMatcher = beatPattern.matcher(beatString);
-			
-			if (beatMatcher.matches()) {
-				int bar = Integer.parseInt(beatMatcher.group(1));
-				int tatum = Integer.parseInt(beatMatcher.group(2));
-				int time = Integer.parseInt(beatMatcher.group(3));
-				
-				Beat beat = new Beat(bar, tatum, time, time);
-				beatsList.add(beat);
-				
-			} else {
-				throw new IOException("Beat tracking results malformed");
+	private static long getFirstDownbeatTime(List<Beat> beatList) {
+		for (Beat beat : beatList) {
+			if (beat.getTatum() == 0) {
+				return beat.getTime();
 			}
 		}
 		
-		return beatsList;
-	}
-
-	/**
-	 * Parse the given hierarchy result String into a Measure.
-	 * 
-	 * @param hierarchy A hierarchy result String.
-	 * @return The Measure, parsed from the given String.
-	 * @throws IOException
-	 */
-	private static Measure parseHierarchy(String hierarchy) throws IOException {
-		Pattern hierarchyPattern = Pattern.compile("M_([0-9]+),([0-9]+) length=([0-9]+) anacrusis=([0-9]+).*");
-
-		Matcher hierarchyMatcher = hierarchyPattern.matcher(hierarchy);
-		Measure measure = null;
-		if (hierarchyMatcher.matches()) {
-			int beatsPerBar = Integer.parseInt(hierarchyMatcher.group(1));
-			int subBeatsPerBeat = Integer.parseInt(hierarchyMatcher.group(2));
-			int length = Integer.parseInt(hierarchyMatcher.group(3));
-			int anacrusis = Integer.parseInt(hierarchyMatcher.group(4));
-			
-			measure = new Measure(beatsPerBar, subBeatsPerBeat, length, anacrusis);
-			
-		} else {
-			throw new IOException("Hierarchy results malformed");
-		}
-		
-		return measure;
-	}
-	
-	/**
-	 * Get the accuracy String for a metrical hypothesis.
-	 *
-	 * @param correctMeasure The correct measure.
-	 * @param correctSubBeatLength The correct sub beat length, in ticks.
-	 * @param correctAnacrusisLength The correct anacrusis length, in ticks.
-	 * @param hypothesisMeasure The hypothesis measure.
-	 * @param hypothesisSubBeatLength The hypothesis sub beat length, in ticks.
-	 * @param hypothesisAnacrusisLength The hypothesis anacrusis length, in ticks.
-	 * 
-	 * @return The accuracy string for the given hypothesis.
-	 */
-	public static String getAccuracyString(Measure correctMeasure, int correctSubBeatLength, int correctAnacrusisLength,
-			Measure hypothesisMeasure, int hypothesisSubBeatLength, int hypothesisAnacrusisLength) {
-		
-		if (hypothesisMeasure.equals(correctMeasure) &&
-				hypothesisAnacrusisLength == correctAnacrusisLength &&
-				hypothesisSubBeatLength == correctSubBeatLength) {
-			return "TP = 3\nFP = 0\nFN = 0\nP = 1.0\nR = 1.0\nF1 = 1.0";
-		}
-		
-		int truePositives = 0;
-		int falsePositives = 0;
-		
-		// Sub beat
-		int length = hypothesisSubBeatLength;
-		int offset = 0;
-		
-		int match = getMatch(length, offset, correctMeasure, correctSubBeatLength, correctAnacrusisLength);
-		if (match > 0) {
-			truePositives++;
-			
-		} else if (match < 0) {
-			falsePositives++;
-		}
-		
-		// Beat
-		length *= hypothesisMeasure.getSubBeatsPerBeat();
-		offset = hypothesisAnacrusisLength % length;
-		
-		match = getMatch(length, offset, correctMeasure, correctSubBeatLength, correctAnacrusisLength);
-		if (match > 0) {
-			truePositives++;
-			
-		} else if (match < 0) {
-			falsePositives++;
-		}
-		
-		// Measure
-		length *= hypothesisMeasure.getBeatsPerMeasure();
-		offset = hypothesisAnacrusisLength;
-		
-		match = getMatch(length, offset, correctMeasure, correctSubBeatLength, correctAnacrusisLength);
-		if (match > 0) {
-			truePositives++;
-			
-		} else if (match < 0) {
-			falsePositives++;
-		}
-		
-		int falseNegatives = 3 - truePositives;
-		
-		double precision = ((double) truePositives) / (truePositives + falsePositives);
-		double recall = ((double) truePositives) / (truePositives + falseNegatives);
-		
-		double fMeasure = 2 * precision * recall / (precision + recall);
-		
-		if (Double.isNaN(fMeasure)) {
-			fMeasure = 0.0;
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		
-		sb.append("TP = ").append(truePositives).append('\n');
-		sb.append("FP = ").append(falsePositives).append('\n');
-		sb.append("FN = ").append(falseNegatives).append('\n');
-		sb.append("P = ").append(precision).append('\n');
-		sb.append("R = ").append(recall).append('\n');
-		sb.append("F1 = ").append(fMeasure);
-		
-		return sb.toString();
-	}
-	
-	/**
-	 * Get the match type of a grouping of the given length and offset given the correct measure,
-	 * anacrusis length, and sub beat length.
-	 * 
-	 * @param length The length of the grouping we want to check.
-	 * @param offset The offset of the grouping we want to check.
-	 * @param correctMeasure The correct measure of this song.
-	 * @param correctSubBeatLength The correct sub beat length.
-	 * @param correctAnacrusisLength The correct anacrusis length, measured in tacti.
-	 * 
-	 * @return A value less than 0 if this grouping overlaps some correct tree boundary. A value
-	 * greater than 0 if this grouping matches a correct tree boundary exactly. A value of 0
-	 * otherwise, for example if the grouping lies under the lowest grouping, but could be grouped
-	 * up into a correct grouping.
-	 */
-	private static int getMatch(int length, int offset, Measure correctMeasure, int correctSubBeatLength,
-			int correctAnacrusisLength) {
-		// Sub beat
-		int correctLength = correctSubBeatLength;
-		int correctOffset = correctAnacrusisLength % correctLength;
-		
-		if (correctLength == length) {
-			return correctOffset == offset ? 1 : -1;
-			
-		} else if (correctLength < length) {
-			if ((offset - correctOffset) % correctLength != 0 || (offset + length - correctOffset) % correctLength != 0) {
-				// We don't match up with both the beginning and the end
-				return -1;
-			}
-			
-		} else {
-			// correctLength > length
-			if ((correctOffset - offset) % length != 0 || (correctOffset + correctLength - offset) % length != 0) {
-				// We don't match up with both the beginning and the end
-				return -1;
-			}
-		}
-
-		// Beat
-		correctLength *= correctMeasure.getSubBeatsPerBeat();
-		correctOffset = correctAnacrusisLength % correctLength;
-		
-		if (correctLength == length) {
-			return correctOffset == offset ? 1 : -1;
-			
-		} else if (correctLength < length) {
-			if ((offset - correctOffset) % correctLength != 0 || (offset + length - correctOffset) % correctLength != 0) {
-				// We don't match up with both the beginning and the end
-				return -1;
-			}
-			
-		} else {
-			// correctLength > length
-			if ((correctOffset - offset) % length != 0 || (correctOffset + correctLength - offset) % length != 0) {
-				// We don't match up with both the beginning and the end
-				return -1;
-			}
-		}
-		
-		// Measure
-		correctLength *= correctMeasure.getBeatsPerMeasure();
-		correctOffset = correctAnacrusisLength;
-		
-		if (correctLength == length) {
-			return correctOffset == offset ? 1 : -1;
-			
-		} else if (correctLength < length) {
-			if ((offset - correctOffset) % correctLength != 0 || (offset + length - correctOffset) % correctLength != 0) {
-				// We don't match up with both the beginning and the end
-				return -1;
-			}
-			
-		} else {
-			// correctLength > length
-			if ((correctOffset - offset) % length != 0 || (correctOffset + correctLength - offset) % length != 0) {
-				// We don't match up with both the beginning and the end
-				return -1;
-			}
-		}
-		
-		return 0;
+		return -1L;
 	}
 	
 	/**
@@ -597,8 +250,10 @@ public class Evaluation {
 		sb.append("-F = Calculate means and standard deviations of the -E FILE results (read from std in).\n");
 		sb.append("-w INT = Use the given INT as the window length for accepted grouping matches, in microseconds.\n");
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
+		sb.append("-s INT = Use INT as the sub beat length. Defaults to 4.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
+		sb.append("-G FILE = Generate our output format from Temperley's output format (from Standard in), given the ground truth file FILE.\n");
+		sb.append("-n FILE = Generate a notefile (for input to Temperley) from the given FILE.\n");
 		
 		System.err.println(sb.toString());
 		System.exit(1);

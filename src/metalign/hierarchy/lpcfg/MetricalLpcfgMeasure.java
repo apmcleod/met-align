@@ -50,7 +50,7 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 	 * of all of its children, or a length 0 head if it has no children.
 	 * 
 	 *  @return The head of this non-terminal.
-	 */
+	 *
 	@Override
 	public MetricalLpcfgHead getHead() {
 		MetricalLpcfgHead head = new MetricalLpcfgHead();

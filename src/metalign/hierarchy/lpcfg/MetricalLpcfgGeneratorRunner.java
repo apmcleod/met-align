@@ -7,6 +7,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import javax.sound.midi.InvalidMidiDataException;
 
@@ -29,38 +34,23 @@ import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
  * 
  * @author Andrew McLeod - 29 February, 2016
  */
-public class MetricalLpcfgGeneratorRunner {
+public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGenerator> {
 	public static boolean VERBOSE = false;
 	public static boolean TESTING = false;
 	public static boolean LEXICALIZATION = true;
-	
+	public static int NUM_PROCS = 1;
+	public static boolean SAVE_TREES = true;
+
 	/**
-	 * The main method for generating an LPCFG grammar file.
-	 * <p>
-	 * Usage: <code>java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner [ARGS] input1 [input2...]</code>
-	 * <p>
-	 * Where each input is either a file or a directory. Each file listed as input, and each file
-	 * beneath every directory listed as input (recursively) is read as input.
-	 * <p>
-	 * <blockquote>
-	 * ARGS:
-	 * <ul>
-	 *  <li><code>-g FILE</code> = Write the grammar out to the given FILE.</li>
-	 *  <li><code>-v</code> = Use verbose printing.</li>
-	 *  <li><code>-T</code> = Use tracks as correct voice (instead of channels) *Only used for MIDI files.</li>
-	 *  <li><code>-l</code> = Do NOT use lexicalisation.</li>
-	 *  <li><code>-e</code> = Extend each note within each voice to the next note's onset.</li>
-	 *  <li><code>-m INT</code> = Throw out notes whose length is shorter than INT microseconds, once extended.</li>
-	 *  <li><code>-s INT</code> = Use INT as the sub beat length.</li>
-	 *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
-	 * </ul>
-	 * </blockquote>
+	 * The main method for generating an LPCFG grammar file. Run with no args to print help.
 	 * 
-	 * @param args The args as described above.
+	 * @param args The args as described.
+	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
+	 * @throws ExecutionException 
 	 */
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args) throws InterruptedException, IOException, ExecutionException {
 		boolean useChannel = true;
 		boolean generate = false;
 		File exportModelFile = null;
@@ -119,8 +109,28 @@ public class MetricalLpcfgGeneratorRunner {
 							LEXICALIZATION = false;
 							break;
 							
+						case 'x':
+							SAVE_TREES = false;
+							break;
+							
+						case 'p':
+							i++;
+							if (args.length == i) {
+								argumentError("No process count given for -p option.");
+							}
+							try {
+								NUM_PROCS = Integer.parseInt(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading process count. Must be an integer: " + args[i]);
+							}
+							break;
+							
 						case 'e':
 							Main.EXTEND_NOTES = true;
+							break;
+							
+						case 'f':
+							Main.EXTEND_NOTES = false;
 							break;
 							
 						case 'g':
@@ -162,15 +172,46 @@ public class MetricalLpcfgGeneratorRunner {
 			argumentError("No music files given for testing");
 		}
 		
+		MetricalLpcfg grammar;
+		
 		// Generate grammar
 		if (generate) {
 			if (VERBOSE) {
 				System.out.println("Generating grammar into " + exportModelFile);
+				System.out.println("Using " + NUM_PROCS + " process(es).");
 			}
 			
-			MetricalLpcfgGenerator generator = generateGrammar(testFiles, anacrusisFiles, useChannel);
+			if (NUM_PROCS > 1) {
+				grammar = new MetricalLpcfg();
+				double filesPerProc = ((double) testFiles.size()) / ((double) NUM_PROCS);
+				
+				// Create callables
+				List<Callable<MetricalLpcfgGenerator>> callables = new ArrayList<Callable<MetricalLpcfgGenerator>>(NUM_PROCS);
+			    for (int i = 0; i < NUM_PROCS; i++) {
+			    	callables.add(new MetricalLpcfgGeneratorRunner(
+			    			testFiles.subList((int) Math.round(i * filesPerProc), (int) Math.round((i + 1) * filesPerProc)),
+			    			anacrusisFiles, useChannel)
+			    	);
+			    }
+	
+			    // Execute the callables
+			    ExecutorService executor = Executors.newFixedThreadPool(NUM_PROCS);
+			    List<Future<MetricalLpcfgGenerator>> results = executor.invokeAll(callables);
+			    
+			    // Grab the results and save the best
+			    for (Future<MetricalLpcfgGenerator> result : results) {
+			    	MetricalLpcfgGenerator generator = result.get();
+			    	
+			    	grammar.mergeGrammar(generator.getGrammar());
+			    }
+			    
+			    executor.shutdown();
+			    
+			} else {
+				grammar = generateGrammar(testFiles, anacrusisFiles, useChannel).getGrammar();
+			}
 			
-			MetricalLpcfg.serialize(generator.getGrammar(), exportModelFile);	
+			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
 
@@ -186,10 +227,16 @@ public class MetricalLpcfgGeneratorRunner {
 	private static MetricalLpcfgGenerator generateGrammar(List<File> midiFiles, List<File> anacrusisFiles, boolean useChannel) throws InterruptedException {
 		// We have files and are ready to run!
 		MetricalLpcfgGenerator generator = new MetricalLpcfgGenerator();
+		int fileNum = 0;
 		
 		for (File file : midiFiles) {
+			fileNum++;
 			if (VERBOSE) {
-				System.out.println("Parsing " + file);
+				if (NUM_PROCS != 1) {
+					System.out.print(Thread.currentThread().getId() + ": ");
+				}
+				
+				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
 			TimeTracker tt = new TimeTracker(Main.SUB_BEAT_LENGTH);
@@ -221,8 +268,17 @@ public class MetricalLpcfgGeneratorRunner {
 				continue;
 			}
 			
-			if (tt.getFirstTimeSignature().getNumerator() == TimeSignature.IRREGULAR_NUMERATOR) {
-				System.err.println("Irregular meter detected. Skipping song " + file);
+			tt.setFirstNoteTime(nlg.getNoteList().get(0).getOnsetTime());
+			
+			if (tt.getFirstTimeSignature().getNumerator() == TimeSignature.IRREGULAR_NUMERATOR ||
+					(tt.getFirstTimeSignature().getNumerator() != 2 &&
+					tt.getFirstTimeSignature().getNumerator() != 3 &&
+					tt.getFirstTimeSignature().getNumerator() != 4 &&
+					tt.getFirstTimeSignature().getNumerator() != 6 &&
+					tt.getFirstTimeSignature().getNumerator() != 9 &&
+					tt.getFirstTimeSignature().getNumerator() != 12)) {
+				System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getNumerator() +
+						"). Skipping song " + file);
 				continue;
 			}
 			
@@ -252,12 +308,20 @@ public class MetricalLpcfgGeneratorRunner {
 			Runner.performInference(jm, nlg);
 			
 			// GRAMMARIZE
-			generator.parseSong(jm, tt);
+			try {
+				generator.parseSong(jm, tt);
+			} catch (Exception e) {
+				System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
+				
+				if (VERBOSE) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		return generator;
 	}
-	
+
 	/**
 	 * Get the anacrusis length for the given test file given the anacrusis files.
 	 * 
@@ -303,12 +367,33 @@ public class MetricalLpcfgGeneratorRunner {
 		sb.append("-v = Use verbose printing.\n");
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
 		sb.append("-l = Do NOT use lexicalisation.\n");
-		sb.append("-e = Extend each note within each voice to the next note's onset.\n");
-		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
+		sb.append("-f = Do NOT extend each note within each voice to the next note's onset.\n");
+		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended. Defaults to 100000.\n");
+		sb.append("-s INT = Use INT as the sub beat length. Defaults to 4.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
+		sb.append("-p INT = Run multi-threaded with the given number of processes.\n");
+		sb.append("-x = Do NOT save trees in the grammar file (saves memory, cannot extract when testing).");
 		
 		System.err.println(sb.toString());
 		System.exit(1);
+	}
+	
+	/*******
+	 * Class objects for multi-threading.
+	 */
+	
+	private List<File> testFiles;
+	private List<File> anacrusisFiles;
+	private boolean useChannel;
+	
+	public MetricalLpcfgGeneratorRunner(List<File> testFiles, List<File> anacrusisFiles, boolean useChannel) {
+		this.testFiles = testFiles;
+		this.anacrusisFiles = anacrusisFiles;
+		this.useChannel = useChannel;
+	}
+	
+	@Override
+	public MetricalLpcfgGenerator call() throws InterruptedException {
+		return MetricalLpcfgGeneratorRunner.generateGrammar(testFiles, anacrusisFiles, useChannel);
 	}
 }

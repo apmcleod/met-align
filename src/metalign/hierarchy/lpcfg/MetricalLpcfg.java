@@ -9,7 +9,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -61,14 +60,19 @@ public class MetricalLpcfg implements Serializable {
 	}
 	
 	/**
-	 * Create a new grammar, used by the {@link #deepCopy()} method.
+	 * Create a new grammar, used by the {@link #deepCopy()} and {@link #shallowCopy()} methods.
 	 * 
 	 * @param lpcfg The old grammar this one is to be a copy of.
+	 * @param deep True if this is to be a deep copy. False otherwise.
 	 */
-	private MetricalLpcfg(MetricalLpcfg lpcfg) {
+	private MetricalLpcfg(MetricalLpcfg lpcfg, boolean deep) {
 		trees = new ArrayList<MetricalLpcfgTree>();
-		for (MetricalLpcfgTree tree : lpcfg.trees) {
-			trees.add(tree.deepCopy());
+		if (deep) {
+			for (MetricalLpcfgTree tree : lpcfg.trees) {
+				trees.add(tree.deepCopy());
+			}
+		} else {
+			trees.addAll(lpcfg.trees);
 		}
 		
 		probabilities = lpcfg.probabilities.deepCopy();
@@ -109,10 +113,10 @@ public class MetricalLpcfg implements Serializable {
 			
 			// p(head(nonterminal) | nonterminal, parentHeadLength)
 			// Only need for WEAK, all others equal to their parent head length always
-			if (nonterminal.getTypeString().startsWith("WEAK")) {
+			if (!(nonterminal instanceof MetricalLpcfgMeasure)) {
 				logProbability += probabilities.getHeadProbability(measure, typeString, parentHead, head, level);
 				
-			} else if (nonterminal instanceof MetricalLpcfgMeasure) {
+			} else {
 				// p(head(measure) | measure)
 				logProbability += probabilities.getMeasureHeadProbability(measure, head);
 			}
@@ -160,7 +164,9 @@ public class MetricalLpcfg implements Serializable {
 	 * @param tree A new tree we want to add to this grammar.
 	 */
 	public void addTree(MetricalLpcfgTree tree) {
-		trees.add(tree);
+		if (MetricalLpcfgGeneratorRunner.SAVE_TREES) {
+			trees.add(tree);
+		}
 		
 		try {
 			updateCounts(tree.getMeasure(), tree.getMeasure().getHead(), tree.getMeasure().getMeasure(), true);
@@ -201,8 +207,8 @@ public class MetricalLpcfg implements Serializable {
 			}
 			
 			// p(head(nonterminal) | nonterminal, parentHeadLength)
-			// Only need for weak, all others are equal to their parent head length always
-			if (nonterminal.getTypeString().startsWith("WEAK")) {
+			// Only need for non measures
+			if (!(nonterminal instanceof MetricalLpcfgMeasure)) {
 				if (adding) {
 					probabilities.addHead(measure, typeString, parentHead, head, level);
 				} else {
@@ -213,7 +219,7 @@ public class MetricalLpcfg implements Serializable {
 					}
 				}
 				
-			} else if (nonterminal instanceof MetricalLpcfgMeasure) {
+			} else {
 				// p(head(measure) | measure)
 				if (adding) {
 					probabilities.addMeasureHead(measure, head);
@@ -232,20 +238,13 @@ public class MetricalLpcfg implements Serializable {
 			}
 		}
 	}
-
 	/**
 	 * Get a Set of the Measures which are contained in any tree from within this lpcfg.
 	 * 
 	 * @return The Set of the Measures which are in this grammar.
 	 */
 	public Set<Measure> getMeasures() {
-		Set<Measure> measures = new HashSet<Measure>();
-		
-		for (MetricalLpcfgTree tree : trees) {
-			measures.add(tree.getMeasure().getMeasure());
-		}
-		
-		return measures;
+		return probabilities.getMeasures();
 	}
 	
 	/**
@@ -267,12 +266,36 @@ public class MetricalLpcfg implements Serializable {
 	}
 	
 	/**
+	 * Merge the given other grammar into this one.
+	 * 
+	 * @param other The grammar to merge into this one.
+	 */
+	public void mergeGrammar(MetricalLpcfg other) {
+		// Don't use addTree() here because that also updates probabilities.
+		// We do it separately in case the other grammar was built with -x (i.e. has no trees).
+		for (MetricalLpcfgTree tree : other.getTrees()) {
+			trees.add(tree);
+		}
+		
+		probabilities.merge(other.getProbabilityTracker());
+	}
+	
+	/**
 	 * Get a deep copy of this grammar.
 	 * 
 	 * @return A deep copy of this grammar.
 	 */
 	public MetricalLpcfg deepCopy() {
-		return new MetricalLpcfg(this);
+		return new MetricalLpcfg(this, true);
+	}
+	
+	/**
+	 * Get a shallow copy of this grammar.
+	 * 
+	 * @return A shallow copy of this grammar.
+	 */
+	public MetricalLpcfg shallowCopy() {
+		return new MetricalLpcfg(this, false);
 	}
 	
 	@Override

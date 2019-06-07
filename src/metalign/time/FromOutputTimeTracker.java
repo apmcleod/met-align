@@ -102,7 +102,7 @@ public class FromOutputTimeTracker extends TimeTracker {
      * 
      * @return A List of the 32nd-note Beats of this TimeTracker until the given tick.
      */
-    public List<Beat> getBeats() {
+    public List<Beat> getTatums() {
     	return fixBeatsGivenSubBeatLength(beats, subBeatLength);
     }
     

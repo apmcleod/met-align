@@ -68,7 +68,7 @@ public class ArgumentException extends Exception {
 
 	@Override
 	public String getLocalizedMessage() {
-		StringBuilder sb = new StringBuilder("BeatTracking: Argument error: ");
+		StringBuilder sb = new StringBuilder("metalign: Argument error: ");
 		
 		sb.append(messageHeader).append('\n');
 		
@@ -79,18 +79,18 @@ public class ArgumentException extends Exception {
 		sb.append("-P = Use super verbose printing.\n");
 		sb.append("-l = Print logging (time, hypothesis count, and notes at each step).\n");
 		sb.append("-J = Run with incremental joint processing.\n");
-		sb.append("-VClass = Use the given class for voice separation. (FromFile (default) or Hmm)\n");
-		sb.append("-BClass = Use the given class for beat tracking. (FromFile (default) or Hmm).\n");
-		sb.append("-HClass = Use the given class for hierarchy detection. (FromFile (default) or lpcfg).\n");
-		sb.append("-g FILE = Load a grammar in from the given file. Used only with -Hlpcfg.\n");
+		sb.append("-BClass = Use the given class for beat tracking. (FromFile or Hmm (default)).\n");
+		sb.append("-HClass = Use the given class for hierarchy detection. (FromFile or lpcfg (default)).\n");
+		sb.append("-g FILE = Load a grammar in from the given file. Used only with -Hlpcfg. Can merge multiple grammars with multiple -g.\n");
 		sb.append("-x = Extract the trees of the song for testing from the loaded grammar when testing. Used only with -Hlpcfg.\n");
-		sb.append("-e = Extend each note within each voice to the next note's onset.\n");
-		sb.append("-m INT = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
-		sb.append("-b INT = Use INT as the beam size.\n");
-		sb.append("-v INT = Use INT as the voice beam size.\n");
+		sb.append("-e = Extend each note within each voice to the next note's onset (default, left in for backwards compatability).\n");
+		sb.append("-f = DO NOT extend each note.\n");
+		sb.append("-m INT = For beat tracking and hierarchy detection, throw out notes whose length is shorter than INT microseconds, once extended. (default = 100000)\n");
+		sb.append("-s INT = Use INT as the sub beat length. (default = 4)\n");
+		sb.append("-b INT = Use INT as the beam size (default = 200).\n");
 		sb.append("-E FILE = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
+		sb.append("-L DOUBLE = Set the local grammar weight alpha. (default = 2/3)\n");
 		
 		return sb.toString();
 	}

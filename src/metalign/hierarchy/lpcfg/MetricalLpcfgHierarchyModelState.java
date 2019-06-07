@@ -46,6 +46,8 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		WRONG;
 	}
 	
+	public static double LOCAL_WEIGHT = 0.5;
+	
 	/**
 	 * Object to save tree log probabilities so as not to regenerate every time.
 	 */
@@ -81,6 +83,11 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 	 * The log probability of this hypothesis.
 	 */
 	private double logProbability;
+	
+	/**
+	 * The log probability of this hypothesis from its local grammar.
+	 */
+	private double localLogProb;
 	
 	/**
 	 * The measure number of the next subbeat to be shifted onto the stack.
@@ -153,6 +160,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		localGrammar = new MetricalLpcfg();
 		
 		logProbability = 0.0;
+		localLogProb = 0.0;
 		
 		measureNum = 0;
 		nextMeasureIndex = 0;
@@ -185,6 +193,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		wrongMatches = state.wrongMatches;
 		
 		logProbability = state.logProbability;
+		localLogProb = state.localLogProb;
 		
 		measureNum = state.measureNum;
 		measuresUsed = state.measuresUsed;
@@ -216,7 +225,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		hasBegun = new ArrayList<Boolean>(state.hasBegun);
 		
-		localGrammar = state.localGrammar.deepCopy();
+		localGrammar = state.localGrammar.shallowCopy();
 		
 		setVoiceState(state.voiceState);
 		setBeatState(state.beatState.deepCopy());
@@ -356,6 +365,10 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		}
 			
 		if (!isWrong() && isFullyMatched()) {
+			/*for (MetricalLpcfgTree tree : localGrammar.getTrees()) {
+				double logProb = localGrammar.getTreeLogProbability(tree);
+				localEntropy -= logProb * Math.exp(logProb);
+			}*/
 			newStates.add(this);
 				
 		} else if (Main.SUPER_VERBOSE) {
@@ -374,6 +387,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		
 		if (measuresUsed == 0) {
 			logProbability = 0.0;
+			localLogProb = 0.0;
 		}
 		
 		for (int voiceIndex = 0; voiceIndex < unfinishedNotes.size(); voiceIndex++) {
@@ -422,10 +436,16 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 				}
 				logProbability += logProb;
 				
-				if (MetricalLpcfgGeneratorRunner.VERBOSE) {
+				
+				if (LOCAL_WEIGHT != 0.0) {
 					if (tree == null) {
 						tree = MetricalLpcfgTreeFactory.makeTree(quantums, beatsPerMeasure, subBeatsPerBeat);
 					}
+					
+					if (!localGrammar.getTrees().isEmpty()) {
+						localLogProb += localGrammar.getTreeLogProbability(tree);
+					}
+					
 					localGrammar.addTree(tree);
 				}
 			}
@@ -469,7 +489,9 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 			
 			if (notes.contains(note)) {
 				
-				if (voice.getNumNotes() == 1) {
+				notes.remove(note);
+				
+				if (voice.isNew(note.getOnsetTime())) {
 					// This was a new voice
 					List<MidiNote> newNote = new ArrayList<MidiNote>();
 					newNote.add(note);
@@ -495,6 +517,46 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					
 					if (!isFullyMatched()) {
 						notesToCheck.get(voiceIndex).add(note);
+					}
+				}
+			}
+		}
+		
+		// PROBLEM!!
+		if (!notes.isEmpty()) {
+			for (MidiNote note : notes) {
+				for (int voiceIndex = 0; voiceIndex < voiceState.getVoices().size(); voiceIndex++) {
+					Voice voice = voiceState.getVoices().get(voiceIndex);
+					
+					if (voice.getNotes().contains(note)) {
+						if (voice.isNew(note.getOnsetTime())) {
+							// This was a new voice
+							List<MidiNote> newNote = new ArrayList<MidiNote>();
+							newNote.add(note);
+							unfinishedNotes.add(voiceIndex, newNote);
+							hasBegun.add(voiceIndex, Boolean.FALSE);
+							
+							if (!matches(MetricalLpcfgMatch.BEAT)) {
+								notesToCheckBeats.add(voiceIndex, new ArrayList<MidiNote>(newNote));
+							}
+							
+							if (!isFullyMatched()) {
+								newNote = new ArrayList<MidiNote>();
+								newNote.add(note);
+								notesToCheck.add(voiceIndex, newNote);
+							}
+							
+						} else {
+							unfinishedNotes.get(voiceIndex).add(note);
+							
+							if (!matches(MetricalLpcfgMatch.BEAT)) {
+								notesToCheckBeats.get(voiceIndex).add(note);
+							}
+							
+							if (!isFullyMatched()) {
+								notesToCheck.get(voiceIndex).add(note);
+							}
+						}
 					}
 				}
 			}
@@ -1021,7 +1083,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 
 	@Override
 	public double getScore() {
-		return logProbability;
+		return logProbability + LOCAL_WEIGHT * localLogProb;
 	}
 	
 	@Override
@@ -1110,7 +1172,7 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append(measure).append(" length=").append(subBeatLength).append(" anacrusis=").append(anacrusisLength);
-		sb.append(" Score=").append(logProbability);
+		sb.append(" Score=").append(logProbability).append(" + ").append(localLogProb).append(" = ").append(getScore());
 		
 		return sb.toString();
 	}

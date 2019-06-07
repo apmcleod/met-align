@@ -20,6 +20,7 @@ import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
 import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.joint.JointModelState;
+import metalign.parsing.MatchParser;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
 import metalign.parsing.XMLParser;
@@ -71,6 +72,11 @@ public class Evaluator {
 	private int subBeatsPerBeat;
 	
 	/**
+	 * Whether the given piece has a time signature change or not.
+	 */
+	private boolean hasTimeChange;
+	
+	/**
 	 * Create a new Evaluator from the given ground truth file. This performs all of the
 	 * parsing necessary to get the ground truth times, groupings, etc.
 	 * 
@@ -90,6 +96,7 @@ public class Evaluator {
 		
 		beatsPerBar = 1;
 		subBeatsPerBeat = 1;
+		hasTimeChange = false;
 
 		// Parse ground truth file
 		TimeTracker tt = new TimeTracker();
@@ -110,13 +117,30 @@ public class Evaluator {
 				beatsPerBar /= 3;
 				subBeatsPerBeat = 3;
 			}
+			
 			tatums = FromOutputTimeTracker.fixBeatsGivenSubBeatLength(tatums, Main.SUB_BEAT_LENGTH * subBeatsPerBeat);
+			
+		} else if (groundTruth.toString().endsWith(".match")) {
+			MatchParser match = new MatchParser(groundTruth);
+			match.run();
+			
+			tatums = match.getTatums();
+			
+			beatsPerBar = match.getMeasure().getBeatsPerMeasure();
+			subBeatsPerBeat = match.getMeasure().getSubBeatsPerBeat();
 			
 		} else {
 			groundTruthVoices = Runner.parseFile(groundTruth, nep, tt, useChannel).getGoldStandardVoices();
-			tatums = tt.getBeats();
 			
-			TimeSignature timeSig = tt.getNodeAtTime(tatums.get(0).getTime()).getTimeSignature();
+			tt.setFirstNoteTime(((NoteListGenerator) nep).getNoteList().get(0).getOnsetTime());
+			
+			tatums = tt.getTatums();
+			
+			if (tt.getAllTimeSignatures().size() != 1) {
+				hasTimeChange = true;
+			}
+			
+			TimeSignature timeSig = tt.getFirstTimeSignature();
 			Measure tmpMeasure = timeSig.getMetricalMeasure();
 			beatsPerBar = tmpMeasure.getBeatsPerMeasure();
 			subBeatsPerBeat = tmpMeasure.getSubBeatsPerBeat();
@@ -159,6 +183,10 @@ public class Evaluator {
 	
 				notes32PerBeat = tatumsPerBar / beatsPerBar;
 				notes32PerSubBeat = notes32PerBeat / subBeatsPerBeat;
+				
+				if (subBeatsPerBeat != this.subBeatsPerBeat || beatsPerBar != this.beatsPerBar) {
+					hasTimeChange = true;
+				}
 			}
 			
 			// Found a sub-beat
@@ -216,7 +244,7 @@ public class Evaluator {
 			groundTruthGroupings.add(new MetricalGrouping(downbeatTimes.get(i - 1), downbeatTimes.get(i)));
 		}
 	}
-	
+
 	/**
 	 * Evaluate the given JointModelState and return its evaluation String.
 	 * 
@@ -374,5 +402,9 @@ public class Evaluator {
 	
 	public Measure getHierarchy() {
 		return new Measure(beatsPerBar, subBeatsPerBeat);
+	}
+	
+	public boolean getHasTimeChange() {
+		return hasTimeChange;
 	}
 }

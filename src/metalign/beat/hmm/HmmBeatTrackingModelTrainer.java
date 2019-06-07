@@ -30,22 +30,7 @@ import metalign.utils.MidiNote;
 public class HmmBeatTrackingModelTrainer {
 	
 	/**
-	 * The main method for running training the beat-tracker parameters.
-	 * <p>
-	 * Usage: <code>java -cp bin metalign.beat.hmm.HmmBeatTrackingModelTrainer [ARGS] input1 [input2...]</code>
-	 * <p>
-	 * Where each input is either a file or a directory. Each file listed as input, and each file
-	 * beneath every directory listed as input (recursively) is read as input.
-	 * <p>
-	 * <blockquote>
-	 * ARGS:
-	 * <ul>
-	 *  <li><code>-T</code> = Use tracks as correct voice (instead of channels) *Only used for MIDI files.</li>
-	 *  <li><code>-s INT</code> = Use INT as the sub beat length.</li>
-	 *  <li><code>-X</code> = Input files are xml directories from CrestMusePEDB.</li>
-	 *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
-	 * </ul>
-	 * </blockquote>
+	 * The main method for running training the beat-tracker parameters. For help, run with no arguments.
 	 * 
 	 * @param args Arguments described above.
 	 */
@@ -207,7 +192,7 @@ public class HmmBeatTrackingModelTrainer {
 				}
 				
 				beats = tt.getBeatsOnly();
-				tatums = tt.getBeats();
+				tatums = tt.getTatums();
 			}
 			
 			if (!beats.isEmpty()) {
@@ -328,12 +313,12 @@ public class HmmBeatTrackingModelTrainer {
 		//System.out.println("Bar Change Count = " + barChangeCount);
 		//System.out.println("Tempo Diff Mean = " + tempoDiffMean);
 		//System.out.println("Tempo Diff St Dev = " + Math.sqrt(tempoDiffVariance));
-		System.out.println("Tempo Percent Diff Mean = " + tempoPercentDiffMean);
-		System.out.println("Tempo Percent Diff St Dev = " + Math.sqrt(tempoPercentDiffVariance));
-		System.out.println("Initial Tempo Mean = " + initialTempoMean);
-		System.out.println("Initial Tempo St Dev = " + Math.sqrt(initialTempoVariance));
-		System.out.println("Min Tempo = " + minTempo);
-		System.out.println("Max Tempo = " + maxTempo);
+		//System.out.println("Tempo Percent Diff Mean = " + tempoPercentDiffMean);
+		System.out.println("TEMPO_PERCENT_CHANGE_STD = " + Math.sqrt(tempoPercentDiffVariance));
+		System.out.println("INITIAL_TEMPO_MEAN = " + initialTempoMean);
+		System.out.println("INITIAL_TEMPO_STD = " + Math.sqrt(initialTempoVariance));
+		System.out.println("MINIMUM_TEMPO = " + minTempo);
+		System.out.println("MAXIMUM_TEMPO = " + maxTempo);
 		
 		//double barStdMean = barStdSum / barCount;
 		//double barStdVariance = barStdSumSquared / barCount - barStdMean * barStdMean;
@@ -344,15 +329,15 @@ public class HmmBeatTrackingModelTrainer {
 		//System.out.println("Bar Count = " + barCount);
 		//System.out.println("Bar Std Mean = " + barStdMean);
 		//System.out.println("Bar Std Std Dev = " + Math.sqrt(barStdVariance));
-		System.out.println("Evenness Mean = " + barPercentStdMean);
-		System.out.println("Evenness Std Dev = " + Math.sqrt(barPercentStdVariance));
+		System.out.println("BEAT_SPACING_MEAN = " + barPercentStdMean);
+		System.out.println("BEAT_SPACING_STD = " + Math.sqrt(barPercentStdVariance));
 		
 		double deviationMean = deviationSum / deviationCount;
 		double deviationVariance = deviationSumSquared / deviationCount - deviationMean * deviationMean;
 		
 		//System.out.println("Deviation Count = " + deviationCount);
 		//System.out.println("Deviation Mean = " + deviationMean);
-		System.out.println("Note Deviation Std Dev = " + Math.sqrt(deviationVariance));
+		System.out.println("NOTE_STD = " + Math.sqrt(deviationVariance));
 	}
 
 	/**
@@ -371,7 +356,7 @@ public class HmmBeatTrackingModelTrainer {
 		
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
 		sb.append("-X = Input files are xml directories from CrestMusePEDB.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
+		sb.append("-s INT = Use INT as the sub beat length. Defaults to 4.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		
 		System.err.println(sb.toString());
