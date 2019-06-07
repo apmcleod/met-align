@@ -1,5 +1,15 @@
 # Metrical Alignment
-This is the code and data from my 2019 ICASSP paper. If you use it, please cite it:
+This is the code and data from my 2018 ISMIR paper ([ismir2018](https://github.com/apmcleod/met-align/releases/tag/ismir2018)) and my 2019 ICASSP paper ([icassp2019](https://github.com/apmcleod/met-align/releases/tag/icassp2019)). The master branch currently contains the icassp code. If you use either, please cite it:
+
+```
+@inproceedings{McLeod:18b,
+  title={Meter detection and alignment of {MIDI} performance},
+  author={McLeod, Andrew and Steedman, Mark},
+  booktitle={International Society for Music Information Retrieval Conference (ISMIR)},
+  year={2018},
+  pages={113--119}
+}
+```
 
 ```
 @inproceedings{McLeod:19,
@@ -10,8 +20,6 @@ This is the code and data from my 2019 ICASSP paper. If you use it, please cite 
   pages={186--190}
 }
 ```
-
-If you are looking for the code from the 2018 ISMIR paper, see the branch [ismir2018](https://github.com/apmcleod/met-align/tree/ismir2018).
 
 ## Project Overview
 This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and a pre-trained grammar can be found in the `grammars` directory.
@@ -30,8 +38,6 @@ Once the class files are installed in the bin directory, the project can be run.
 Run the project from the command line as follows (with default settings):
 
 `$ java -cp bin metalign.Main -g grammar FILES`
-
- For example: `$ java -cp bin metalign.Main -g grammars/misc.lpcfg corpora/WTCInv/bach-0846-fugue.mid`
 
 `grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). YOu may include `-g` multiple times with different grammar files to create a joint grammar.
 `FILES` should be a list of 1 or more music files (MIDI/krn) or directories containing only music files. Any directory entered will be searched recursively for files.
