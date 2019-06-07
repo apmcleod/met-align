@@ -17,6 +17,13 @@ If you would like to use the code from the 2019 ICASSP paper, see the branch [ic
 ## Project Overview
 This is a model for meter detection and alignment from live performance MIDI data. Example corpora are found in the `corpora` directory, [anacrusis files](#anacrusis-files) are found in the `anacrusis` directory, and pre-trained grammars are found in the `grammars` directory.
 
+NOTE: In order to work well, the notes in the input MIDI files should be split into monophonic voices per MIDI channel. If they are not, the recommended way to do so is to use my [voice-splitting](https://github.com/apmcleod/voice-splitting) package, and run like this:
+
+`$ java -cp bin voicesplitting.voice.hmm.HmmVoiceSplittingTester -w voice FILES`
+(also add `-l` if the files are live performance).
+
+This will create new files with the extension ".voice" added to the end, with voice separation performed. Use these new .voice files as input for meter alignment.
+
 ## Documentation
 This document contains some basic examples and a general overview of how to use
 the classes in this project. All specific documentation for the code found in this
