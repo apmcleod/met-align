@@ -31,21 +31,7 @@ public class Evaluation {
 	public static boolean VERBOSE = false;
 
 	/**
-	 * The main method for evaluating results.
-	 * <p>
-	 * Usage: <code>java -cp bin metalign.utils.Evaluation ARGS</code>
-	 * <p>
-	 * <blockquote>
-	 * ARGS:
-	 * <ul>
-	 *  <li><code>-E FILE</code> = Evaluate the Main output (from std in) given the ground truth FILE.</li>
-	 *  <li><code>-F</code> = Calculate means and standard deviations of the -E FILE results (read from std in).</li>
-	 *  <li><code>-w INT</code> = Use the given INT as the window length for accepted grouping matches, in microseconds.</li>
-	 *  <li><code>-T</code> = Use tracks as correct voice (instead of channels) *Only used for MIDI files.</li>
-	 *  <li><code>-s INT</code> = Use INT as the sub beat length.</li>
-	 *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
-	 * </ul>
-	 * </blockquote>
+	 * The main method for evaluating results. Run with no arguments to print help.
 	 * 
 	 * @param args The arguments, described above.
 	 * @throws InterruptedException
@@ -264,7 +250,7 @@ public class Evaluation {
 		sb.append("-F = Calculate means and standard deviations of the -E FILE results (read from std in).\n");
 		sb.append("-w INT = Use the given INT as the window length for accepted grouping matches, in microseconds.\n");
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
+		sb.append("-s INT = Use INT as the sub beat length. Defaults to 4.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-G FILE = Generate our output format from Temperley's output format (from Standard in), given the ground truth file FILE.\n");
 		sb.append("-n FILE = Generate a notefile (for input to Temperley) from the given FILE.\n");

@@ -68,19 +68,24 @@ public class HmmBeatTrackingModelParameters {
 	 * Create a new beat tracking model with default parameters.
 	 */
 	public HmmBeatTrackingModelParameters() {
+		//From Here until the next comment can be replaced with the trained values
 		TEMPO_PERCENT_CHANGE_STD = 0.0743;
 		
 		BEAT_SPACING_STD = 0.0336;
 		BEAT_SPACING_MEAN = 0.0181;
-		BEAT_SPACING_NORM_FACTOR = 0.5 + BEAT_SPACING_MEAN / BEAT_SPACING_STD * MathUtils.getStandardNormal(BEAT_SPACING_MEAN, BEAT_SPACING_MEAN, BEAT_SPACING_STD);
 		
 		NOTE_STD = 6655;
 		
-		MINIMUM_TEMPO = 400000; // 400 milliseconds
-		MAXIMUM_TEMPO = 3000000; // 3000 milliseconds
+		MINIMUM_TEMPO = 400000;
+		MAXIMUM_TEMPO = 3000000;
 		
 		INITIAL_TEMPO_MEAN = 1088500;
 		INITIAL_TEMPO_STD = 709918;
+		// Replace above here with the trained values
+		
+		
+		// Below this line should not be changed!!
+		BEAT_SPACING_NORM_FACTOR = 0.5 + BEAT_SPACING_MEAN / BEAT_SPACING_STD * MathUtils.getStandardNormal(BEAT_SPACING_MEAN, BEAT_SPACING_MEAN, BEAT_SPACING_STD);
 		
 		MAGNETISM_BEAT = 1.0;
 		MAGNETISM_SUB_BEAT = 0.5;

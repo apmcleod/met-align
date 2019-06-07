@@ -6,7 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -18,7 +17,6 @@ import javax.sound.midi.InvalidMidiDataException;
 
 import metalign.Main;
 import metalign.Runner;
-import metalign.beat.Beat;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.joint.JointModel;
@@ -28,7 +26,6 @@ import metalign.parsing.NoteListGenerator;
 import metalign.time.NoteBTimeTracker;
 import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
-import metalign.utils.MidiNote;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
 
 /**
@@ -42,32 +39,13 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static boolean TESTING = false;
 	public static boolean LEXICALIZATION = true;
 	public static int NUM_PROCS = 1;
-	public static double QUANTIZATION_THRESHOLD = 0.9;
 	public static boolean SAVE_TREES = true;
 
 	/**
-	 * The main method for generating an LPCFG grammar file.
-	 * <p>
-	 * Usage: <code>java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner [ARGS] input1 [input2...]</code>
-	 * <p>
-	 * Where each input is either a file or a directory. Each file listed as input, and each file
-	 * beneath every directory listed as input (recursively) is read as input.
-	 * <p>
-	 * <blockquote>
-	 * ARGS:
-	 * <ul>
-	 *  <li><code>-g FILE</code> = Write the grammar out to the given FILE.</li>
-	 *  <li><code>-v</code> = Use verbose printing.</li>
-	 *  <li><code>-T</code> = Use tracks as correct voice (instead of channels) *Only used for MIDI files.</li>
-	 *  <li><code>-l</code> = Do NOT use lexicalisation.</li>
-	 *  <li><code>-e</code> = Extend each note within each voice to the next note's onset.</li>
-	 *  <li><code>-m INT</code> = Throw out notes whose length is shorter than INT microseconds, once extended.</li>
-	 *  <li><code>-s INT</code> = Use INT as the sub beat length.</li>
-	 *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
-	 * </ul>
-	 * </blockquote>
+	 * The main method for generating an LPCFG grammar file. Run with no args to print help.
 	 * 
-	 * @param args The args as described above.
+	 * @param args The args as described.
+	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
 	 * @throws ExecutionException 
@@ -151,24 +129,16 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 							Main.EXTEND_NOTES = true;
 							break;
 							
+						case 'f':
+							Main.EXTEND_NOTES = false;
+							break;
+							
 						case 'g':
 							generate = true;
 							if (args.length <= ++i) {
 								argumentError("No File used with -g");
 							}
 							exportModelFile = new File(args[i]);
-							break;
-							
-						case 'q':
-							i++;
-							if (args.length == i) {
-								argumentError("No quantization threshold given for -q option.");
-							}
-							try {
-								QUANTIZATION_THRESHOLD = Double.parseDouble(args[i]);
-							} catch (NumberFormatException e) {
-								argumentError("Exception reading quantization threshold. Must be a double: " + args[i]);
-							}
 							break;
 							
 						case 'a':
@@ -317,12 +287,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				continue;
 			}
 			
-			double alignmentScore = getAlignmentScore(nlg, tt);
-			if (alignmentScore < QUANTIZATION_THRESHOLD) {
-				System.err.println("Poor alignment with beats detected (" + alignmentScore + "). Skipping song " + file);
-				continue;
-			}
-			
 			// RUN!
 			JointModel jm;
 			try {
@@ -356,41 +320,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		}
 		
 		return generator;
-	}
-	
-	/**
-	 * Get the alignment score of a song given a NoteListGenerator and a TimeTracker. A song's
-	 * alignment score is 1 minus the average distance each note's onset away from the nearest
-	 * tatum location, measured as a percentage of the tatum length at that point.
-	 * 
-	 * @param nlg The NoteListGenerator.
-	 * @param tt The TimeTracker.
-	 * @return The alignment score.
-	 */
-	private static double getAlignmentScore(NoteListGenerator nlg, TimeTracker tt) {
-		List<Beat> tatums = tt.getTatums();
-		if (tatums.size() <= 1) {
-			return 0.0;
-		}
-		
-		Iterator<Beat> tatumIterator = tatums.iterator();
-		Beat prevTatum = tatumIterator.next();
-		Beat currentTatum = tatumIterator.next();
-		
-		double totalError = 0.0;
-		for (MidiNote note : nlg.getNoteList()) {
-			long time = note.getOnsetTime();
-			
-			while (time > currentTatum.getTime() && tatumIterator.hasNext()) {
-				prevTatum = currentTatum;
-				currentTatum = tatumIterator.next();
-			}
-			
-			long diff = Math.min(Math.abs(time - prevTatum.getTime()), Math.abs(currentTatum.getTime() - time));
-			totalError += ((double) diff) / ((double) (currentTatum.getTime() - prevTatum.getTime()));
-		}
-		
-		return 1.0 - totalError / nlg.getNoteList().size();
 	}
 
 	/**
@@ -438,13 +367,12 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		sb.append("-v = Use verbose printing.\n");
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
 		sb.append("-l = Do NOT use lexicalisation.\n");
-		sb.append("-e = Extend each note within each voice to the next note's onset.\n");
-		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
+		sb.append("-f = Do NOT extend each note within each voice to the next note's onset.\n");
+		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended. Defaults to 100000.\n");
+		sb.append("-s INT = Use INT as the sub beat length. Defaults to 4.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-p INT = Run multi-threaded with the given number of processes.\n");
-		sb.append("-q DOUBLE = Skip songs with a quantization score less than the given threshold (default=0.9).\n");
-		sb.append("-x = Do not save trees in the grammar file (saves memory, cannot extract when testing).");
+		sb.append("-x = Do NOT save trees in the grammar file (saves memory, cannot extract when testing).");
 		
 		System.err.println(sb.toString());
 		System.exit(1);
