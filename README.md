@@ -6,7 +6,7 @@ This is the code and data from my 2018 ISMIR paper. If you use it, please cite i
 @inproceedings{McLeod:18b,
   title={Meter detection and alignment of {MIDI} performance},
   author={McLeod, Andrew and Steedman, Mark},
-  booktitle={{ISMIR}},
+  booktitle={International Society for Music Information Retrieval Conference (ISMIR)},
   year={2018},
   pages={113--119}
 }
