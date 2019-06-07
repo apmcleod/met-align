@@ -32,7 +32,7 @@ Run the project from the command line as follows:
 
 `$ java -cp bin metalign.Main ARGS Files` 
 
- Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid`
+ Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -s 4 -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid`
 
 Files should be a list of 1 or more music files (MIDI/krn) or directories containing only music
 files. Any directory entered will be searched recursively for files.
@@ -58,9 +58,9 @@ ARGS:
  
  Usage examples:
  
- Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid -l`
+ Standard usage: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -s 4 -e -m 100000 -x -a anacrusis -b 200 corpora/WTCInv/bach-0846-fugue.mid -l`
  
- Incremental joint: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -e -m 100000 -x -a anacrusis -b 200 -v 5 corpora/WTCInv/bach-0846-fugue.mid -l`
+ Incremental joint: `$ java -cp bin metalign.Main -BHmm -HLpcfg -g grammars/WTCInvMiscq4e.m100000.lpcfg -s 4 -e -m 100000 -x -a anacrusis -b 200 -v 5 corpora/WTCInv/bach-0846-fugue.mid -l`
  
  
 ### Generating an LPCFG Grammar File
