@@ -39,7 +39,9 @@ Run the project from the command line as follows (with default settings):
 
 `$ java -cp bin metalign.Main -g grammar FILES`
 
-`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). YOu may include `-g` multiple times with different grammar files to create a joint grammar.
+For example: `$ java -cp bin metalign.Main -g grammars/misc.lpcfg corpora/WTCInv/invent1.mid`
+
+`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). You may include `-g` multiple times with different grammar files to create a joint grammar.
 `FILES` should be a list of 1 or more music files (MIDI/krn) or directories containing only music files. Any directory entered will be searched recursively for files.
 
 Arguments to change settings:
@@ -98,7 +100,7 @@ Additional arguments:
  Some pre-trained grammars are included in the grammars directory:
  
   * `misc.lpcfg`: Trained on corpora/misc/perf
-  * `WTCInv.lpcfg`: Trained on corpora/WTCInv with -a anacrusis.
+  * `WTCInv.lpcfg`: Trained on corpora/WTCInv with -a anacrusis. (When testing on WTCInv, use `-a anacrusis -x`.
 
 ### Training the Beat Tracking HMM
 The parameters for the beat tracking HMM must be set manually after an automatic training run. It can be trained as follows:  
