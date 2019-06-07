@@ -93,10 +93,6 @@ public class JointModelState extends MidiModelState {
 		if (newVoiceStates == null) {
 			newVoiceStates = new ArrayList<VoiceSplittingModelState>(voiceState.handleIncoming(notes));
 			
-			if (Main.VOICE_BEAM_SIZE != -1 && newVoiceStates.size() > Main.VOICE_BEAM_SIZE) {
-				newVoiceStates.subList(Main.VOICE_BEAM_SIZE, newVoiceStates.size()).clear();
-			}
-			
 			jointModel.newVoiceStates.put(voiceState, newVoiceStates);
 		}
 		
@@ -227,9 +223,6 @@ public class JointModelState extends MidiModelState {
 		List<VoiceSplittingModelState> newVoiceStates = jointModel.newVoiceStates.get(voiceState);
 		if (newVoiceStates == null) {
 			newVoiceStates = new ArrayList<VoiceSplittingModelState>(voiceState.close());
-			if (Main.VOICE_BEAM_SIZE != -1 && newVoiceStates.size() > Main.VOICE_BEAM_SIZE) {
-				newVoiceStates.subList(Main.VOICE_BEAM_SIZE, newVoiceStates.size()).clear();
-			}
 			jointModel.newVoiceStates.put(voiceState, newVoiceStates);
 		}
 		

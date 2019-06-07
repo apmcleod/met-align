@@ -31,12 +31,12 @@ public class Runner {
 	/**
 	 * The default beat tracker to use.
 	 */
-	public static final String DEFAULT_BEAT_TRACKER = "FromFile";
+	public static final String DEFAULT_BEAT_TRACKER = "Hmm";
 	
 	/**
 	 * The default hierarchy model to use.
 	 */
-	public static final String DEFAULT_HIERARCHY_MODEL = "FromFile";
+	public static final String DEFAULT_HIERARCHY_MODEL = "Lpcfg";
 
 	/**
 	 * Parse the given file with the given objects. Use this method if you don't know specifically whether
