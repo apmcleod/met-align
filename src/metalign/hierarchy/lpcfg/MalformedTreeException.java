@@ -30,4 +30,9 @@ public class MalformedTreeException extends Exception {
 	public String getLocalizedMessage() {
 		return "Malformed Tree Exception: " + message;
 	}
+	
+	@Override
+	public String getMessage() {
+		return getLocalizedMessage();
+	}
 }

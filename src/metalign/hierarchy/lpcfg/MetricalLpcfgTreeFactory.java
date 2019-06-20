@@ -19,6 +19,8 @@ import metalign.utils.MidiNote;
  * @author Andrew McLeod - 25 April, 2016
  */
 public class MetricalLpcfgTreeFactory {
+	private static int SUB_BEAT_LENGTH = Main.SUB_BEAT_LENGTH;
+	
 	/**
 	 * Private constructor to ensure that no factory is instantiated.
 	 */
@@ -111,29 +113,29 @@ public class MetricalLpcfgTreeFactory {
 			// No sub-beats given, try splitting into both 2 and 3.
 			
 			// Try in 2
-			List<Long> timesIn2 = new ArrayList<Long>(Main.SUB_BEAT_LENGTH * 2);
+			List<Long> timesIn2 = new ArrayList<Long>(SUB_BEAT_LENGTH * 2);
 			
-			double diff = ((double) nextTime - beatBeats.get(0).getTime()) / (Main.SUB_BEAT_LENGTH * 2);
+			double diff = ((double) nextTime - beatBeats.get(0).getTime()) / (SUB_BEAT_LENGTH * 2);
 			if (nextTime == Long.MAX_VALUE) {
 				// Fix for no following bar: keep previous bar's tatum length 
 				diff = beatBeats.get(0).getTime() - prevTimeReturn.get(0);
 			}
 			
-			for (int i = 0; i < Main.SUB_BEAT_LENGTH * 2; i++) {
+			for (int i = 0; i < SUB_BEAT_LENGTH * 2; i++) {
 				timesIn2.add(Math.round(beatBeats.get(0).getTime() + i * diff));
 			}
 			MetricalLpcfgNode in2 = makeBeat(prevTimeReturn.get(0), timesIn2, nextTime, beatNotes, hasStarted);
 			
 			// Try in 3
-			List<Long> timesIn3 = new ArrayList<Long>(Main.SUB_BEAT_LENGTH * 3);
+			List<Long> timesIn3 = new ArrayList<Long>(SUB_BEAT_LENGTH * 3);
 			
-			diff = ((double) nextTime - beatBeats.get(0).getTime()) / (Main.SUB_BEAT_LENGTH * 3);
+			diff = ((double) nextTime - beatBeats.get(0).getTime()) / (SUB_BEAT_LENGTH * 3);
 			if (nextTime == Long.MAX_VALUE) {
 				// Fix for no following bar: keep previous bar's tatum length 
 				diff = beatBeats.get(0).getTime() - prevTimeReturn.get(0);
 			}
 			
-			for (int i = 0; i < Main.SUB_BEAT_LENGTH * 3; i++) {
+			for (int i = 0; i < SUB_BEAT_LENGTH * 3; i++) {
 				timesIn3.add(Math.round(beatBeats.get(0).getTime() + i * diff));
 			}
 			MetricalLpcfgNode in3 = makeBeat(prevTimeReturn.get(0), timesIn3, nextTime, beatNotes, hasStarted);
@@ -190,9 +192,11 @@ public class MetricalLpcfgTreeFactory {
 		}
 		
 		if (subBeatIndices.size() != 2 && subBeatIndices.size() != 3) {
-			throw new MalformedTreeException("Expected 2 or 3 sub-beats per bar, but only given "
+			throw new MalformedTreeException("Expected 2 or 3 sub-beats per bar, but given "
 					+ subBeatIndices.size() + " (from beat tracker).");
 		}
+		
+		// TODO: Ignore given subbeats ?
 		
 		// Go through each sub-beat, creating its times
 		List<Long> times = new ArrayList<Long>();
@@ -200,12 +204,12 @@ public class MetricalLpcfgTreeFactory {
 			int numAnchors = (subBeatNum == subBeatIndices.size() - 1 ? beatBeats.size() : subBeatIndices.get(subBeatNum + 1))
 					- subBeatIndices.get(subBeatNum);
 			
-			if (Main.SUB_BEAT_LENGTH % numAnchors != 0) {
+			if (SUB_BEAT_LENGTH % numAnchors != 0) {
 				throw new MalformedTreeException("The number of anchor points between consecutive sub-beats (" + numAnchors +
-						", from beat tracker) does not divide Main.SUB_BEAT_LENGTH (" + Main.SUB_BEAT_LENGTH + ")");
+						", from beat tracker) does not divide SUB_BEAT_LENGTH (" + SUB_BEAT_LENGTH + ")");
 			}
 			
-			int tatumsBetweenAnchors = Main.SUB_BEAT_LENGTH / numAnchors;
+			int tatumsBetweenAnchors = SUB_BEAT_LENGTH / numAnchors;
 			// Pre-load this to allow for saving previous tatum in case of nextTime = Long.MAX_VALUE
 			double diff = beatBeats.get(0).getTime() - prevTimeReturn.get(0);
 			
@@ -248,6 +252,9 @@ public class MetricalLpcfgTreeFactory {
 	 */
 	private static MetricalLpcfgNode makeBeat(long prevTime, List<Long> times, long nextTime,
 			List<MidiNote> notes, boolean hasStarted) {
+		
+		// TODO: Try with 3 or 4 tatums per bar
+		
 		MetricalLpcfgNonterminal beat = new MetricalLpcfgNonterminal(MetricalLpcfgLevel.BEAT);
 		
 		List<MetricalLpcfgQuantum> quantums = new ArrayList<MetricalLpcfgQuantum>(Collections.nCopies(times.size(),
@@ -292,10 +299,10 @@ public class MetricalLpcfgTreeFactory {
 		}
 		
 		// Can't reduce to 1. Make each sub-beat individually.
-		int numSubBeats = quantums.size() / Main.SUB_BEAT_LENGTH;
-		for (int subBeatIndex = 0; subBeatIndex < quantums.size(); subBeatIndex += Main.SUB_BEAT_LENGTH) {
+		int numSubBeats = quantums.size() / SUB_BEAT_LENGTH;
+		for (int subBeatIndex = 0; subBeatIndex < quantums.size(); subBeatIndex += SUB_BEAT_LENGTH) {
 			MetricalLpcfgNonterminal subBeat = new MetricalLpcfgNonterminal(MetricalLpcfgLevel.SUB_BEAT);
-			subBeat.addChild(new MetricalLpcfgTerminal(quantums.subList(subBeatIndex, subBeatIndex + Main.SUB_BEAT_LENGTH), 1, numSubBeats));
+			subBeat.addChild(new MetricalLpcfgTerminal(quantums.subList(subBeatIndex, subBeatIndex + SUB_BEAT_LENGTH), 1, numSubBeats));
 			
 			beat.addChild(subBeat);
 		}
