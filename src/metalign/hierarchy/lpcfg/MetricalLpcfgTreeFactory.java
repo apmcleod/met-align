@@ -106,6 +106,8 @@ public class MetricalLpcfgTreeFactory {
 	private static MetricalLpcfgNode makeBeat(Measure measure, List<Long> prevTimeReturn, List<Beat> beatBeats,
 			long nextTime, List<MidiNote> beatNotes, boolean hasStarted) throws MalformedTreeException {
 		
+		// TODO: Allow for duple and triplet in different sub beats of the same beat?
+		
 		// Try splitting into both 2 and 3.
 		
 		// Try in 2

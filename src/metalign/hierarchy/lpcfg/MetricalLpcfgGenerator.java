@@ -54,13 +54,25 @@ public class MetricalLpcfgGenerator {
 		// Get notes for each voice
 		List<List<MidiNote>> notes = new ArrayList<List<MidiNote>>();
 		for (Voice voice : topHypothesis.getVoiceState().getVoices()) {
-			notes.add(voice.getNotes());
+			
+			List<MidiNote> voiceNotes = new ArrayList<MidiNote>();
+			notes.add(voiceNotes);
+			long prevOnset = -Main.MIN_NOTE_LENGTH;
+			
+			for (MidiNote note : voice.getNotes()) {
+				if (Main.MIN_NOTE_LENGTH == -1 || note.getOnsetTime() - prevOnset >= Main.MIN_NOTE_LENGTH) {
+					voiceNotes.add(note);
+				}
+				prevOnset = note.getOnsetTime();
+			}
 		}
 		
 		// Go through each voice, creating its trees
 		for (List<MidiNote> voice : notes) {
 			for (MetricalLpcfgTree tree : parseVoice(voice, beats, downbeatIndices, tt)) {
 				grammar.addTree(tree);
+				
+				System.out.println(tree.toStringPretty(" "));
 			}
 		}
 	}

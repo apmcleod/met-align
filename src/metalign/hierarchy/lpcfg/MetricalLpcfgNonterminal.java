@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import metalign.utils.MathUtils;
+
 /**
  * A <code>MetricalLpcfgNonterminal</code> is an internal node in a metrical lpcfg tree.
  * 
@@ -217,8 +219,28 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	public List<MetricalLpcfgQuantum> getQuantum() {
 		List<MetricalLpcfgQuantum> quantum = new ArrayList<MetricalLpcfgQuantum>();
 		
+		// Calculate LCM
+		int lcm = 1;
 		for (MetricalLpcfgNode child : children) {
-			quantum.addAll(child.getQuantum());
+			lcm = child.getQuantum().size() * lcm / MathUtils.getGCF(lcm, child.getQuantum().size());
+		}
+		
+		// Concatenate children quantums, scaled up to LCM length
+		for (MetricalLpcfgNode child : children) {
+			List<MetricalLpcfgQuantum> childQuantum = child.getQuantum();
+			
+			int toAdd = lcm / childQuantum.size();
+			
+			if (toAdd != 1) {
+				System.out.println("Interesting");
+			}
+			
+			for (MetricalLpcfgQuantum q : childQuantum) {
+				quantum.add(q);
+				for (int i = 1; i < toAdd; i++) {
+					quantum.add(q == MetricalLpcfgQuantum.REST ? MetricalLpcfgQuantum.REST : MetricalLpcfgQuantum.TIE);
+				}
+			}
 		}
 		
 		return quantum;
