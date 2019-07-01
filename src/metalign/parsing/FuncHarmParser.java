@@ -101,6 +101,7 @@ public class FuncHarmParser implements EventParser {
 				
 			case "Chord":
 				try {
+					@SuppressWarnings("unused")
 					Chord chord = parseChord(lineSplit[1]);
 				} catch (IOException e) {
 					System.err.println(e.getMessage());
@@ -159,8 +160,6 @@ public class FuncHarmParser implements EventParser {
 	 */
 	private static MidiNote parseNote(String noteString) throws IOException {
 		String[] noteSplit = noteString.split(",");
-		
-		// pitch, onset, offset
 		
 		if (noteSplit.length != 3) {
 			throw new IOException("Malformed note string. Should have 3 comma-separated fields: " + noteString);
