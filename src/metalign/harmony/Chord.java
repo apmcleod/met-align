@@ -1,8 +1,11 @@
 package metalign.harmony;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * A <code>Chord</code> object represents a single chord at some time. Chords are naturally ordered by
- * increasing onset time, then increasing offset time, then increasing tonic, then quality (arbitrary
+ * increasing onset time, then increasing offset time, then increasing root, then quality (arbitrary
  * but consistent).
  * 
  * @author Andrew McLeod
@@ -28,6 +31,34 @@ public class Chord implements Comparable<Chord> {
 	}
 	
 	/**
+	 * The default vocabulary reduction for the chord qualities, down to the 4 triads.
+	 */
+	public static Map<ChordQuality, ChordQuality> DEFAULT_VOCAB_MAP = createDefaultVocabMap();
+	
+	/**
+	 * Create the default chord reduction vocabulary, down to the 4 triads.
+	 * 
+	 * @return The default chord quality reduction.
+	 */
+	public static Map<ChordQuality, ChordQuality> createDefaultVocabMap() {
+		Map<ChordQuality, ChordQuality> defaultMap = new HashMap<ChordQuality, ChordQuality>();
+		
+		defaultMap.put(ChordQuality.NO_CHORD, ChordQuality.NO_CHORD);
+		defaultMap.put(ChordQuality.MAJOR, ChordQuality.MAJOR);
+		defaultMap.put(ChordQuality.MINOR, ChordQuality.MINOR);
+		defaultMap.put(ChordQuality.AUGMENTED, ChordQuality.AUGMENTED);
+		defaultMap.put(ChordQuality.DIMINISHED, ChordQuality.DIMINISHED);
+		defaultMap.put(ChordQuality.AUGMENTED_6, ChordQuality.AUGMENTED);
+		defaultMap.put(ChordQuality.DOMINANT_7, ChordQuality.MAJOR);
+		defaultMap.put(ChordQuality.MAJOR_7, ChordQuality.MAJOR);
+		defaultMap.put(ChordQuality.MINOR_7, ChordQuality.MINOR);
+		defaultMap.put(ChordQuality.DIMINISHED_7, ChordQuality.DIMINISHED);
+		defaultMap.put(ChordQuality.HALF_DIMINISHED_7, ChordQuality.DIMINISHED);
+		
+		return defaultMap;
+	}
+	
+	/**
 	 * The onset time of this chord, in microseconds.
 	 */
 	private final long onsetTime;
@@ -38,9 +69,9 @@ public class Chord implements Comparable<Chord> {
 	private final long offsetTime;
 	
 	/**
-	 * The tonic (base note) of this chord.
+	 * The root (base note) of this chord.
 	 */
-	private final int tonic;
+	private final int root;
 	
 	/**
 	 * The quality of the chord (major, minor, diminished, etc.)
@@ -52,13 +83,13 @@ public class Chord implements Comparable<Chord> {
 	 * 
 	 * @param onset {@link #onsetTime}
 	 * @param offset {@link #offsetTime}
-	 * @param tonic {@link #tonic}
+	 * @param root {@link #root}
 	 * @param quality {@link #quality}
 	 */
-	public Chord(long onset, long offset, int tonic, ChordQuality quality) {
+	public Chord(long onset, long offset, int root, ChordQuality quality) {
 		onsetTime = onset;
 		offsetTime = offset;
-		this.tonic = tonic;
+		this.root = root;
 		this.quality = quality;
 	}
 	
@@ -78,7 +109,7 @@ public class Chord implements Comparable<Chord> {
 			return value;
 		}
 		
-		value = Integer.compare(tonic, o.tonic);
+		value = Integer.compare(root, o.root);
 		if (value != 0) {
 			return value;
 		}

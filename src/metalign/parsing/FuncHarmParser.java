@@ -4,14 +4,21 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.sound.midi.InvalidMidiDataException;
 
+import metalign.Runner;
 import metalign.harmony.Chord;
 import metalign.harmony.Chord.ChordQuality;
 import metalign.time.FuncHarmTimeTracker;
 import metalign.utils.MidiNote;
+import metalign.voice.Voice;
+import metalign.voice.VoiceSplittingModel;
+import metalign.voice.hmm.HmmVoiceSplittingModel;
+import metalign.voice.hmm.HmmVoiceSplittingModelParameters;
 
 /**
  * A <code>FuncHarmParser</code> parses a text file derived from the Beethoven piano sonata dataset from [1].
@@ -25,9 +32,14 @@ import metalign.utils.MidiNote;
 public class FuncHarmParser implements EventParser {
 	
 	/**
-	 * The note event parser to send notes to.
+	 * The chord vocabulary reduction.
 	 */
-	private final NoteEventParser nep;
+	private Map<ChordQuality, ChordQuality> vocab;
+	
+	/**
+	 * The note list generator to send notes to.
+	 */
+	private final NoteListGenerator nlg;
 	
 	/**
 	 * The time tracker to send beats and downbeats to.
@@ -56,10 +68,12 @@ public class FuncHarmParser implements EventParser {
 	 * @param tt {@link #tt}
 	 * @param nep {@link #nep}
 	 */
-	public FuncHarmParser(File funcHarmFile, FuncHarmTimeTracker tt, NoteEventParser nep) {
+	public FuncHarmParser(File funcHarmFile, FuncHarmTimeTracker tt, NoteListGenerator nlg) {
 		this.funcHarmFile = funcHarmFile;
 		this.tt = tt;
-		this.nep = nep;
+		this.nlg = nlg;
+		
+		vocab = Chord.DEFAULT_VOCAB_MAP;
 	}
 
 	@Override
@@ -113,8 +127,8 @@ public class FuncHarmParser implements EventParser {
 				try {
 					MidiNote note = parseNote(lineSplit[1]);
 					firstNoteTime = Long.min(firstNoteTime, note.getOnsetTime());
-					nep.noteOn(note.getPitch(), 100, note.getOnsetTime(), 0);
-					nep.noteOff(note.getPitch(), note.getOffsetTime(), 0);
+					nlg.noteOn(note.getPitch(), 100, note.getOnsetTime(), 0);
+					nlg.noteOff(note.getPitch(), note.getOffsetTime(), 0);
 				} catch (Exception e) {
 					System.err.println(e.getMessage());
 					System.err.println("Skipping line: " + line);
@@ -139,8 +153,24 @@ public class FuncHarmParser implements EventParser {
 			return groundTruthVoices;
 		}
 		
-		// TODO Run voice separation, default non-live settings
-		return null;
+		// Perform voice separation (once)
+		VoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters());
+		Runner.performInference(model, nlg);
+		
+		// Parse results and separate notes into voices (and add to ground truth voice lists)
+		List<Voice> voices = model.getHypotheses().first().getVoices();
+		groundTruthVoices = new ArrayList<List<MidiNote>>();
+		
+		for (int i = 0; i < voices.size(); i++) {
+			groundTruthVoices.add(voices.get(i).getNotes());
+			
+			for (MidiNote note : groundTruthVoices.get(i)) {
+				note.setCorrectVoice(i);
+				note.setGuessedVoice(i);
+			}
+		}
+		
+		return groundTruthVoices;
 	}
 
 	@Override
@@ -197,11 +227,11 @@ public class FuncHarmParser implements EventParser {
 	 * Create and return a Chord from a comma-separated chord String.
 	 * 
 	 * @param chordString The chord String, in the format: "onset,offset,tonic,quality". onset and offset are doubles,
-	 * tonic is an int between -1 and 11 (inclusive), and quality is a String.
-	 * @return The Chord object from the given String.
+	 * tonic is an int between 0 and 11 (inclusive), and quality is a String.
+	 * @return The Chord object from the given String, with its quality reduced given {@link #vocab}.
 	 * @throws IOException If the chord String is somehow malformed.
 	 */
-	private static Chord parseChord(String chordString) throws IOException {
+	private Chord parseChord(String chordString) throws IOException {
 		String[] chordSplit = chordString.split(",");
 		
 		if (chordSplit.length != 4) {
@@ -226,11 +256,11 @@ public class FuncHarmParser implements EventParser {
 		try {
 			tonic = Integer.parseInt(chordSplit[2]);
 		} catch (NumberFormatException e) {
-			throw new IOException("Malformed chord string. Third field should be tonic (int (-1)-11), but is: " + chordSplit[2]);
+			throw new IOException("Malformed chord string. Third field should be tonic (int 0-11), but is: " + chordSplit[2]);
 		}
 		
 		if (tonic < 0 || tonic > 11) {
-			throw new IOException("Malformed chord string. Third field should be tonic (int (-1)-11), but is: " + chordSplit[2]);
+			throw new IOException("Malformed chord string. Third field should be tonic (int 0-11), but is: " + chordSplit[2]);
 		}
 		
 		ChordQuality quality;
@@ -277,11 +307,9 @@ public class FuncHarmParser implements EventParser {
 			
 		default:
 			throw new IOException("Malformed chord string. Fourth filed (quality) not recognized " + chordSplit[3] + "\n" +
-									"Should be one of: M, m.");
+									"Should be one of: M, m, a, d, a6, D7, M7, m7, d7, h7.");
 		}
 		
-		// TODO: Reduce chord quality down to some vocabulary
-		
-		return new Chord(Math.round(onset * 1000000), Math.round(offset * 1000000), tonic, quality);
+		return new Chord(Math.round(onset * 1000000), Math.round(offset * 1000000), tonic, vocab.get(quality));
 	}
 }
