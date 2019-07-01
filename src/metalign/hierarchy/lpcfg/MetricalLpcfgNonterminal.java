@@ -231,10 +231,6 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 			
 			int toAdd = lcm / childQuantum.size();
 			
-			if (toAdd != 1) {
-				System.out.println("Interesting");
-			}
-			
 			for (MetricalLpcfgQuantum q : childQuantum) {
 				quantum.add(q);
 				for (int i = 1; i < toAdd; i++) {

@@ -70,9 +70,7 @@ public class MetricalLpcfgGenerator {
 		// Go through each voice, creating its trees
 		for (List<MidiNote> voice : notes) {
 			for (MetricalLpcfgTree tree : parseVoice(voice, beats, downbeatIndices, tt)) {
-				grammar.addTree(tree);
-				
-				System.out.println(tree.toStringPretty(" "));
+				grammar.addTree(tree);;
 			}
 		}
 	}
