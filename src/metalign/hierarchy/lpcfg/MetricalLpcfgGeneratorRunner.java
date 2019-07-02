@@ -23,8 +23,10 @@ import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
+import metalign.parsing.FuncHarmParser;
 import metalign.parsing.NoteBParser;
 import metalign.parsing.NoteListGenerator;
+import metalign.time.FuncHarmTimeTracker;
 import metalign.time.MidiTimeTracker;
 import metalign.time.NoteBTimeTracker;
 import metalign.time.TimeSignature;
@@ -47,28 +49,10 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static boolean SAVE_TREES = true;
 
 	/**
-	 * The main method for generating an LPCFG grammar file.
-	 * <p>
-	 * Usage: <code>java -cp bin metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner [ARGS] input1 [input2...]</code>
-	 * <p>
-	 * Where each input is either a file or a directory. Each file listed as input, and each file
-	 * beneath every directory listed as input (recursively) is read as input.
-	 * <p>
-	 * <blockquote>
-	 * ARGS:
-	 * <ul>
-	 *  <li><code>-g FILE</code> = Write the grammar out to the given FILE.</li>
-	 *  <li><code>-v</code> = Use verbose printing.</li>
-	 *  <li><code>-T</code> = Use tracks as correct voice (instead of channels) *Only used for MIDI files.</li>
-	 *  <li><code>-l</code> = Do NOT use lexicalisation.</li>
-	 *  <li><code>-e</code> = Extend each note within each voice to the next note's onset.</li>
-	 *  <li><code>-m INT</code> = Throw out notes whose length is shorter than INT microseconds, once extended.</li>
-	 *  <li><code>-s INT</code> = Use INT as the sub beat length.</li>
-	 *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
-	 * </ul>
-	 * </blockquote>
+	 * The main method for generating an LPCFG grammar file. Run with no args to print help.
 	 * 
-	 * @param args The args as described above.
+	 * @param args The args as described.
+	 * 
 	 * @throws InterruptedException
 	 * @throws IOException
 	 * @throws ExecutionException 
@@ -94,6 +78,18 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 					}
 					
 					switch (args[i].charAt(1)) {
+						case 's':
+							i++;
+							if (args.length == i) {
+								argumentError("No sub beat length given for -s option.");
+							}
+							try {
+								Main.SUB_BEAT_LENGTH = Integer.parseInt(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
+							}
+							break;
+							
 						case 'm':
 							i++;
 							if (args.length == i) {
@@ -138,6 +134,10 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 							
 						case 'e':
 							Main.EXTEND_NOTES = true;
+							break;
+							
+						case 'f':
+							Main.EXTEND_NOTES = false;
 							break;
 							
 						case 'g':
@@ -230,7 +230,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				grammar = generateGrammar(testFiles, anacrusisFiles, useChannel).getGrammar();
 			}
 			
-			System.out.println(grammar.getProbabilityTracker());
 			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
@@ -269,6 +268,12 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 					// NoteB
 					tt = new NoteBTimeTracker();
 					ep = new NoteBParser(file, nlg, (NoteBTimeTracker) tt);
+					ep.run();
+					
+				} else if (file.toString().endsWith(".txt")) {
+					// Functional txt
+					tt = new FuncHarmTimeTracker();
+					ep = new FuncHarmParser(file, (FuncHarmTimeTracker) tt, nlg);
 					ep.run();
 					
 				} else {
@@ -428,13 +433,12 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		sb.append("-v = Use verbose printing.\n");
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
 		sb.append("-l = Do NOT use lexicalisation.\n");
-		sb.append("-e = Extend each note within each voice to the next note's onset.\n");
-		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended.\n");
-		sb.append("-s INT = Use INT as the sub beat length.\n");
+		sb.append("-f = Do NOT extend each note within each voice to the next note's onset.\n");
+		sb.append("-m INT = Throw out notes whose length is shorter than INT microseconds, once extended. Defaults to 100000.\n");
+		sb.append("-s INT = Use INT as the sub beat length. Defaults to 4.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-p INT = Run multi-threaded with the given number of processes.\n");
-		sb.append("-q DOUBLE = Skip songs with a quantization score less than the given threshold (default=0.9).\n");
-		sb.append("-x = Do not save trees in the grammar file (saves memory, cannot extract when testing).");
+		sb.append("-x = Do NOT save trees in the grammar file (saves memory, cannot extract when testing).");
 		
 		System.err.println(sb.toString());
 		System.exit(1);
