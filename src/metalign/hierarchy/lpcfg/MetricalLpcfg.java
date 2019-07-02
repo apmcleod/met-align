@@ -59,14 +59,19 @@ public class MetricalLpcfg implements Serializable {
 	}
 	
 	/**
-	 * Create a new grammar, used by the {@link #deepCopy()} method.
+	 * Create a new grammar, used by the {@link #deepCopy()} and {@link #shallowCopy()} methods.
 	 * 
 	 * @param lpcfg The old grammar this one is to be a copy of.
+	 * @param deep True if this is to be a deep copy. False otherwise.
 	 */
-	private MetricalLpcfg(MetricalLpcfg lpcfg) {
+	private MetricalLpcfg(MetricalLpcfg lpcfg, boolean deep) {
 		trees = new ArrayList<MetricalLpcfgTree>();
-		for (MetricalLpcfgTree tree : lpcfg.trees) {
-			trees.add(tree.deepCopy());
+		if (deep) {
+			for (MetricalLpcfgTree tree : lpcfg.trees) {
+				trees.add(tree.deepCopy());
+			}
+		} else {
+			trees.addAll(lpcfg.trees);
 		}
 		
 		probabilities = lpcfg.probabilities.deepCopy();
@@ -281,7 +286,16 @@ public class MetricalLpcfg implements Serializable {
 	 * @return A deep copy of this grammar.
 	 */
 	public MetricalLpcfg deepCopy() {
-		return new MetricalLpcfg(this);
+		return new MetricalLpcfg(this, true);
+	}
+	
+	/**
+	 * Get a shallow copy of this grammar.
+	 * 
+	 * @return A shallow copy of this grammar.
+	 */
+	public MetricalLpcfg shallowCopy() {
+		return new MetricalLpcfg(this, false);
 	}
 	
 	@Override

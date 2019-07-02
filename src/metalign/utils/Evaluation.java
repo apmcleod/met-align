@@ -11,24 +11,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 
 import metalign.Main;
-import metalign.Runner;
 import metalign.beat.Beat;
-import metalign.beat.fromfile.FromFileBeatTrackingModelState;
 import metalign.hierarchy.Measure;
-import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
-import metalign.hierarchy.lpcfg.MetricalLpcfg;
-import metalign.hierarchy.lpcfg.MetricalLpcfgGenerator;
-import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
-import metalign.hierarchy.lpcfg.MetricalLpcfgHierarchyModelState;
-import metalign.hierarchy.lpcfg.MetricalLpcfgTree;
-import metalign.joint.JointModel;
-import metalign.parsing.EventParser;
-import metalign.parsing.NoteListGenerator;
 import metalign.parsing.OutputParser;
-import metalign.time.MidiTimeTracker;
-import metalign.time.TimeTracker;
 import metalign.voice.Voice;
-import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
 
 /**
  * The <code>Evaluation</code> can be used to perform global evaluation on some output file.
@@ -71,9 +57,6 @@ public class Evaluation {
 	public static void main(String[] args) throws InterruptedException, IOException, InvalidMidiDataException, ParserConfigurationException, SAXException {
 		List<File> anacrusisFiles = new ArrayList<File>();
 		boolean useChannel = true;
-		boolean joint = false;
-		List<File> grammarFiles = new ArrayList<File>();
-		MetricalLpcfg grammar = new MetricalLpcfg();
 		File groundTruth = null;
 		File file = null;
 		
@@ -174,36 +157,6 @@ public class Evaluation {
 							System.out.println(Temperley.getNoteFileString(file));
 							return;
 							
-						// Get Joint Ground Truth probability
-						case 'J':
-							joint = true;
-							i++;
-							if (args.length <= i) {
-								argumentError("No ground truth file given for -J option.");
-							}
-							if (groundTruth != null) {
-								argumentError("-E or -J option can only be given once.");
-							}
-							groundTruth = new File(args[i]);
-							if (!groundTruth.exists()) {
-								argumentError("Ground truth file " + groundTruth + " does not exist.");
-							}
-							break;
-							
-						// Load grammar (for -J)
-						case 'g':
-							i++;
-							if (args.length == i) {
-								argumentError("No grammar file given with -g option.");
-							}
-							grammarFiles.add(new File(args[i]));
-							try {
-								grammar.mergeGrammar(MetricalLpcfg.deserialize(grammarFiles.get(grammarFiles.size() - 1)));
-							} catch (Exception e) {
-								argumentError("Exception loading grammar file " + grammarFiles.get(grammarFiles.size() - 1) + ": " + e.getLocalizedMessage());
-							}
-							break;
-							
 						// Error
 						default:
 							argumentError("Unrecognized option: " + args[i]);
@@ -217,84 +170,10 @@ public class Evaluation {
 		}
 		
 		if (groundTruth != null) {
-			if (joint) {
-				if (grammarFiles.isEmpty()) {
-					argumentError("No grammar (-g) given with -J option.");
-				}
-				calculateJointGroundTruth(groundTruth, anacrusisFiles, useChannel, grammar);
-				
-			} else {
-				evaluateGroundTruth(groundTruth, anacrusisFiles, useChannel);
-			}
+			evaluateGroundTruth(groundTruth, anacrusisFiles, useChannel);
 		} else {
 			argumentError("No options given:");
 		}
-	}
-	
-	/**
-	 * Calculate and print the probability of the given ground truth beats and hierarchy
-	 * under a joint model.
-	 * 
-	 * @param groundTruth The ground truth file.
-	 * @param anacrusisFiles The anacrusis files.
-	 * @param useChannel Whether to use channel for MIDI.
-	 * @throws InterruptedException 
-	 * @throws InvalidMidiDataException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
-	 * @throws IOException 
-	 */
-	private static void calculateJointGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel, MetricalLpcfg grammar) throws IOException, ParserConfigurationException, SAXException, InvalidMidiDataException, InterruptedException {
-		MetricalLpcfg groundTruthGrammar = null;
-		
-		TimeTracker tt = new MidiTimeTracker();
-		tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(groundTruth, anacrusisFiles));
-		NoteListGenerator nlg = new NoteListGenerator();
-		
-		// PARSE!
-		EventParser ep = Runner.parseMidiFile(groundTruth, nlg, (MidiTimeTracker) tt, useChannel);
-			
-		// RUN!
-		JointModel jm = new JointModel(
-				new FromFileVoiceSplittingModelState(ep),
-				new FromFileBeatTrackingModelState(tt),
-				new FromFileHierarchyModelState(tt));
-		
-		Runner.performInference(jm, nlg);
-		
-		// GRAMMARIZE
-		MetricalLpcfgGenerator generator = new MetricalLpcfgGenerator();
-		generator.parseSong(jm, tt);
-		
-		groundTruthGrammar = generator.getGrammar();
-		
-		double grammarLogProb = 0.0;
-		double localGrammarLogProb = 0.0;
-		MetricalLpcfg localGrammar = new MetricalLpcfg();
-		
-		for (MetricalLpcfgTree tree : groundTruthGrammar.getTrees()) {
-			if (VERBOSE) {
-				System.out.println(tree.toStringPretty(" "));
-			}
-			double logProb = grammar.getTreeLogProbability(tree);
-			grammarLogProb += logProb;
-			
-			double localLogProb = 0.0;
-			if (!localGrammar.getTrees().isEmpty()) {
-				localLogProb = localGrammar.getTreeLogProbability(tree);
-				localGrammarLogProb += localLogProb;
-			}
-			localGrammar.addTree(tree);
-			
-			if (VERBOSE) {
-				System.out.println("Log probability = " + (logProb * MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT) + " + " + (localLogProb * (1.0 - MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT)));
-			}
-		}
-		System.out.println("Hierarchy log probability = " + (grammarLogProb * MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT) + " + " + (localGrammarLogProb * (1.0 - MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT)) + " = " +
-				(MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT * grammarLogProb + (1.0 - MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT) * localGrammarLogProb));
-		
-		// TODO: For beats, go through each bar, create a static method in HmmBeatTracker to calculate prob of tatums in beat (given previous tempo)
-		
 	}
 
 	/**

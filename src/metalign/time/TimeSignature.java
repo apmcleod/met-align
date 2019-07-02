@@ -54,6 +54,21 @@ public class TimeSignature {
 	}
 	
 	/**
+	 * Create a new TimeSignature with the given Measure type (sub beats per beat and beats per bar).
+	 * 
+	 * @param measure The measure type of this time signature.
+	 */
+	public TimeSignature(Measure measure) {
+		if (measure.getSubBeatsPerBeat() == 3) {
+			numerator = measure.getBeatsPerBar() * 3;
+			denominator = 8;
+		} else {
+			numerator = measure.getBeatsPerBar();
+			denominator = 4;
+		}
+	}
+
+	/**
 	 * Get the number of 32nd notes per measure at this time signature.
 	 * 
 	 * @return The number of 32nd notes per measure.

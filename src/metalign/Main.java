@@ -24,12 +24,10 @@ import metalign.hierarchy.lpcfg.MetricalLpcfgHierarchyModelState;
 import metalign.joint.JointModel;
 import metalign.joint.JointModelState;
 import metalign.parsing.EventParser;
-import metalign.parsing.MidiWriter;
 import metalign.parsing.NoteListGenerator;
 import metalign.time.MidiTimeTracker;
 import metalign.time.TimeTracker;
 import metalign.utils.Evaluator;
-import metalign.utils.MidiNote;
 import metalign.voice.VoiceSplittingModelState;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
 import metalign.voice.hmm.HmmVoiceSplittingModelParameters;
@@ -46,7 +44,7 @@ import metalign.voice.hmm.HmmVoiceSplittingModelState;
  */
 public class Main {
 	
-	public static boolean EXTEND_NOTES = false;
+	public static boolean EXTEND_NOTES = true;
 
 	public static boolean VERBOSE = false;
 	
@@ -62,7 +60,7 @@ public class Main {
 	
 	public static int VOICE_BEAM_SIZE = -1;
 	
-	public static int MIN_NOTE_LENGTH = -1;
+	public static int MIN_NOTE_LENGTH = 100000;
 	
 	public static int NUM_FROM_FILE = 0;
 	
@@ -117,7 +115,6 @@ public class Main {
 		File groundTruth = null;
 		MetricalLpcfg grammar = new MetricalLpcfg();
 		boolean extract = false;
-		boolean incrementalJoint = false;
 		
 		// No args given
 		if (args.length == 0) {
@@ -138,12 +135,20 @@ public class Main {
 							useChannel = false;
 							break;
 							
-						case 'J':
-							incrementalJoint = true;
-							break;
-							
 						case 'l':
 							LOG_STATUS = true;
+							break;
+							
+						case 's':
+							i++;
+							if (args.length == i) {
+								argumentError("No sub beat length given with -s option.");
+							}
+							try {
+								SUB_BEAT_LENGTH = Integer.parseInt(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
+							}
 							break;
 							
 						case 'm':
@@ -168,15 +173,19 @@ public class Main {
 							EXTEND_NOTES = true;
 							break;
 							
-						case 'G':
+						case 'f':
+							EXTEND_NOTES = false;
+							break;
+							
+						case 'L':
 							i++;
 							if (args.length == i) {
-								argumentError("No global weight given with -G option.");
+								argumentError("No local weight given with -L option.");
 							}
 							try {
-								MetricalLpcfgHierarchyModelState.GLOBAL_WEIGHT = Double.parseDouble(args[i]);
+								MetricalLpcfgHierarchyModelState.LOCAL_WEIGHT = Double.parseDouble(args[i]);
 							} catch (NumberFormatException e) {
-								argumentError("Exception reading global weight. Must be a double: " + args[i]);
+								argumentError("Exception reading local weight. Must be a double: " + args[i]);
 							}
 							break;
 							
@@ -201,27 +210,6 @@ public class Main {
 						case 'P':
 							SUPER_VERBOSE = true;
 							VERBOSE = true;
-							break;
-							
-						// Voice beam
-						case 'v':
-							i++;
-							if (args.length == i) {
-								argumentError("No voice beam size given with -v option.");
-							}
-							try {
-								VOICE_BEAM_SIZE = Integer.parseInt(args[i]);
-							} catch (NumberFormatException e) {
-								argumentError("Exception reading voice beam size. Must be an integer: " + args[i]);
-							}
-							break;
-							
-						// Voice separation class
-						case 'V':
-							if (args[i].length() == 2) {
-								argumentError("No Class given for -V. (There should be no space between -V and the Class name).");
-							}
-							voiceClass = args[i].substring(2);
 							break;
 							
 						// Beat tracking class
@@ -315,10 +303,6 @@ public class Main {
 		if (VERBOSE) {
 			System.out.println((SUPER_VERBOSE ? "Super " : "") + "Verbose mode");
 			
-			if (incrementalJoint) {
-				System.out.println("Incremental Joint processing");
-			}
-			
 			System.out.println((EVALUATOR == null ? "Not evaluating" : "Evaluating") + " hypotheses from ground truth " + groundTruth);
 			System.out.println("Using " + (useChannel ? "channels" : "tracks") + " for gold standard voices.");
 			System.out.println("Using beats input from Temperley Std in.");
@@ -337,8 +321,8 @@ public class Main {
 				System.out.println((extract ? "Extracting" : "Not extracting") + " trees from grammar");
 			}
 			
+			System.out.println("Using sub beat length " + SUB_BEAT_LENGTH);
 			System.out.println("Using beam size " + BEAM_SIZE);
-			System.out.println("Using voice beam size " + VOICE_BEAM_SIZE);
 			
 			System.out.println((EXTEND_NOTES ? "Extending" : "Not extending") + " notes through rests");
 			
@@ -346,150 +330,82 @@ public class Main {
 			System.out.println("Using anacrusis files: " + anacrusisFiles);
 		}
 		
-		if (incrementalJoint) {
-			for (File file : files) {
-				System.out.println("File: " + file);
+		// Test
+		for (File file : files) {
+			System.out.println("File: " + file);
+			
+			TimeTracker tt = new MidiTimeTracker();
+			tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
+			NoteListGenerator nlg = new NoteListGenerator();
+			EventParser ep;
+			
+			try {
+				ep = Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
 				
-				TimeTracker tt = new MidiTimeTracker();
-				NoteListGenerator nlg = new NoteListGenerator();
-				EventParser ep;
+			} catch (IOException | InvalidMidiDataException e) {
+				System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
 				
+				if (VERBOSE) {
+					e.printStackTrace();
+				}
+				
+				continue;
+			}
+			
+			tt.setFirstNoteTime(nlg.getNoteList().get(0).getOnsetTime());
+			if (tt.getAllTimeSignatures().size() != 1) {
+				System.err.println("Time change detected. Skipping song " + file);
+				continue;
+			}
+			
+			if (tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() < 2 || tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() > 4 ||
+					tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() > 3) {
+				System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() + "," +
+					tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() + "). Skipping song " + file);
+				continue;
+			}
+			
+			JointModel jm = null;
+			
+			if (grammar != null && extract) {
 				try {
-					ep = Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
-					
-				} catch (IOException | InvalidMidiDataException e) {
-					System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
+					grammar.extract(file, anacrusisFiles, useChannel);
+				} catch (IOException | InvalidMidiDataException
+						| MetricalLpcfgElementNotFoundException e) {
+					System.err.println("Error parsing file " + file +
+							" for grammar extraction:\n" + e.getLocalizedMessage());
 					
 					if (VERBOSE) {
 						e.printStackTrace();
 					}
 					
 					continue;
-				}
-				
-				if (grammar != null && extract) {
-					try {
-						grammar.extract(file, anacrusisFiles, useChannel);
-					} catch (IOException | InvalidMidiDataException
-							| MetricalLpcfgElementNotFoundException e) {
-						System.err.println("Error parsing file " + file +
-								" for grammar extraction:\n" + e.getLocalizedMessage());
-						
-						if (VERBOSE) {
-							e.printStackTrace();
-						}
-						
-						continue;
-					}
-				}
-				
-				JointModel jm = getJointModel(voiceClass, "FromFile", "FromFile", ep, tt, grammar);
-				
-				// Run with VOICE_BEAM as BEAM
-				TESTING = true;
-				int prevBeam = BEAM_SIZE;
-				BEAM_SIZE = VOICE_BEAM_SIZE;
-				Runner.performInference(jm, nlg);
-				BEAM_SIZE = prevBeam;
-				TESTING = false;
-				
-				JointModelState best = null;
-				double bestScore = Double.NEGATIVE_INFINITY;
-						
-				for (JointModelState jms : jm.getHypotheses()) {
-					
-					VoiceSplittingModelState voiceState = jms.getVoiceState();
-					
-					// Write file
-					File newFile = new File("tmp." + voiceState.hashCode() + ".mid");
-					MidiWriter voiceWriter = new MidiWriter(newFile, (MidiTimeTracker) tt);
-					
-					for (int i = 0; i < voiceState.getVoices().size(); i++) {
-						for (MidiNote note : voiceState.getVoices().get(i).getNotes()) {
-							MidiNote newNote = new MidiNote(note.getPitch(), note.getVelocity(), note.getOnsetTime(), i, 0);
-							newNote.close(note.getOffsetTime());
-							voiceWriter.addMidiNote(newNote);
-						}
-					}
-						
-					voiceWriter.write();
-					
-					TimeTracker newTt = new MidiTimeTracker();
-					NoteListGenerator newNlg = new NoteListGenerator();
-					EventParser newEp;
-					
-					try {
-						newEp = Runner.parseMidiFile(newFile, newNlg, (MidiTimeTracker) newTt, useChannel);
-						
-					} catch (IOException | InvalidMidiDataException e) {
-						System.err.println("Error parsing file " + newFile + " during incremental of " + file + ":\n" + e.getLocalizedMessage());
-						
-						if (VERBOSE) {
-							e.printStackTrace();
-						}
-						
-						return;
-					}
-					
-					newFile.delete();
-					
-					JointModel newJm = getJointModel("FromFile", beatClass, hierarchyClass, newEp, newTt, grammar);
-					
-					// Run
-					TESTING = true;
-					Runner.performInference(newJm, newNlg);
-					TESTING = false;
-					
-					if (!newJm.getHypotheses().isEmpty()) {
-						JointModelState bestJmsGuess = newJm.getHypotheses().first();
-						
-						if (bestJmsGuess.getScore() + voiceState.getScore() > bestScore) {
-							best = bestJmsGuess;
-							bestScore = bestJmsGuess.getScore() + voiceState.getScore();
-						}
-					}
-				}
-				
-				if (grammar != null && extract) {
-					try {
-						grammar.unextract(file, anacrusisFiles, useChannel);
-					} catch (IOException | InvalidMidiDataException e) {
-						System.err.println("Error parsing file " + file +
-								" for grammar extraction:\n" + e.getLocalizedMessage());
-						
-						if (VERBOSE) {
-							e.printStackTrace();
-						}
-						
-						continue;
-					}
-				}
-				
-				if (best == null) {
-					System.out.println("NONE");
-				} else {
-					System.out.println("Voices: " + best.getVoiceState());
-					System.out.println("Beats: " + best.getBeatState());
-					System.out.println("Hierarchy: " + best.getHierarchyState());
 				}
 			}
 			
-		} else {
-		
-			// Test
-			for (File file : files) {
-				System.out.println("File: " + file);
+			try {
+				jm = getJointModel(voiceClass, beatClass, hierarchyClass, ep, tt, grammar);
 				
-				TimeTracker tt = new MidiTimeTracker();
-				tt.setAnacrusis(MetricalLpcfgGeneratorRunner.getAnacrusisLength(file, anacrusisFiles));
-				NoteListGenerator nlg = new NoteListGenerator();
-				EventParser ep;
+			} catch (InvalidMidiDataException e) {
+				System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
 				
+				if (VERBOSE) {
+					e.printStackTrace();
+				}
+				
+				System.exit(1);
+			}
+			
+			TESTING = true;
+			Runner.performInference(jm, nlg);
+			TESTING = false;
+			
+			if (grammar != null && extract) {
 				try {
-					ep = Runner.parseMidiFile(file, nlg, (MidiTimeTracker) tt, useChannel);
-					
+					grammar.unextract(file, anacrusisFiles, useChannel);
 				} catch (IOException | InvalidMidiDataException e) {
-					System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
+					System.err.println("Error parsing file " + file +
+							" for grammar extraction:\n" + e.getLocalizedMessage());
 					
 					if (VERBOSE) {
 						e.printStackTrace();
@@ -497,97 +413,34 @@ public class Main {
 					
 					continue;
 				}
-				
-				tt.setFirstNoteTime(nlg.getNoteList().get(0).getOnsetTime());
-				if (tt.getAllTimeSignatures().size() != 1) {
-					System.err.println("Time change detected. Skipping song " + file);
-					continue;
-				}
-				
-				if (tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() < 2 || tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() > 4 ||
-						tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() > 3) {
-					System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() + "," +
-						tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() + "). Skipping song " + file);
-					continue;
-				}
-				
-				JointModel jm = null;
-				
-				if (grammar != null && extract) {
-					try {
-						grammar.extract(file, anacrusisFiles, useChannel);
-					} catch (IOException | InvalidMidiDataException
-							| MetricalLpcfgElementNotFoundException e) {
-						System.err.println("Error parsing file " + file +
-								" for grammar extraction:\n" + e.getLocalizedMessage());
-						
-						if (VERBOSE) {
-							e.printStackTrace();
-						}
-						
-						continue;
-					}
-				}
-				
-				try {
-					jm = getJointModel(voiceClass, beatClass, hierarchyClass, ep, tt, grammar);
-					
-				} catch (InvalidMidiDataException e) {
-					System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
-					
+			}
+			
+			if (VERBOSE || EVALUATOR != null) {
+				// Print all choices
+				for (JointModelState jms : jm.getHypotheses()) {
 					if (VERBOSE) {
-						e.printStackTrace();
+						System.out.println(jms.getVoiceState());
+						System.out.println(jms.getBeatState());
+						System.out.println(jms.getHierarchyState());
 					}
 					
-					System.exit(1);
-				}
-				
-				TESTING = true;
-				Runner.performInference(jm, nlg);
-				TESTING = false;
-				
-				if (grammar != null && extract) {
-					try {
-						grammar.unextract(file, anacrusisFiles, useChannel);
-					} catch (IOException | InvalidMidiDataException e) {
-						System.err.println("Error parsing file " + file +
-								" for grammar extraction:\n" + e.getLocalizedMessage());
-						
-						if (VERBOSE) {
-							e.printStackTrace();
-						}
-						
-						continue;
+					// Also print score for each
+					if (EVALUATOR != null) {
+						System.out.println("Voice prob: " + jms.getVoiceState().getScore());
+						System.out.println("Beats prob: " + jms.getBeatState().getScore());
+						System.out.println("Hierarchy: " + jms.getHierarchyState());
+						System.out.println(EVALUATOR.evaluate(jms));
 					}
 				}
 				
-				if (VERBOSE || EVALUATOR != null) {
-					// Print all choices
-					for (JointModelState jms : jm.getHypotheses()) {
-						if (VERBOSE) {
-							System.out.println(jms.getVoiceState());
-							System.out.println(jms.getBeatState());
-							System.out.println(jms.getHierarchyState());
-						}
-						
-						// Also print score for each
-						if (EVALUATOR != null) {
-							System.out.println("Voice prob: " + jms.getVoiceState().getScore());
-							System.out.println("Beats prob: " + jms.getBeatState().getScore());
-							System.out.println("Hierarchy: " + jms.getHierarchyState());
-							System.out.println(EVALUATOR.evaluate(jms));
-						}
-					}
-					
+			} else {
+				// Print only top choices
+				if (jm.getHypotheses().isEmpty()) {
+					System.out.println("NONE");
 				} else {
-					// Print only top choices
-					if (jm.getHypotheses().isEmpty()) {
-						System.out.println("NONE");
-					} else {
-						System.out.println("Voices: " + jm.getHypotheses().first().getVoiceState());
-						System.out.println("Beats: " + jm.getHypotheses().first().getBeatState());
-						System.out.println("Hierarchy: " + jm.getHypotheses().first().getHierarchyState());
-					}
+					System.out.println("Voices: " + jm.getHypotheses().first().getVoiceState());
+					System.out.println("Beats: " + jm.getHypotheses().first().getBeatState());
+					System.out.println("Hierarchy: " + jm.getHypotheses().first().getHierarchyState());
 				}
 			}
 		}
