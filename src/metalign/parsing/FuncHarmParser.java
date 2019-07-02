@@ -13,6 +13,7 @@ import javax.sound.midi.InvalidMidiDataException;
 import metalign.Runner;
 import metalign.harmony.Chord;
 import metalign.harmony.Chord.ChordQuality;
+import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.time.FuncHarmTimeTracker;
 import metalign.utils.MidiNote;
 import metalign.voice.Voice;
@@ -97,7 +98,7 @@ public class FuncHarmParser implements EventParser {
 			switch (lineSplit[0]) {
 			case "Beat":
 				try {
-					tt.addBeat(Math.round(Double.parseDouble(lineSplit[1]) * 1000000));
+					tt.addBeat(Math.round(Double.parseDouble(lineSplit[1]) * 500000));
 				} catch (NumberFormatException e) {
 					System.err.println("Beat line malformed. Should be \"Beat time\", but time not given as double.");
 					System.err.println("Skipping line: " + line);
@@ -106,7 +107,7 @@ public class FuncHarmParser implements EventParser {
 				
 			case "Downbeat":
 				try {
-					tt.addDownbeat(Math.round(Double.parseDouble(lineSplit[1]) * 1000000));
+					tt.addDownbeat(Math.round(Double.parseDouble(lineSplit[1]) * 500000));
 				} catch (NumberFormatException e) {
 					System.err.println("Downbeat line malformed. Should be \"Dowbnbeat time\", but time not given as double.");
 					System.err.println("Skipping line: " + line);
@@ -153,8 +154,12 @@ public class FuncHarmParser implements EventParser {
 			return groundTruthVoices;
 		}
 		
+		if (MetricalLpcfgGeneratorRunner.VERBOSE) {
+			System.out.println("Voice splitting...");
+		}
+		
 		// Perform voice separation (once)
-		VoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters());
+		VoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters(5));
 		Runner.performInference(model, nlg);
 		
 		// Parse results and separate notes into voices (and add to ground truth voice lists)
@@ -168,6 +173,10 @@ public class FuncHarmParser implements EventParser {
 				note.setCorrectVoice(i);
 				note.setGuessedVoice(i);
 			}
+		}
+		
+		if (MetricalLpcfgGeneratorRunner.VERBOSE) {
+			System.out.println("Done voice splitting.");
 		}
 		
 		return groundTruthVoices;
@@ -216,8 +225,8 @@ public class FuncHarmParser implements EventParser {
 			throw new IOException("Malformed note string. Third field should be offset time (a float), but is: " + noteSplit[2]);
 		}
 		
-		MidiNote note = new MidiNote(pitch, 100, Math.round(onset * 1000000), 0, 0);
-		note.close(Math.round(offset * 1000000));
+		MidiNote note = new MidiNote(pitch, 100, Math.round(onset * 500000), 0, 0);
+		note.close(Math.round(offset * 500000));
 		
 		return note;
 	}

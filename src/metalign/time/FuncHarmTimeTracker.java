@@ -147,7 +147,7 @@ public class FuncHarmTimeTracker extends TimeTracker {
 			
 			// Add new time signature (if has changed)
 			TimeSignature ts = new TimeSignature(new Measure(beatsPerBar, subBeatsPerBeat));
-			if (!ts.equals(timeSignatures.get(timeSignatures.size() - 1))) {
+			if (timeSignatures.isEmpty() || !ts.equals(timeSignatures.get(timeSignatures.size() - 1))) {
 				timeSignatures.add(ts);
 				timeSignatureTimes.add(beats.get(0));
 			}

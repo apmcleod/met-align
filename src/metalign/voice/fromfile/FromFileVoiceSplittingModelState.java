@@ -49,9 +49,6 @@ public class FromFileVoiceSplittingModelState extends VoiceSplittingModelState {
 			// Initialize
 			if (!voice.isEmpty()) {
 				newVoice = new Voice(voice.get(0));
-				if (voice.get(0).getOffsetTime() == 0L) {
-					throw new InvalidMidiDataException("No offset found for note " + voice.get(0));
-				}
 				
 				// Chain
 				for (int i = 1; i < voice.size(); i++) {

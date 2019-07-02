@@ -7,6 +7,7 @@ import java.util.List;
 import javax.sound.midi.InvalidMidiDataException;
 
 import metalign.generic.MidiModel;
+import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.parsing.MidiEventParser;
 import metalign.parsing.NoteEventParser;
 import metalign.parsing.NoteListGenerator;
@@ -68,6 +69,10 @@ public class Runner {
 	 */
 	public static void performInference(MidiModel model, NoteListGenerator nlg) {
 		for (List<MidiNote> incoming : nlg.getIncomingLists()) {
+			if (MetricalLpcfgGeneratorRunner.MIN_NUM_VOICES > 0 && incoming.size() > MetricalLpcfgGeneratorRunner.MIN_NUM_VOICES) {
+				incoming = incoming.subList(0, MetricalLpcfgGeneratorRunner.MIN_NUM_VOICES);
+			}
+			
 			model.handleIncoming(incoming);
 		}
 		

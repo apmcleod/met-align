@@ -74,6 +74,25 @@ public class HmmVoiceSplittingModelParameters implements Comparable<HmmVoiceSpli
 		this(25, 3E-8, 6, 806000, 6, 0.01);
 	}
 	
+	/**
+	 * Create new params with the given beam size and default beat-aligned values.
+	 * 
+	 * @param beam The beam size to use.
+	 */
+	public HmmVoiceSplittingModelParameters(int beam) {
+		this(beam, 1E-9, 6, 127000, 4, 8E-4);
+	}
+	
+	/**
+	 * Create new params with the given beam size and default live performance values.
+	 * 
+	 * @param beam The beam size to use.
+	 * @param live Unused.
+	 */
+	public HmmVoiceSplittingModelParameters(int beam, boolean live) {
+		this(beam, 3E-8, 6, 806000, 6, 0.01);
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (!(other instanceof HmmVoiceSplittingModelParameters)) {

@@ -47,6 +47,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static int NUM_PROCS = 1;
 	public static double QUANTIZATION_THRESHOLD = 0.9;
 	public static boolean SAVE_TREES = true;
+	public static int MIN_NUM_VOICES = -1;
 
 	/**
 	 * The main method for generating an LPCFG grammar file. Run with no args to print help.
@@ -171,6 +172,18 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 							anacrusisFiles.addAll(Main.getAllFilesRecursive(file));
 							break;
 							
+						case 'M':
+							i++;
+							if (args.length == i) {
+								argumentError("No minimum number of voices given with -M option.");
+							}
+							try {
+								MIN_NUM_VOICES = Integer.parseInt(args[i]);
+							} catch (NumberFormatException e) {
+								argumentError("Exception reading minimum number of voices. Must be an int: " + args[i]);
+							}
+							break;
+							
 						// Error
 						default:
 							argumentError("Unrecognized option: " + args[i]);
@@ -230,6 +243,9 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				grammar = generateGrammar(testFiles, anacrusisFiles, useChannel).getGrammar();
 			}
 			
+			System.out.println(grammar.getProbabilityTracker());
+			System.out.println("\n\n");
+			System.out.println(grammar.getTrees());
 			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
