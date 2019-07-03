@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -62,6 +63,11 @@ public class FuncHarmParser implements EventParser {
 	private List<List<MidiNote>> groundTruthVoices = null;
 	
 	/**
+	 * Boolean indicating whether the parsed notes included voices (true) or not (false).
+	 */
+	private boolean includesVoices;
+	
+	/**
 	 * Create a new parser with the given fields.
 	 * 
 	 * @param funcHarmFile The File to parse the piece from.
@@ -72,6 +78,8 @@ public class FuncHarmParser implements EventParser {
 		this.funcHarmFile = funcHarmFile;
 		this.tt = tt;
 		this.nlg = nlg;
+		
+		includesVoices = false;
 		
 		vocab = Chord.DEFAULT_VOCAB_MAP;
 	}
@@ -153,20 +161,38 @@ public class FuncHarmParser implements EventParser {
 			return groundTruthVoices;
 		}
 		
-		// Perform voice separation (once)
-		VoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters(5));
-		Runner.performInference(model, nlg);
-		
-		// Parse results and separate notes into voices (and add to ground truth voice lists)
-		List<Voice> voices = model.getHypotheses().first().getVoices();
-		groundTruthVoices = new ArrayList<List<MidiNote>>();
-		
-		for (int i = 0; i < voices.size(); i++) {
-			groundTruthVoices.add(voices.get(i).getNotes());
+		if (includesVoices) {
+			// Use given voices
+			groundTruthVoices = new ArrayList<List<MidiNote>>();
 			
-			for (MidiNote note : groundTruthVoices.get(i)) {
-				note.setCorrectVoice(i);
-				note.setGuessedVoice(i);
+			for (MidiNote note : nlg.getNoteList()) {
+				while (groundTruthVoices.size() < note.getCorrectVoice()) {
+					groundTruthVoices.add(new ArrayList<MidiNote>());
+				}
+				
+				groundTruthVoices.get(note.getCorrectVoice()).add(note);
+			}
+			
+			for (List<MidiNote> gT : groundTruthVoices) {
+	        	Collections.sort(gT);
+	        }
+			
+		} else {
+			// Perform voice separation (once)
+			VoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters(5));
+			Runner.performInference(model, nlg);
+			
+			// Parse results and separate notes into voices (and add to ground truth voice lists)
+			List<Voice> voices = model.getHypotheses().first().getVoices();
+			groundTruthVoices = new ArrayList<List<MidiNote>>();
+			
+			for (int i = 0; i < voices.size(); i++) {
+				groundTruthVoices.add(voices.get(i).getNotes());
+				
+				for (MidiNote note : groundTruthVoices.get(i)) {
+					note.setCorrectVoice(i);
+					note.setGuessedVoice(i);
+				}
 			}
 		}
 		
@@ -181,18 +207,18 @@ public class FuncHarmParser implements EventParser {
 	/**
 	 * Create and return a MidiNote from a comma-separated note String.
 	 * 
-	 * @param noteString The note String, in the format: "pitch,onset,offset". pitch is an int, and
+	 * @param noteString The note String, in the format: "pitch,onset,offset[,voice]". pitch is an int, and
 	 * onset and offset are doubles.
 	 * 
 	 * @return The parsed MidiNote.
 	 * 
 	 * @throws IOException If the note String is somehow malformed.
 	 */
-	private static MidiNote parseNote(String noteString) throws IOException {
+	private MidiNote parseNote(String noteString) throws IOException {
 		String[] noteSplit = noteString.split(",");
 		
-		if (noteSplit.length != 3) {
-			throw new IOException("Malformed note string. Should have 3 comma-separated fields: " + noteString);
+		if (noteSplit.length < 3 || noteSplit.length > 4) {
+			throw new IOException("Malformed note string. Should have 3 or 4 comma-separated fields: " + noteString);
 		}
 		
 		int pitch;
@@ -216,7 +242,17 @@ public class FuncHarmParser implements EventParser {
 			throw new IOException("Malformed note string. Third field should be offset time (a float), but is: " + noteSplit[2]);
 		}
 		
-		MidiNote note = new MidiNote(pitch, 100, Math.round(onset * 500000), 0, 0);
+		int voice = 0;
+		if (noteSplit.length == 4) {
+			includesVoices = true;
+			try {
+				voice = Integer.parseInt(noteSplit[3]);
+			} catch (NumberFormatException e) {
+				throw new IOException("Malformed note string. Fourth field (if included) should be voice (an int), but is: " + noteSplit[3]);
+			}
+		}
+		
+		MidiNote note = new MidiNote(pitch, 100, Math.round(onset * 500000), voice, voice);
 		note.close(Math.round(offset * 500000));
 		
 		return note;
