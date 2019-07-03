@@ -13,7 +13,6 @@ import javax.sound.midi.InvalidMidiDataException;
 import metalign.Runner;
 import metalign.harmony.Chord;
 import metalign.harmony.Chord.ChordQuality;
-import metalign.hierarchy.lpcfg.MetricalLpcfgGeneratorRunner;
 import metalign.time.FuncHarmTimeTracker;
 import metalign.utils.MidiNote;
 import metalign.voice.Voice;
@@ -154,10 +153,6 @@ public class FuncHarmParser implements EventParser {
 			return groundTruthVoices;
 		}
 		
-		if (MetricalLpcfgGeneratorRunner.VERBOSE) {
-			System.out.println("Voice splitting...");
-		}
-		
 		// Perform voice separation (once)
 		VoiceSplittingModel model = new HmmVoiceSplittingModel(new HmmVoiceSplittingModelParameters(5));
 		Runner.performInference(model, nlg);
@@ -173,10 +168,6 @@ public class FuncHarmParser implements EventParser {
 				note.setCorrectVoice(i);
 				note.setGuessedVoice(i);
 			}
-		}
-		
-		if (MetricalLpcfgGeneratorRunner.VERBOSE) {
-			System.out.println("Done voice splitting.");
 		}
 		
 		return groundTruthVoices;
