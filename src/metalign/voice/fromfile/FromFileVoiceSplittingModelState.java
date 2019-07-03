@@ -53,7 +53,7 @@ public class FromFileVoiceSplittingModelState extends VoiceSplittingModelState {
 				// Chain
 				for (int i = 1; i < voice.size(); i++) {
 					newVoice = new Voice(voice.get(i), newVoice);
-					if (voice.get(i).getOffsetTime() == 0L) {
+					if (voice.get(i).getOffsetTime() == -1L) {
 						throw new InvalidMidiDataException("No offset found for note " + voice.get(i));
 					}
 				}

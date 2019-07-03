@@ -9,11 +9,6 @@ import metalign.hierarchy.Measure;
  * @author Andrew McLeod - 11 Feb, 2015
  */
 public class TimeSignature {
-	
-	/**
-	 * The numerator used to signify an irregular meter. It can be used with any denominator (4, for example).
-	 */
-	public static final int IRREGULAR_NUMERATOR = Integer.MAX_VALUE / 32;
 
 	/**
 	 * The numerator of the time signature.
@@ -93,6 +88,17 @@ public class TimeSignature {
 	 */
 	public int getDenominator() {
 		return denominator;
+	}
+	
+	/**
+	 * Decide if this time signature is irregular. That is, if its numerator is not any of
+	 * 2, 3, 4, 5, 6, 9, or 12.
+	 * 
+	 * @return True if this time signature is irregular. False otherwise.
+	 */
+	public boolean isIrregular() {
+		return numerator != 2 && numerator != 3 && numerator != 4 && numerator != 6 &&
+			   numerator != 9 && numerator != 12;
 	}
 	
 	@Override

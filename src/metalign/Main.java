@@ -358,8 +358,7 @@ public class Main {
 				continue;
 			}
 			
-			if (tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() < 2 || tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() > 4 ||
-					tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() < 2 || tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() > 3) {
+			if (tt.getFirstTimeSignature().isIrregular()) {
 				System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getMeasure().getBeatsPerBar() + "," +
 					tt.getFirstTimeSignature().getMeasure().getSubBeatsPerBeat() + "). Skipping song " + file);
 				continue;

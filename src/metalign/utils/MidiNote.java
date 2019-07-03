@@ -59,7 +59,7 @@ public class MidiNote implements Comparable<MidiNote> {
 		this.velocity = velocity;
 		this.onsetTime = onsetTime;
 		this.correctVoice = correctVoice;
-		offsetTime = 0;
+		offsetTime = -1L;
 		this.guessedVoice = guessedVoice;
 	}
 	

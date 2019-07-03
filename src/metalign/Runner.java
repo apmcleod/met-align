@@ -2,6 +2,7 @@ package metalign;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.sound.midi.InvalidMidiDataException;
@@ -69,8 +70,19 @@ public class Runner {
 	 */
 	public static void performInference(MidiModel model, NoteListGenerator nlg) {
 		for (List<MidiNote> incoming : nlg.getIncomingLists()) {
-			if (MetricalLpcfgGeneratorRunner.MIN_NUM_VOICES > 0 && incoming.size() > MetricalLpcfgGeneratorRunner.MIN_NUM_VOICES) {
-				incoming = incoming.subList(0, MetricalLpcfgGeneratorRunner.MIN_NUM_VOICES);
+			if (MetricalLpcfgGeneratorRunner.MAX_NUM_NOTES > 0 && incoming.size() > MetricalLpcfgGeneratorRunner.MAX_NUM_NOTES) {
+				// Create reduced incoming list with fewer notes
+				List<MidiNote> reducedIncoming = new ArrayList<MidiNote>(MetricalLpcfgGeneratorRunner.MAX_NUM_NOTES);
+				
+				// Add lowest MAX / 2 notes (rounded up)
+				reducedIncoming.addAll(incoming.subList(0, (MetricalLpcfgGeneratorRunner.MAX_NUM_NOTES + 1) / 2));
+				
+				// Add highest notes to match desired size
+				int size = incoming.size();
+				reducedIncoming.addAll(incoming.subList(size - (MetricalLpcfgGeneratorRunner.MAX_NUM_NOTES - reducedIncoming.size()), size));
+				
+				// Set incoming to new reducedIncoming
+				incoming = reducedIncoming;
 			}
 			
 			model.handleIncoming(incoming);

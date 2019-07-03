@@ -132,22 +132,31 @@ public class FuncHarmTimeTracker extends TimeTracker {
 			int subBeatsPerBeat = 2;
 			int beatsPerBar = beats.size();
 			
+			// Fix for compound meters
+			if (beatsPerBar > 3 && beatsPerBar % 3 == 0) {
+				beatsPerBar /= 3;
+				subBeatsPerBeat = 3;
+			}
+
+			int anchorPoints = beats.size();
+			int anchorsPerBeat = anchorPoints / beatsPerBar;
+			
 			// Create anacrusis (once)
 			if (hasAnacrusis) {
 				timeSignatureTimes.add(anacrusisBeats.get(0));
 				timeSignatures.add(new TimeSignature(new Measure(beatsPerBar, subBeatsPerBeat)));
 				
-				for (int i = 0; i < anacrusisBeats.size(); i++) {
-					tatums.add(new Beat(-1, beatsPerBar - anacrusisBeats.size() + i, 0, 0, anacrusisBeats.get(i)));
+				for (int i = beatsPerBar - anacrusisBeats.size(); i < anchorPoints; i++) {
+					tatums.add(new Beat(-1, i / anchorsPerBeat, i % anchorsPerBeat, 0, anacrusisBeats.get(i)));
 				}
 				
 				// Don't create anacrusis again
 				hasAnacrusis = false;
 			}
 			
-			// Add new time signature (if has changed)
+			// Add new time signature (if has changed AND we aren't in the final bar)
 			TimeSignature ts = new TimeSignature(new Measure(beatsPerBar, subBeatsPerBeat));
-			if (timeSignatures.isEmpty() || !ts.equals(timeSignatures.get(timeSignatures.size() - 1))) {
+			if (timeSignatures.isEmpty() || (!ts.equals(timeSignatures.get(timeSignatures.size() - 1)) && downbeatIterator.hasNext())) {
 				timeSignatures.add(ts);
 				timeSignatureTimes.add(beats.get(0));
 			}
@@ -155,7 +164,7 @@ public class FuncHarmTimeTracker extends TimeTracker {
 			// Place beats
 			// TODO: Check how compound meters are done in dataset
 			for (int beatNum = 0; beatNum < beats.size(); beatNum++) {
-				tatums.add(new Beat(barNum, beatNum, 0, 0, beats.get(beatNum)));
+				tatums.add(new Beat(barNum, beatNum / anchorsPerBeat, beatNum % anchorsPerBeat, 0, beats.get(beatNum)));
 			}
 			
 			barNum++;

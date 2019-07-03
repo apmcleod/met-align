@@ -144,7 +144,10 @@ public class MetricalLpcfgGenerator {
 					if (!tree.isEmpty()) {
 						// hasStarted OR startsWithNoteOrTie
 						if (voice.get(0).getOnsetTime() < barBeats.get(0).getTime() || !tree.startsWithRest()) {
-							trees.add(tree);
+							// Skip bars with irregular meter. We had to do the calculation to update prevTime.
+							if (!tt.getTimeSignatureAtTime(barBeats.get(0).getTime()).isIrregular()) {
+								trees.add(tree);
+							}
 						}
 					}
 				} catch(MalformedTreeException e) {

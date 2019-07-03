@@ -1,9 +1,11 @@
 package metalign.hierarchy.lpcfg;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,7 +31,6 @@ import metalign.parsing.NoteListGenerator;
 import metalign.time.FuncHarmTimeTracker;
 import metalign.time.MidiTimeTracker;
 import metalign.time.NoteBTimeTracker;
-import metalign.time.TimeSignature;
 import metalign.time.TimeTracker;
 import metalign.utils.MidiNote;
 import metalign.voice.fromfile.FromFileVoiceSplittingModelState;
@@ -47,7 +48,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static int NUM_PROCS = 1;
 	public static double QUANTIZATION_THRESHOLD = 0.9;
 	public static boolean SAVE_TREES = true;
-	public static int MIN_NUM_VOICES = -1;
+	public static int MAX_NUM_NOTES = -1;
 
 	/**
 	 * The main method for generating an LPCFG grammar file. Run with no args to print help.
@@ -178,7 +179,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 								argumentError("No minimum number of voices given with -M option.");
 							}
 							try {
-								MIN_NUM_VOICES = Integer.parseInt(args[i]);
+								MAX_NUM_NOTES = Integer.parseInt(args[i]);
 							} catch (NumberFormatException e) {
 								argumentError("Exception reading minimum number of voices. Must be an int: " + args[i]);
 							}
@@ -244,8 +245,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			}
 			
 			System.out.println(grammar.getProbabilityTracker());
-			System.out.println("\n\n");
-			System.out.println(grammar.getTrees());
 			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
@@ -268,10 +267,10 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			fileNum++;
 			if (VERBOSE) {
 				if (NUM_PROCS != 1) {
-					System.out.print(Thread.currentThread().getId() + ": ");
+					System.out.println(Thread.currentThread().getId() + ": Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
+				} else {
+					System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 				}
-				
-				System.out.println("Parsing " + fileNum + "/" + midiFiles.size() + ": " + file);
 			}
 			
 			TimeTracker tt;
@@ -292,6 +291,16 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 					ep = new FuncHarmParser(file, (FuncHarmTimeTracker) tt, nlg);
 					ep.run();
 					
+					File newNotes = new File(file.toString() + ".notes");
+					BufferedWriter bw = new BufferedWriter(new FileWriter(newNotes));
+					for (List<MidiNote> voice : ep.getGoldStandardVoices()) {
+						for (MidiNote note : voice) {
+							bw.write("Note " + note.getPitch() + "," + ((double) note.getOnsetTime() / 500000.0) + "," + ((double) note.getOffsetTime() / 500000.0) + "," + note.getCorrectVoice());
+							bw.newLine();
+						}
+					}
+					bw.close();
+					
 				} else {
 					// Midi
 					tt = new MidiTimeTracker();
@@ -311,13 +320,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			
 			tt.setFirstNoteTime(nlg.getNoteList().get(0).getOnsetTime());
 			
-			if (tt.getFirstTimeSignature().getNumerator() == TimeSignature.IRREGULAR_NUMERATOR ||
-					(tt.getFirstTimeSignature().getNumerator() != 2 &&
-					tt.getFirstTimeSignature().getNumerator() != 3 &&
-					tt.getFirstTimeSignature().getNumerator() != 4 &&
-					tt.getFirstTimeSignature().getNumerator() != 6 &&
-					tt.getFirstTimeSignature().getNumerator() != 9 &&
-					tt.getFirstTimeSignature().getNumerator() != 12)) {
+			if (tt.getFirstTimeSignature().isIrregular()) {
 				System.err.println("Irregular meter detected (" + tt.getFirstTimeSignature().getNumerator() +
 						"). Skipping song " + file);
 				continue;
