@@ -166,7 +166,7 @@ public class FuncHarmParser implements EventParser {
 			groundTruthVoices = new ArrayList<List<MidiNote>>();
 			
 			for (MidiNote note : nlg.getNoteList()) {
-				while (groundTruthVoices.size() < note.getCorrectVoice()) {
+				while (groundTruthVoices.size() <= note.getCorrectVoice()) {
 					groundTruthVoices.add(new ArrayList<MidiNote>());
 				}
 				

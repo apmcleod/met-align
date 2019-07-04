@@ -1,11 +1,9 @@
 package metalign.hierarchy.lpcfg;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -290,16 +288,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 					tt = new FuncHarmTimeTracker();
 					ep = new FuncHarmParser(file, (FuncHarmTimeTracker) tt, nlg);
 					ep.run();
-					
-					File newNotes = new File(file.toString() + ".notes");
-					BufferedWriter bw = new BufferedWriter(new FileWriter(newNotes));
-					for (List<MidiNote> voice : ep.getGoldStandardVoices()) {
-						for (MidiNote note : voice) {
-							bw.write("Note " + note.getPitch() + "," + ((double) note.getOnsetTime() / 500000.0) + "," + ((double) note.getOffsetTime() / 500000.0) + "," + note.getCorrectVoice());
-							bw.newLine();
-						}
-					}
-					bw.close();
 					
 				} else {
 					// Midi
