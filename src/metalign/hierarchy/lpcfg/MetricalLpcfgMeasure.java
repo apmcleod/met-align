@@ -27,8 +27,8 @@ public class MetricalLpcfgMeasure extends MetricalLpcfgNonterminal implements Se
 	 * @param measure {@link #measure}
 	 */
 	public MetricalLpcfgMeasure(Measure measure) {
-		super(MetricalLpcfgLevel.MEASURE);
-		setType(MetricalLpcfgType.MEASURE);
+		super(MetricalLpcfgLevel.BAR);
+		setType(MetricalLpcfgType.BAR);
 		
 		this.measure = measure;
 	}

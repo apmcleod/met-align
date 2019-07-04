@@ -20,6 +20,7 @@ import metalign.Main;
 import metalign.Runner;
 import metalign.beat.Beat;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
+import metalign.harmony.ChordProbabilityTracker;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
@@ -47,6 +48,8 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static double QUANTIZATION_THRESHOLD = 0.9;
 	public static boolean SAVE_TREES = true;
 	public static int MAX_NUM_NOTES = -1;
+	
+	public static ChordProbabilityTracker cpt = new ChordProbabilityTracker();
 
 	/**
 	 * The main method for generating an LPCFG grammar file. Run with no args to print help.

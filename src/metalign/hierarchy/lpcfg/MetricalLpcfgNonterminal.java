@@ -26,7 +26,7 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 		/**
 		 * This is {@link MetricalLpcfgMeasure} (which should be at the head of the tree).
 		 */
-		MEASURE,
+		BAR,
 		
 		/**
 		 * This node's head length is less than none of its siblings' and greater than at least
@@ -54,7 +54,7 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 		/**
 		 * This node is at the measure level of a tree.
 		 */
-		MEASURE,
+		BAR,
 		
 		/**
 		 * This node is at the beat level of a tree.
@@ -153,7 +153,7 @@ public class MetricalLpcfgNonterminal implements MetricalLpcfgNode, Serializable
 	}
 	
 	/**
-	 * Get the String of the type of this node.
+	 * Get the String of the type of this node. That is, STRENGTH_LEVEL.
 	 * 
 	 * @return {@link #type}'s toString.
 	 */

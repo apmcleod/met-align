@@ -690,7 +690,7 @@ public class MetricalLpcfgProbabilityTracker implements Serializable {
 				measureKey = measure.getSubBeatsPerBeat() + "SB";
 				break;
 				
-			case MEASURE:
+			case BAR:
 				measureKey = measure.getBeatsPerBar() + "B";
 				break;
 		}
