@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import metalign.beat.Beat;
 import metalign.hierarchy.Measure;
@@ -73,9 +75,9 @@ public class ChordProbabilityTracker {
 		// Update maps
 		updateMaps(measure, "BAR", downbeatValue == 1, 1);
 		updateMaps(measure, "BEAT", true, beatValue);
-		updateMaps(measure, "BEAT", false, measure.getBeatsPerBar() - beatValue);
-		updateMaps(measure, "SUBBEAT", true, subBeatValue);
-		updateMaps(measure, "SUBBEAT", false, measure.getBeatsPerBar() * measure.getSubBeatsPerBeat() - subBeatValue);
+		updateMaps(measure, "BEAT", false, measure.getBeatsPerBar() - 1 - beatValue);
+		updateMaps(measure, "SUB_BEAT", true, subBeatValue);
+		updateMaps(measure, "SUB_BEAT", false, measure.getBeatsPerBar() * (measure.getSubBeatsPerBeat() - 1) - subBeatValue);
 		updateMaps(measure, "TATUM", true, tatumValue);
 		
 		// Next, check rhythmic-based changes
@@ -166,12 +168,17 @@ public class ChordProbabilityTracker {
 		for (Beat changeBeat : changeBeats) {
 			if (changeBeat.getBeat() == beat.getBeat() &&
 					changeBeat.getSubBeat() == beat.getSubBeat() && changeBeat.getTatum() == beat.getTatum()) {
+				if (!beat.isDownbeat()) {
+					change = true;
+				}
 				change = true;
 				break;
 			}
 		}
 		
-		updateMaps(measure, getKey(node), change, value);
+		for (String key : getKeys(node, beat, measure)) {
+			updateMaps(measure, key, change, value);
+		}
 	}
 	
 	/**
@@ -185,6 +192,11 @@ public class ChordProbabilityTracker {
 	 * @param value The value to add to the maps.
 	 */
 	private void updateMaps(Measure measure, String key, boolean change, double value) {
+		if (!counts.containsKey(measure)) {
+			counts.put(measure, new HashMap<String, Double>());
+			changes.put(measure, new HashMap<String, Double>());
+		}
+		
 		Map<String, Double> thisCounts = counts.get(measure);
 		Map<String, Double> thisChanges = changes.get(measure);
 		
@@ -208,19 +220,57 @@ public class ChordProbabilityTracker {
 	 * @return The type string (level and strength) of the given node. Or, the strength of the 1st beat
 	 * plus "_BAR" if this is a bar node.
 	 */
-	private String getKey(MetricalLpcfgNonterminal node) {
+	private List<String> getKeys(MetricalLpcfgNonterminal node, Beat beat, Measure measure) {
+		List<String> keys = new ArrayList<String>();
+		
 		switch (node.getLevel()) {
 		case BEAT:
-			return node.getTypeString();
+			keys.add("BEAT_" + node.getTypeString());
+			keys.add("BEAT_" + beat.getBeat() + "/" + measure.getBeatsPerBar());
+			keys.add("BEAT_" + beat.getBeat() + "/" + measure.getBeatsPerBar() + "_" + node.getTypeString());
+			break;
 			
 		case BAR:
-			return ((MetricalLpcfgNonterminal) node.getChildren().get(0)).getTypeString() + "_BAR";
+			keys.add("BAR_" + ((MetricalLpcfgNonterminal) node.getChildren().get(0)).getTypeString());
+			break;
 			
 		case SUB_BEAT:
-			return node.getTypeString();
+			keys.add("SUB_BEAT_" + node.getTypeString());
+			keys.add("SUB_BEAT_" + beat.getBeat() + "," + beat.getSubBeat() + "/" + measure.getSubBeatsPerBeat());
+			keys.add("SUB_BEAT_" + beat.getBeat() + "," + beat.getSubBeat() + "/" + measure.getSubBeatsPerBeat() + "_" + node.getTypeString());
+			break;
 			
 		default:
-			return "";
+			break;
 		}
+		
+		return keys;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		
+		Set<String> internalKeys = new TreeSet<String>();
+		
+		for (Measure measure : changes.keySet()) {
+			internalKeys.addAll(changes.get(measure).keySet());
+		}
+		
+		for (String internalKey : internalKeys) {
+			double count = 0.0;
+			double change = 0.0;
+			
+			for (Measure measure : changes.keySet()) {
+				if (changes.get(measure).containsKey(internalKey)) {
+					count += counts.get(measure).get(internalKey);
+					change += changes.get(measure).get(internalKey);
+				}
+			}
+			
+			sb.append(internalKey).append(": ").append(change).append(" / ").append(count).append(" = ").append(change / count).append('\n');
+		}
+		
+		return sb.toString();
 	}
 }

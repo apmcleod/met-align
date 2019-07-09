@@ -6,12 +6,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import javax.sound.midi.InvalidMidiDataException;
 
 import metalign.Runner;
+import metalign.beat.Beat;
 import metalign.harmony.Chord;
 import metalign.harmony.Chord.ChordQuality;
 import metalign.time.FuncHarmTimeTracker;
@@ -31,6 +35,8 @@ import metalign.voice.hmm.HmmVoiceSplittingModelParameters;
  * @author Andrew McLeod
  */
 public class FuncHarmParser implements EventParser {
+	
+	private static final int MICROS_PER_TICK = 500000;
 	
 	/**
 	 * The chord vocabulary reduction.
@@ -67,6 +73,8 @@ public class FuncHarmParser implements EventParser {
 	 */
 	private boolean includesVoices;
 	
+	private SortedSet<Chord> chords;
+	
 	/**
 	 * Create a new parser with the given fields.
 	 * 
@@ -80,6 +88,8 @@ public class FuncHarmParser implements EventParser {
 		this.nlg = nlg;
 		
 		includesVoices = false;
+		
+		chords = new TreeSet<Chord>();
 		
 		vocab = Chord.DEFAULT_VOCAB_MAP;
 	}
@@ -105,7 +115,7 @@ public class FuncHarmParser implements EventParser {
 			switch (lineSplit[0]) {
 			case "Beat":
 				try {
-					tt.addBeat(Math.round(Double.parseDouble(lineSplit[1]) * 500000));
+					tt.addBeat(Math.round(Double.parseDouble(lineSplit[1]) * MICROS_PER_TICK));
 				} catch (NumberFormatException e) {
 					System.err.println("Beat line malformed. Should be \"Beat time\", but time not given as double.");
 					System.err.println("Skipping line: " + line);
@@ -114,7 +124,7 @@ public class FuncHarmParser implements EventParser {
 				
 			case "Downbeat":
 				try {
-					tt.addDownbeat(Math.round(Double.parseDouble(lineSplit[1]) * 500000));
+					tt.addDownbeat(Math.round(Double.parseDouble(lineSplit[1]) * MICROS_PER_TICK));
 				} catch (NumberFormatException e) {
 					System.err.println("Downbeat line malformed. Should be \"Dowbnbeat time\", but time not given as double.");
 					System.err.println("Skipping line: " + line);
@@ -123,8 +133,9 @@ public class FuncHarmParser implements EventParser {
 				
 			case "Chord":
 				try {
-					@SuppressWarnings("unused")
 					Chord chord = parseChord(lineSplit[1]);
+					chords.add(chord);
+					
 				} catch (IOException e) {
 					System.err.println(e.getMessage());
 					System.err.println("Skipping line: " + line);
@@ -135,8 +146,8 @@ public class FuncHarmParser implements EventParser {
 				try {
 					MidiNote note = parseNote(lineSplit[1]);
 					firstNoteTime = Long.min(firstNoteTime, note.getOnsetTime());
-					nlg.noteOn(note.getPitch(), 100, note.getOnsetTime(), 0);
-					nlg.noteOff(note.getPitch(), note.getOffsetTime(), 0);
+					nlg.noteOn(note.getPitch(), 100, note.getOnsetTime(), note.getCorrectVoice());
+					nlg.noteOff(note.getPitch(), note.getOffsetTime(), note.getCorrectVoice());
 				} catch (Exception e) {
 					System.err.println(e.getMessage());
 					System.err.println("Skipping line: " + line);
@@ -153,6 +164,55 @@ public class FuncHarmParser implements EventParser {
 		}
 		
 		br.close();
+	}
+	
+	/**
+	 * Get a List of the Beats on which there is a chord change in the parsed song.
+	 * 
+	 * @return A List of the beats on which there is a chord change.
+	 */
+	public List<Beat> getChordChangeBeats() {
+		List<Beat> changes = new ArrayList<Beat>();
+		
+		List<Beat> beats = tt.getTatums();
+		Iterator<Chord> chordIterator = chords.iterator();
+		
+		// Skip 1st chord (not really a "change")
+		chordIterator.next();
+		
+		// No beats on which to change
+		if (beats.isEmpty()) {
+			return changes;
+		}
+		
+		int beatNum = 0;
+		
+		// Add each chord's change
+		while (chordIterator.hasNext()) {
+			Chord chord = chordIterator.next();
+			
+			// Find the correct beat
+			while (beatNum < beats.size() - 1 && beats.get(beatNum).getTime() < chord.onsetTime) {
+				beatNum++;
+			}
+			
+			if (beatNum == 0) {
+				// The first beat is already past the chord onset
+				changes.add(beats.get(beatNum));
+				
+			} else if (Math.abs(beats.get(beatNum - 1).getTime() - chord.onsetTime) < Math.abs(beats.get(beatNum).getTime() - chord.onsetTime)) {
+				// The closest beat is the previous one
+				changes.add(beats.get(beatNum - 1));
+				// Rewind the beat pointer
+				beatNum--;
+				
+			} else {
+				// The closest beat is the current one
+				changes.add(beats.get(beatNum));
+			}
+		}
+		
+		return changes;
 	}
 
 	@Override
@@ -252,8 +312,8 @@ public class FuncHarmParser implements EventParser {
 			}
 		}
 		
-		MidiNote note = new MidiNote(pitch, 100, Math.round(onset * 500000), voice, voice);
-		note.close(Math.round(offset * 500000));
+		MidiNote note = new MidiNote(pitch, 100, Math.round(onset * MICROS_PER_TICK), voice, voice);
+		note.close(Math.round(offset * MICROS_PER_TICK));
 		
 		return note;
 	}
@@ -346,6 +406,6 @@ public class FuncHarmParser implements EventParser {
 									"Should be one of: M, m, a, d, a6, D7, M7, m7, d7, h7.");
 		}
 		
-		return new Chord(Math.round(onset * 1000000), Math.round(offset * 1000000), tonic, vocab.get(quality));
+		return new Chord(Math.round(onset * MICROS_PER_TICK), Math.round(offset * MICROS_PER_TICK), tonic, vocab.get(quality));
 	}
 }

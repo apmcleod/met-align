@@ -61,22 +61,22 @@ public class Chord implements Comparable<Chord> {
 	/**
 	 * The onset time of this chord, in microseconds.
 	 */
-	private final long onsetTime;
+	public final long onsetTime;
 	
 	/**
 	 * The offset time of this chord, in microseconds.
 	 */
-	private final long offsetTime;
+	public final long offsetTime;
 	
 	/**
 	 * The root (base note) of this chord.
 	 */
-	private final int root;
+	public final int root;
 	
 	/**
 	 * The quality of the chord (major, minor, diminished, etc.)
 	 */
-	private final ChordQuality quality;
+	public final ChordQuality quality;
 	
 	/**
 	 * Create a new Chord with the given fields.

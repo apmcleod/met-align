@@ -207,6 +207,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 		}
 		
 		MetricalLpcfg grammar;
+		MetricalLpcfgGenerator generator;
 		
 		// Generate grammar
 		if (generate) {
@@ -234,18 +235,19 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			    
 			    // Grab the results and save the best
 			    for (Future<MetricalLpcfgGenerator> result : results) {
-			    	MetricalLpcfgGenerator generator = result.get();
-			    	
-			    	grammar.mergeGrammar(generator.getGrammar());
+			    	grammar.mergeGrammar(result.get().getGrammar());
 			    }
 			    
 			    executor.shutdown();
 			    
 			} else {
-				grammar = generateGrammar(testFiles, anacrusisFiles, useChannel).getGrammar();
+				generator = generateGrammar(testFiles, anacrusisFiles, useChannel);
+				System.out.println(generator.getCPT());
+				
+				grammar = generator.getGrammar();
 			}
 			
-			System.out.println(grammar.getProbabilityTracker());
+			//System.out.println(grammar.getProbabilityTracker());
 			MetricalLpcfg.serialize(grammar, exportModelFile);	
 		}
 	}
@@ -317,10 +319,10 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 				continue;
 			}
 			
-			if (tt.getAllTimeSignatures().size() != 1) {
-				System.err.println("Meter change detected. Skipping song " + file);
-				continue;
-			}
+			//if (tt.getAllTimeSignatures().size() != 1) {
+			//	System.err.println("Meter change detected. Skipping song " + file);
+			//	continue;
+			//}
 			
 			double alignmentScore = getAlignmentScore(nlg, tt);
 			if (alignmentScore < QUANTIZATION_THRESHOLD) {
@@ -350,7 +352,11 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			
 			// GRAMMARIZE
 			try {
-				generator.parseSong(jm, tt);
+				if (ep instanceof FuncHarmParser) {
+					generator.parseSong(jm, tt, ((FuncHarmParser) ep).getChordChangeBeats());
+				} else {
+					generator.parseSong(jm, tt);
+				}
 			} catch (Exception e) {
 				System.err.println("Error parsing file " + file + ":\n" + e.getLocalizedMessage());
 				
