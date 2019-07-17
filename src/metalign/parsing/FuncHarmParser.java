@@ -18,6 +18,7 @@ import metalign.Runner;
 import metalign.beat.Beat;
 import metalign.harmony.Chord;
 import metalign.harmony.Chord.ChordQuality;
+import metalign.harmony.ChordEmissionProbabilityTracker;
 import metalign.time.FuncHarmTimeTracker;
 import metalign.utils.MidiNote;
 import metalign.voice.Voice;
@@ -73,6 +74,9 @@ public class FuncHarmParser implements EventParser {
 	 */
 	private boolean includesVoices;
 	
+	/**
+	 * A SortedSet of the chords present in this piece.
+	 */
 	private SortedSet<Chord> chords;
 	
 	/**
@@ -164,6 +168,32 @@ public class FuncHarmParser implements EventParser {
 		}
 		
 		br.close();
+	}
+	
+	/**
+	 * Update the ChordEmissionProbabilityTracker from this parsed piece.
+	 * 
+	 * @params emit The ChordEmissionProbabilityTracker to update.
+	 */
+	public void updateChordEmissionProbabilityTracker(ChordEmissionProbabilityTracker emit) {
+		List<MidiNote> notes = nlg.getNoteList();
+		int noteIndex = 0;
+		
+		// Fast-forward to first note which onsets at least after the first chord begins
+		while (noteIndex < notes.size() && notes.get(noteIndex).getOnsetTime() < chords.first().onsetTime) {
+			noteIndex++;
+		}
+		
+		// Go through each chord
+		for (Chord chord : chords) {
+			
+			while (noteIndex < notes.size() && notes.get(noteIndex).getOnsetTime() < chord.offsetTime) {
+				// This note is within the current chord
+				emit.addNote(chord, notes.get(noteIndex));
+				
+				noteIndex++;
+			}
+		}
 	}
 	
 	/**

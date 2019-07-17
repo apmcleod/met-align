@@ -48,7 +48,7 @@ public class Chord implements Comparable<Chord> {
 		defaultMap.put(ChordQuality.MINOR, ChordQuality.MINOR);
 		defaultMap.put(ChordQuality.AUGMENTED, ChordQuality.AUGMENTED);
 		defaultMap.put(ChordQuality.DIMINISHED, ChordQuality.DIMINISHED);
-		defaultMap.put(ChordQuality.AUGMENTED_6, ChordQuality.AUGMENTED);
+		defaultMap.put(ChordQuality.AUGMENTED_6, ChordQuality.AUGMENTED_6);
 		defaultMap.put(ChordQuality.DOMINANT_7, ChordQuality.MAJOR);
 		defaultMap.put(ChordQuality.MAJOR_7, ChordQuality.MAJOR);
 		defaultMap.put(ChordQuality.MINOR_7, ChordQuality.MINOR);

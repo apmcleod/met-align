@@ -1,6 +1,7 @@
 package metalign.harmony;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,7 +17,7 @@ import metalign.hierarchy.lpcfg.MetricalLpcfgQuantum;
 import metalign.hierarchy.lpcfg.MetricalLpcfgTerminal;
 import metalign.hierarchy.lpcfg.MetricalLpcfgTree;
 
-public class ChordProbabilityTracker {
+public class ChordTransitionProbabilityTracker {
 
 	/**
 	 * For each measure type, the number of possible changes we could have had.
@@ -37,7 +38,7 @@ public class ChordProbabilityTracker {
 	/**
 	 * Create a new empty tracker.
 	 */
-	public ChordProbabilityTracker() {
+	public ChordTransitionProbabilityTracker() {
 		counts = new HashMap<Measure, Map<String, Double>>();
 		changes = new HashMap<Measure, Map<String, Double>>();
 	}
@@ -56,13 +57,21 @@ public class ChordProbabilityTracker {
 		double subBeatValue = 0.0;
 		double tatumValue = 0.0;
 		
+		boolean[] beats = new boolean[measure.getBeatsPerBar()];
+		
 		// Check all changes
 		for (Beat beat : changeBeats) {
 			if (beat.isDownbeat()) {
 				downbeatValue++;
+				beats[0] = true;
 				
 			} else if (beat.isBeat()) {
 				beatValue++;
+				if (beat.getBeat() >= beats.length) {
+					System.err.println("Beat Error. Found: " + beat + " in measure " + measure);
+				} else {
+					beats[beat.getBeat()] = true;
+				}
 				
 			} else if (beat.isSubBeat()) {
 				subBeatValue++;
@@ -79,6 +88,8 @@ public class ChordProbabilityTracker {
 		updateMaps(measure, "SUB_BEAT", true, subBeatValue);
 		updateMaps(measure, "SUB_BEAT", false, measure.getBeatsPerBar() * (measure.getSubBeatsPerBeat() - 1) - subBeatValue);
 		updateMaps(measure, "TATUM", true, tatumValue);
+		
+		updateMaps(measure, beats.length + Arrays.toString(beats), true, 1);
 		
 		// Next, check rhythmic-based changes
 		if (trees.size() == 0) {

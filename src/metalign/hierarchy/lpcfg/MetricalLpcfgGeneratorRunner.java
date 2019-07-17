@@ -20,7 +20,8 @@ import metalign.Main;
 import metalign.Runner;
 import metalign.beat.Beat;
 import metalign.beat.fromfile.FromFileBeatTrackingModelState;
-import metalign.harmony.ChordProbabilityTracker;
+import metalign.harmony.ChordEmissionProbabilityTracker;
+import metalign.harmony.ChordTransitionProbabilityTracker;
 import metalign.hierarchy.fromfile.FromFileHierarchyModelState;
 import metalign.joint.JointModel;
 import metalign.parsing.EventParser;
@@ -49,7 +50,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	public static boolean SAVE_TREES = true;
 	public static int MAX_NUM_NOTES = -1;
 	
-	public static ChordProbabilityTracker cpt = new ChordProbabilityTracker();
+	public static ChordTransitionProbabilityTracker cpt = new ChordTransitionProbabilityTracker();
 
 	/**
 	 * The main method for generating an LPCFG grammar file. Run with no args to print help.
@@ -241,7 +242,9 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 			    executor.shutdown();
 			    
 			} else {
-				generator = generateGrammar(testFiles, anacrusisFiles, useChannel);
+				ChordEmissionProbabilityTracker emit = new ChordEmissionProbabilityTracker();
+				generator = generateGrammar(testFiles, anacrusisFiles, useChannel, emit);
+				System.out.println(emit);
 				System.out.println(generator.getCPT());
 				
 				grammar = generator.getGrammar();
@@ -261,7 +264,8 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	 * False for tracks.
 	 * @throws InterruptedException An interrupt occurred in GUI mode.
 	 */
-	private static MetricalLpcfgGenerator generateGrammar(List<File> midiFiles, List<File> anacrusisFiles, boolean useChannel) throws InterruptedException {
+	private static MetricalLpcfgGenerator generateGrammar(List<File> midiFiles, List<File> anacrusisFiles, boolean useChannel,
+			ChordEmissionProbabilityTracker emit) throws InterruptedException {
 		// We have files and are ready to run!
 		MetricalLpcfgGenerator generator = new MetricalLpcfgGenerator();
 		int fileNum = 0;
@@ -293,6 +297,7 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 					tt = new FuncHarmTimeTracker();
 					ep = new FuncHarmParser(file, (FuncHarmTimeTracker) tt, nlg);
 					ep.run();
+					((FuncHarmParser) ep).updateChordEmissionProbabilityTracker(emit);
 					
 				} else {
 					// Midi
@@ -476,6 +481,6 @@ public class MetricalLpcfgGeneratorRunner implements Callable<MetricalLpcfgGener
 	
 	@Override
 	public MetricalLpcfgGenerator call() throws InterruptedException {
-		return MetricalLpcfgGeneratorRunner.generateGrammar(testFiles, anacrusisFiles, useChannel);
+		return MetricalLpcfgGeneratorRunner.generateGrammar(testFiles, anacrusisFiles, useChannel, null);
 	}
 }

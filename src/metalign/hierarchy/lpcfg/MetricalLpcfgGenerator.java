@@ -6,7 +6,7 @@ import java.util.ListIterator;
 
 import metalign.Main;
 import metalign.beat.Beat;
-import metalign.harmony.ChordProbabilityTracker;
+import metalign.harmony.ChordTransitionProbabilityTracker;
 import metalign.hierarchy.Measure;
 import metalign.joint.JointModel;
 import metalign.joint.JointModelState;
@@ -30,14 +30,14 @@ public class MetricalLpcfgGenerator {
 	/**
 	 * The chord tracker (used only with {@link #parseSong(JointModel, TimeTracker, FuncHarmEventParser)}).
 	 */
-	private final ChordProbabilityTracker cpt;
+	private final ChordTransitionProbabilityTracker cpt;
 	
 	/**
 	 * Create a new default MetricalGrammarGenerator.
 	 */
 	public MetricalLpcfgGenerator() {
 		grammar = new MetricalLpcfg();
-		cpt = new ChordProbabilityTracker();
+		cpt = new ChordTransitionProbabilityTracker();
 	}
 	
 	/**
@@ -252,7 +252,7 @@ public class MetricalLpcfgGenerator {
 		return grammar;
 	}
 
-	public ChordProbabilityTracker getCPT() {
+	public ChordTransitionProbabilityTracker getCPT() {
 		return cpt;
 	}
 }
