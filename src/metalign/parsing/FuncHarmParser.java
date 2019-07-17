@@ -19,6 +19,7 @@ import metalign.beat.Beat;
 import metalign.harmony.Chord;
 import metalign.harmony.Chord.ChordQuality;
 import metalign.harmony.ChordEmissionProbabilityTracker;
+import metalign.harmony.ChordTransitionProbabilityTracker;
 import metalign.time.FuncHarmTimeTracker;
 import metalign.utils.MidiNote;
 import metalign.voice.Voice;
@@ -193,6 +194,26 @@ public class FuncHarmParser implements EventParser {
 				
 				noteIndex++;
 			}
+		}
+	}
+	
+	/**
+	 * Update the ChordTransitionProbabilityTracker from this parsed piece.
+	 * 
+	 * @params trans The ChordTransitionProbabilityTracker to update.
+	 */
+	public void updateChordTransitionProbabilityTracker(ChordTransitionProbabilityTracker trans) {
+		Chord prevChord = null;
+		
+		for (Chord chord : chords) {
+			try {
+				trans.addTransition(prevChord, chord);
+			} catch (IOException e) {
+				System.err.println("Error calculating chord transitions:");
+				System.err.println(e.getMessage());
+			}
+			
+			prevChord = chord;
 		}
 	}
 	
