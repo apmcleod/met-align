@@ -393,8 +393,29 @@ public class TimeTracker {
     	return beats;
     }
     
+    /**
+     * Get the beats of this time tracker.
+     * 
+     * @return The beats of this time tracker.
+     */
     public List<Beat> getBeatsOnly() {
-    	return new ArrayList<Beat>();
+    	List<Beat> tatums = getTatums();
+    	List<Beat> beats = new ArrayList<Beat>();
+    	
+    	// Check which tatums are beats
+    	for (Beat tatum : tatums) {
+    		TimeTrackerNode node = getNodeAtTime(tatum.getTime());
+    		
+    		int notes32PerMeasure = node.getTimeSignature().getNotes32PerBar();
+    		int beatsPerBar = node.getTimeSignature().getMetricalMeasure().getBeatsPerMeasure();
+    		int beatLength = notes32PerMeasure / beatsPerBar;
+    		
+    		if (tatum.getTatum() % beatLength == 0) {
+    			beats.add(tatum);
+    		}
+    	}
+    	
+    	return beats;
     }
     
     /**
