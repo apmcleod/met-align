@@ -1,5 +1,15 @@
 # Metrical Alignment
-This is the code and data from my 2019 ICASSP paper. If you use it, please cite it:
+This is the code and data from my 2018 ISMIR paper ([ismir2018](https://github.com/apmcleod/met-align/releases/tag/ismir2018)) and my 2019 ICASSP paper ([branch](https://github.com/apmcleod/met-align/tree/icassp2019),[tag](https://github.com/apmcleod/met-align/releases/tag/icassp19)). The master branch currently contains the icassp code. If you use either, please cite it:
+
+```
+@inproceedings{McLeod:18b,
+  title={Meter detection and alignment of {MIDI} performance},
+  author={McLeod, Andrew and Steedman, Mark},
+  booktitle={International Society for Music Information Retrieval Conference (ISMIR)},
+  year={2018},
+  pages={113--119}
+}
+```
 
 ```
 @inproceedings{McLeod:19,
@@ -38,7 +48,9 @@ Run the project from the command line as follows (with default settings):
 
 `$ java -cp bin metalign.Main -g grammar FILES`
 
-`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). YOu may include `-g` multiple times with different grammar files to create a joint grammar.
+For example: `$ java -cp bin metalign.Main -g grammars/misc.lpcfg corpora/WTCInv/invent1.mid`
+
+`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). You may include `-g` multiple times with different grammar files to create a joint grammar.
 `FILES` should be a list of 1 or more music files (MIDI/krn) or directories containing only music files. Any directory entered will be searched recursively for files.
 
 Arguments to change settings:
@@ -65,8 +77,41 @@ Other arguments:
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-E FILE` = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
- 
- 
+
+### Output Format
+The output of the Main program (without the verbose `-p` or `-P` flags) is as follows:
+
+```
+Voices: [[note_1,note_2,...],[note_1,note_2,...],...]
+Beats: [tatum_1,tatum_2,...]
+Hierarchy: M_4,2 length=4 anacrusis=0
+```
+The Beats and Hierarchy lines also contain that component's log-likelihood (a large, negative number) at the end.
+
+The `Voices` line simply prints the voices given in the input file, since this model does not perform voice separation itself.
+
+The `Beats` line contains a list of tatums (NOT just downbeats, beats, or sub-beats). Each looks like `(0.32,1000)`, where the first two numbers just index the tatum, and the last number represents the time of the tatum in microseconds.
+
+The `Hierarchy` line describes the metrical structure of the printed tatums of the previous line.
+* First, in `M_4,2`, the first number is the number of beats per bar, and the second number is the number of sub-beats per beat. E.g., `M_4,2` describes 4/4 time, and `M_2,3` describes 6/8 time. (Note that we consider there to be only 2 beats per 6/8 bar, each with 3 sub-beats. Other compound meters are defined similarly.)
+* The `length` represents the number of tatums per sub-beat, and should always be 4, unless that was changed with `-s`.
+* The `anacrusis` represents how many sub-beats fall before the first downbeat.
+
+The following sections describe how to find the sub-beats, beats, and downbeats from the output.
+
+#### Finding Sub-Beats
+The first printed tatum is always a sub-beat. After that, every `length` tatums is another sub-beat.
+
+#### Finding Beats
+First, the sub-beats can be found as described above. Then, you have to figure out which of those sub-beats are beats.
+
+For simple meters (`M_x,2`), if `anacrusis` is even, the first sub-beat is a beat. Otherwise, the 2nd sub-beat is a beat. After that, every 2nd sub-beat is a beat.
+
+For compound meters (`M_x,3`), if `anacrusis % 3` is 0, the first sub-beat is a beat. If `anacrusis % 3` is 1, the 2nd sub-beat is a beat. If `anacrusis % 3` is 2, the 3rd sub-beat is a beat. After that, every 3rd sub-beat is a beat.
+
+#### Finding Downbeats
+The `length * anacrusis`th tatum is the first downbeat. After that, every `length * beats_per_bar * sub_beats_per_beat` tatum is another downbeat.
+
 ### Training a grammar
 Grammars for the LPCFG can be trained as follows:
 
@@ -97,7 +142,7 @@ Additional arguments:
  Some pre-trained grammars are included in the grammars directory:
  
   * `misc.lpcfg`: Trained on corpora/misc/perf
-  * `WTCInv.lpcfg`: Trained on corpora/WTCInv with -a anacrusis.
+  * `WTCInv.lpcfg`: Trained on corpora/WTCInv with -a anacrusis. (When testing on WTCInv, use `-a anacrusis -x`.
 
 ### Training the Beat Tracking HMM
 The parameters for the beat tracking HMM must be set manually after an automatic training run. It can be trained as follows:  
