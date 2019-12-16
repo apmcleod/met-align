@@ -1,15 +1,5 @@
 # Metrical Alignment
-This is the code and data from my 2018 ISMIR paper ([ismir2018](https://github.com/apmcleod/met-align/releases/tag/ismir2018)) and my 2019 ICASSP paper ([branch](https://github.com/apmcleod/met-align/tree/icassp2019),[tag](https://github.com/apmcleod/met-align/releases/tag/icassp19)). The master branch currently contains the icassp code. If you use either, please cite it:
-
-```
-@inproceedings{McLeod:18b,
-  title={Meter detection and alignment of {MIDI} performance},
-  author={McLeod, Andrew and Steedman, Mark},
-  booktitle={International Society for Music Information Retrieval Conference (ISMIR)},
-  year={2018},
-  pages={113--119}
-}
-```
+This is the code and data from my 2019 ICASSP paper. If you use it, please cite:
 
 ```
 @inproceedings{McLeod:19,
