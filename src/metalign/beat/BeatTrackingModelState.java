@@ -139,4 +139,35 @@ public abstract class BeatTrackingModelState extends MidiModelState {
 		sb.append(' ').append(getScore());
 		return sb.toString();
 	}
+
+	/**
+	 * Get the tatum times of this state as a comma-separated String.
+	 * 
+	 * @return The tatum times, in microseconds, separated by commas.
+	 */
+	public abstract String getTatumTimesString();
+	
+	/**
+	 * Get the sub-beat times of this state as a comma-separated String.
+	 * 
+	 * @param state The Hierarchy for this state's tatums.
+	 * @return The sub-beat times, in microseconds, separated by commas.
+	 */
+	public abstract String getSubBeatTimesString(HierarchyModelState state);
+	
+	/**
+	 * Get the beat times of this state as a comma-separated String.
+	 * 
+	 * @param state The Hierarchy for this state's tatums.
+	 * @return The beat times, in microseconds, separated by commas.
+	 */
+	public abstract String getBeatTimesString(HierarchyModelState state);
+	
+	/**
+	 * Get the downbeat times of this state as a comma-separated String.
+	 * 
+	 * @param state The Hierarchy for this state's tatums.
+	 * @return The downbeat times, in microseconds, separated by commas.
+	 */
+	public abstract String getDownbeatTimesString(HierarchyModelState state);
 }
