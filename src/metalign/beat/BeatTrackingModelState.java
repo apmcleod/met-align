@@ -78,13 +78,6 @@ public abstract class BeatTrackingModelState extends MidiModelState {
 	public abstract int getNumTatums();
 	
 	/**
-	 * Gets the Beats which are contained by this state currently.
-	 * 
-	 * @return A List of the Beats contained by this State.
-	 */
-	//public abstract List<Beat> getBeats();
-	
-	/**
 	 * Get the number of full bars we have gone through so far.
 	 * 
 	 * @return The number of full bars we have gone through so far.
@@ -141,33 +134,70 @@ public abstract class BeatTrackingModelState extends MidiModelState {
 	}
 
 	/**
+	 * Get a comma-separated string of tatum times beginning at start,
+	 * and getting every "step"th tatum.
+	 * 
+	 * @param start The index to start from.
+	 * @param step The step length to return.
+	 * @return A comma-separated String of the wanted tatum times.
+	 */
+	public String getTatumTimesString(int start, int step) {
+		StringBuilder sb = new StringBuilder();
+		
+		List<Beat> beats = getBeats();
+		for (int i = start; i < beats.size(); i += step) {
+			Beat beat = beats.get(i);
+			sb.append(beat.getTime()).append(',');
+		}
+		
+		if (sb.length() > 0) {
+			sb.deleteCharAt(sb.length() - 1);
+		}
+		
+		return sb.toString();
+	}
+
+	/**
 	 * Get the tatum times of this state as a comma-separated String.
 	 * 
 	 * @return The tatum times, in microseconds, separated by commas.
 	 */
-	public abstract String getTatumTimesString();
+	public String getTatumTimesString() {
+		return getTatumTimesString(0, 1);
+	}
 	
 	/**
 	 * Get the sub-beat times of this state as a comma-separated String.
 	 * 
-	 * @param state The Hierarchy for this state's tatums.
 	 * @return The sub-beat times, in microseconds, separated by commas.
 	 */
-	public abstract String getSubBeatTimesString(HierarchyModelState state);
+	public String getSubBeatTimesString() {
+		return getTatumTimesString(0, hierarchyState.getSubBeatLength());
+	}
 	
 	/**
 	 * Get the beat times of this state as a comma-separated String.
 	 * 
-	 * @param state The Hierarchy for this state's tatums.
 	 * @return The beat times, in microseconds, separated by commas.
 	 */
-	public abstract String getBeatTimesString(HierarchyModelState state);
+	public String getBeatTimesString() {
+		int anacrusis = hierarchyState.getAnacrusis();
+		int subBeatsPerBeat = hierarchyState.getMetricalMeasure().getSubBeatsPerBeat();
+		int subBeatLength = hierarchyState.getSubBeatLength();
+		int beatLength = subBeatsPerBeat * subBeatLength;
+		
+		return getTatumTimesString((anacrusis % subBeatsPerBeat) * subBeatLength, beatLength);
+	}
 	
 	/**
 	 * Get the downbeat times of this state as a comma-separated String.
 	 * 
-	 * @param state The Hierarchy for this state's tatums.
 	 * @return The downbeat times, in microseconds, separated by commas.
 	 */
-	public abstract String getDownbeatTimesString(HierarchyModelState state);
+	public  String getDownbeatTimesString() {
+		int anacrusis = hierarchyState.getAnacrusis();
+		int barLength = hierarchyState.getMetricalMeasure().getBeatsPerMeasure() * hierarchyState.getMetricalMeasure().getSubBeatsPerBeat() * hierarchyState.getSubBeatLength();
+		
+		return getTatumTimesString(anacrusis * hierarchyState.getSubBeatLength(), barLength);
+	}
 }

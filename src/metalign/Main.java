@@ -405,9 +405,9 @@ public class Main {
 					System.out.println("Beats: " + jm.getHypotheses().first().getBeatState());
 					System.out.println("Hierarchy: " + jm.getHypotheses().first().getHierarchyState());
 					System.out.println("Tatum times: " + jm.getHypotheses().first().getBeatState().getTatumTimesString());
-					System.out.println("Sub-beat times: " + jm.getHypotheses().first().getBeatState().getSubBeatTimesString(jm.getHypotheses().first().getHierarchyState()));
-					System.out.println("Beat times: " + jm.getHypotheses().first().getBeatState().getBeatTimesString(jm.getHypotheses().first().getHierarchyState()));
-					System.out.println("Downbeat times: " + jm.getHypotheses().first().getBeatState().getDownbeatTimesString(jm.getHypotheses().first().getHierarchyState()));
+					System.out.println("Sub-beat times: " + jm.getHypotheses().first().getBeatState().getSubBeatTimesString());
+					System.out.println("Beat times: " + jm.getHypotheses().first().getBeatState().getBeatTimesString());
+					System.out.println("Downbeat times: " + jm.getHypotheses().first().getBeatState().getDownbeatTimesString());
 				}
 			}
 		}
