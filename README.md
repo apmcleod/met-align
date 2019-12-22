@@ -29,7 +29,7 @@ NOTE: In order to work well, the notes in the input MIDI files should be split i
 `$ java -cp bin voicesplitting.voice.hmm.HmmVoiceSplittingTester -w voice FILES`
 (also add `-l` if the files are live performance).
 
-This will create new files with the extension ".voice" added to the end, with voice separation performed. Use these new .voice files as input for meter alignment.
+This will create new MIDI files in the "voice" directory, with voice separation performed. Use these new MIDI files as input for meter alignment.
 
 ## Documentation
 This document contains some basic examples and a general overview of how to use
@@ -83,32 +83,23 @@ The output of the Main program (without the verbose `-p` or `-P` flags) is as fo
 Voices: [[note_1,note_2,...],[note_1,note_2,...],...]
 Beats: [tatum_1,tatum_2,...]
 Hierarchy: M_4,2 length=4 anacrusis=0
+Tatum times: ...
+Sub-beat times: ...
+Beat times: ...
+Downbeat times: ...
 ```
 The Beats and Hierarchy lines also contain that component's log-likelihood (a large, negative number) at the end.
 
 The `Voices` line simply prints the voices given in the input file, since this model does not perform voice separation itself.
 
-The `Beats` line contains a list of tatums (NOT just downbeats, beats, or sub-beats). Each looks like `(0.32,1000)`, where the first two numbers just index the tatum, and the last number represents the time of the tatum in microseconds.
+The `Beats` line contains a list of tatum objects (NOT just downbeats, beats, or sub-beats). Each looks like `(0.32,1000)`, where the first two numbers just index the tatum, and the last number represents the time of the tatum in microseconds.
 
 The `Hierarchy` line describes the metrical structure of the printed tatums of the previous line.
 * First, in `M_4,2`, the first number is the number of beats per bar, and the second number is the number of sub-beats per beat. E.g., `M_4,2` describes 4/4 time, and `M_2,3` describes 6/8 time. (Note that we consider there to be only 2 beats per 6/8 bar, each with 3 sub-beats. Other compound meters are defined similarly.)
 * The `length` represents the number of tatums per sub-beat, and should always be 4, unless that was changed with `-s`.
 * The `anacrusis` represents how many sub-beats fall before the first downbeat.
 
-The following sections describe how to find the sub-beats, beats, and downbeats from the output.
-
-#### Finding Sub-Beats
-The first printed tatum is always a sub-beat. After that, every `length` tatums is another sub-beat.
-
-#### Finding Beats
-First, the sub-beats can be found as described above. Then, you have to figure out which of those sub-beats are beats.
-
-For simple meters (`M_x,2`), if `anacrusis` is even, the first sub-beat is a beat. Otherwise, the 2nd sub-beat is a beat. After that, every 2nd sub-beat is a beat.
-
-For compound meters (`M_x,3`), if `anacrusis % 3` is 0, the first sub-beat is a beat. If `anacrusis % 3` is 1, the 2nd sub-beat is a beat. If `anacrusis % 3` is 2, the 3rd sub-beat is a beat. After that, every 3rd sub-beat is a beat.
-
-#### Finding Downbeats
-The `length * anacrusis`th tatum is the first downbeat. After that, every `length * beats_per_bar * sub_beats_per_beat` tatum is another downbeat.
+Finally, the 4 `times` lines list the tatum, sub-beat, beat, and downbeat times of the metrical structure, in microseconds.
 
 ### Training a grammar
 Grammars for the LPCFG can be trained as follows:
