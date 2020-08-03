@@ -52,7 +52,7 @@ Run the project from the command line as follows (with default settings):
 
 For example: `$ java -cp bin metalign.Main -g grammars/all.lpcfg corpora/WTCInv/invent1.mid`
 
-`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). You may include `-g` multiple times with different grammar files to create a joint grammar. (grammars/all.lpcfg contains all songs within the corpora directory.)
+`grammar` should be a pre-trained grammar (see [Training a Grammar](#training-a-grammar)). You may include `-g` multiple times with different grammar files to create a joint grammar. (grammars/all.lpcfg contains all songs within the corpora directory, but is untested.)
 `FILES` should be a list of 1 or more music files (MIDI/krn) or directories containing only music files. Any directory entered will be searched recursively for files.
 
 Arguments to change settings:
@@ -170,6 +170,7 @@ ARGS:
  * `-T` = Use tracks as correct voice (instead of channels). Only used for MIDI files.
  * `-s INT` = Use INT as the sub beat length. Defaults to 4.
  * `-a FILE` = Search recursively under the given FILE for anacrusis files. See [Anacrusis Files](#anacrusis-files) for information about the anacrusis file format.
+ * `-X` = Force the model to output results for pieces with time signature changes and irregular time signatures. By default, such files are skipped because the model cannot output either.
 
 To calculate means of multiple evaluations:
 `$ java -cp bin metalign.utils.Evaluation -F <eval*.txt`
