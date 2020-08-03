@@ -495,7 +495,14 @@ public class MetricalLpcfgHierarchyModelState extends HierarchyModelState {
 					// This was a new voice
 					List<MidiNote> newNote = new ArrayList<MidiNote>();
 					newNote.add(note);
-					unfinishedNotes.add(voiceIndex, newNote);
+					try {
+						unfinishedNotes.add(voiceIndex, newNote);
+					} catch (IndexOutOfBoundsException e) {
+						System.err.println("An error occurred. Probably, a voice/track has multiple notes onset at the same time (" +
+										   note.getOnsetTime() + " microseconds). The file should be run through my voice splitter " +
+										   "first. See the README.");
+						System.exit(1);
+					}
 					hasBegun.add(voiceIndex, Boolean.FALSE);
 
 					if (!matches(MetricalLpcfgMatch.BEAT)) {
