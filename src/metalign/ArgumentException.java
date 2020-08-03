@@ -18,8 +18,6 @@ package metalign;
  *  <li><code>-p</code> = Use verbose printing.</li>
  *  <li><code>-P</code> = Use super verbose printing.</li>
  *  <li><code>-l</code> = Print logging (time, hypothesis count, and notes at each step).</li>
- *  <li><code>-J</code> = Run with incremental joint processing.</li>
- *  <li><code>-VClass</code> = Use the given class for voice separation. (FromFile (default) or Hmm)</li>
  *  <li><code>-BClass</code> = Use the given class for beat tracking. (FromFile (default) or Hmm).</li>
  *  <li><code>-HClass</code> = Use the given class for hierarchy detection. (FromFile (default) or lpcfg).</li>
  *  <li><code>-g FILE</code> = Load a grammar in from the given file. Used only with -Hlpcfg.</li>
@@ -31,35 +29,38 @@ package metalign;
  *  <li><code>-v INT</code> = Use INT as the voice beam size.</li>
  *  <li><code>-E FILE</code> = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.</li>
  *  <li><code>-a FILE</code> = Search recursively under the given FILE for anacrusis files.</li>
+ *  <li><code>-L FLOAT</code> = Set the local grammar alpha (default 2/3).</li>
+ *  <li><code>-c</code> = Do not apply the Rule of Congruence (can help for some extremely syncopated pieces).</li>
+ *  <li><code>-X</code> = Do not skip pieces with time signature changes or irregular time signatures.</li>
  * </ul>
  * </blockquote>
- * 
+ *
  * @author Andrew McLeod - 16 June, 2015
  */
 public class ArgumentException extends Exception {
 
 	/**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = -2085179626730582890L;
-	
+
 	/**
 	 * The first line of the Exception to print.
 	 */
 	private String messageHeader;
-	
+
 	/**
 	 * Create a new ArgumentException with the given header message.
-	 * 
+	 *
 	 * @param header {@link #messageHeader}
 	 */
 	public ArgumentException(String header) {
 		messageHeader = header;
 	}
-	
+
 	/**
 	 * Get the message header this exception was created with.
-	 * 
+	 *
 	 * @return {@link #messageHeader}
 	 */
 	public String getHeader() {
@@ -69,11 +70,11 @@ public class ArgumentException extends Exception {
 	@Override
 	public String getLocalizedMessage() {
 		StringBuilder sb = new StringBuilder("metalign: Argument error: ");
-		
+
 		sb.append(messageHeader).append('\n');
-		
+
 		sb.append("Usage: java -cp bin metalign.Main ARGS file [directory...]\n");
-		
+
 		sb.append("-T = Use tracks as correct voice (instead of channels) *Only used for MIDI files.\n");
 		sb.append("-p = Use verbose printing.\n");
 		sb.append("-P = Use super verbose printing.\n");
@@ -91,7 +92,8 @@ public class ArgumentException extends Exception {
 		sb.append("-E FILE = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-L DOUBLE = Set the local grammar weight alpha. (default = 2/3)\n");
-		
+		sb.append("-c = Do not apply the Rule of Congruence.");
+
 		return sb.toString();
 	}
 }
