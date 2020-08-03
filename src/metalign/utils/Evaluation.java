@@ -18,7 +18,7 @@ import metalign.voice.Voice;
 
 /**
  * The <code>Evaluation</code> can be used to perform global evaluation on some output file.
- * 
+ *
  * @author Andrew McLeod - 9 September, 2016
  */
 public class Evaluation {
@@ -27,12 +27,12 @@ public class Evaluation {
 	 * The accepted error for a beat location to be considered correct
 	 */
 	public static long BEAT_EPSILON = 70000;
-	
+
 	public static boolean VERBOSE = false;
 
 	/**
 	 * The main method for evaluating results. Run with no arguments to print help.
-	 * 
+	 *
 	 * @param args The arguments, described above.
 	 * @throws InterruptedException
 	 * @throws IOException
@@ -45,12 +45,12 @@ public class Evaluation {
 		boolean useChannel = true;
 		File groundTruth = null;
 		File file = null;
-		
+
 		// No args given
 		if (args.length == 0) {
 			argumentError("No arguments given");
 		}
-		
+
 		for (int i = 0; i < args.length; i++) {
 			switch (args[i].charAt(0)) {
 				// ARGS
@@ -58,13 +58,17 @@ public class Evaluation {
 					if (args[i].length() == 1) {
 						argumentError("Unrecognized option: " + args[i]);
 					}
-					
+
 					switch (args[i].charAt(1)) {
 						// Use track
 						case 'T':
 							useChannel = false;
 							break;
-							
+
+						case 'X':
+							Main.TS_CHECK = false;
+							break;
+
 						case 'w':
 							i++;
 							if (args.length == i) {
@@ -76,12 +80,12 @@ public class Evaluation {
 								argumentError("Exception reading window length. Must be an long: " + args[i]);
 							}
 							break;
-							
+
 						// Check Full
 						case 'F':
 							OutputParser.checkFull();
 							return;
-							
+
 						case 's':
 							i++;
 							if (args.length == i) {
@@ -93,7 +97,7 @@ public class Evaluation {
 								argumentError("Exception reading sub beat length. Must be an integer: " + args[i]);
 							}
 							break;
-						
+
 						// Evaluate!
 						case 'E':
 							i++;
@@ -108,11 +112,11 @@ public class Evaluation {
 								argumentError("Ground truth file " + groundTruth + " does not exist.");
 							}
 							break;
-							
+
 						case 'v':
 							VERBOSE = true;
 							break;
-							
+
 						// Anacrusis files
 						case 'a':
 							if (args.length <= ++i) {
@@ -124,49 +128,49 @@ public class Evaluation {
 							}
 							anacrusisFiles.addAll(Main.getAllFilesRecursive(file));
 							break;
-							
+
 						// Generate Temperley
 						case 'G':
 							i++;
 							if (args.length <= i) {
 								argumentError("No file given for -G option.");
 							}
-							
+
 							file = new File(args[i]);
 							if (!file.exists()) {
 								argumentError("File " + args[i] + " not found");
 							}
-							
+
 							Temperley.generateFromTemperley(file);
 							return;
-							
+
 						// Notefile generation
 						case 'n':
 							i++;
 							if (args.length <= i) {
 								argumentError("No file given for -n option.");
 							}
-							
+
 							file = new File(args[i]);
 							if (!file.exists()) {
 								argumentError("File " + args[i] + " not found");
 							}
-							
+
 							System.out.println(Temperley.getNoteFileString(file));
 							return;
-							
+
 						// Error
 						default:
 							argumentError("Unrecognized option: " + args[i]);
 					}
 					break;
-					
+
 				// Error
 				default:
 					argumentError("Unrecognized option: " + args[i]);
 			}
 		}
-		
+
 		if (groundTruth != null) {
 			evaluateGroundTruth(groundTruth, anacrusisFiles, useChannel);
 		} else {
@@ -177,40 +181,46 @@ public class Evaluation {
 	/**
 	 * Evaluate the program output (from std in) with the given ground truth file.
 	 * Prints the result to std out.
-	 * 
+	 *
 	 * @param groundTruth The ground truth file (MIDI, **krn).
-	 * @param useChannel 
-	 * @param anacrusisFiles 
-	 * @throws InterruptedException 
-	 * @throws InvalidMidiDataException 
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws ParserConfigurationException 
+	 * @param useChannel
+	 * @param anacrusisFiles
+	 * @throws InterruptedException
+	 * @throws InvalidMidiDataException
+	 * @throws IOException
+	 * @throws SAXException
+	 * @throws ParserConfigurationException
 	 */
 	private static void evaluateGroundTruth(File groundTruth, List<File> anacrusisFiles, boolean useChannel) throws IOException, InvalidMidiDataException, InterruptedException, ParserConfigurationException, SAXException {
 		Evaluator evaluator = new Evaluator(groundTruth, anacrusisFiles, useChannel);
-		
-		if (evaluator.getHasTimeChange()) {
+
+		if (Main.TS_CHECK && evaluator.getHasTimeChange()) {
 			System.err.println("Meter change detected. Skipping song " + groundTruth);
+			System.err.println("It is recommended to split files on time changes, since the model " +
+							   "cannot output them. This check can be overriden with " +
+					     	   "the -X flag.");
 			return;
 		}
-		
-		if (evaluator.getHierarchy().getBeatsPerMeasure() < 2 || evaluator.getHierarchy().getBeatsPerMeasure() > 4 ||
-				evaluator.getHierarchy().getSubBeatsPerBeat() < 2 || evaluator.getHierarchy().getSubBeatsPerBeat() > 3) {
+
+		if (Main.TS_CHECK && (evaluator.getHierarchy().getBeatsPerMeasure() < 2 || evaluator.getHierarchy().getBeatsPerMeasure() > 4 ||
+				evaluator.getHierarchy().getSubBeatsPerBeat() < 2 || evaluator.getHierarchy().getSubBeatsPerBeat() > 3)) {
 			System.err.println("Irregular meter detected (" + evaluator.getHierarchy().getBeatsPerMeasure() + "," +
 				evaluator.getHierarchy().getSubBeatsPerBeat() + "). Skipping song " + groundTruth);
+			System.err.println("It is recommended to skip files with irregular time signatures, since the model " +
+							   "cannot output them. This check can be overriden with " +
+							   "the -X flag.");
 			return;
 		}
-		
+
 		OutputParser op = new OutputParser();
-		
+
 		List<Voice> voiceList = op.getVoices();
 		List<Beat> beatList = op.getBeats();
 		Measure measure = op.getMeasure();
-		
+
 		// Get scores
 		System.out.println(evaluator.evaluate(voiceList, beatList, measure));
-		
+
 		if (VERBOSE) {
 			System.out.println("Average tatum length transcribed: " +
 					((beatList.get(beatList.size() - 1).getTime() - beatList.get(0).getTime()) / (beatList.size() / 1)));
@@ -230,20 +240,20 @@ public class Evaluation {
 				return beat.getTime();
 			}
 		}
-		
+
 		return -1L;
 	}
-	
+
 	/**
 	 * Some argument error occurred. Print the message to std err and exit.
-	 * 
+	 *
 	 * @param message The message to print to std err.
 	 */
 	private static void argumentError(String message) {
 		StringBuilder sb = new StringBuilder("Evaluation: Argument error: ");
-		
+
 		sb.append(message).append('\n');
-		
+
 		sb.append("Usage: java -cp bin metalign.utils.Evaluation ARGS\n");
 
 		sb.append("-E FILE = Evaluate the Main output (from std in) given the ground truth FILE.\n");
@@ -254,7 +264,7 @@ public class Evaluation {
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-G FILE = Generate our output format from Temperley's output format (from Standard in), given the ground truth file FILE.\n");
 		sb.append("-n FILE = Generate a notefile (for input to Temperley) from the given FILE.\n");
-		
+
 		System.err.println(sb.toString());
 		System.exit(1);
 	}
