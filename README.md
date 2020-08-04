@@ -26,7 +26,7 @@ This is a model for meter detection and alignment from live performance MIDI dat
 
 *NOTE*: In order to work well, the notes in the input MIDI files should be split into monophonic voices per MIDI channel. If they are not, the recommended way to do so is to use my [voice-splitting](https://github.com/apmcleod/voice-splitting) package, and run like this:
 
-`$ java -cp bin voicesplitting.voice.hmm.HmmVoiceSplittingTester -w voice FILES`
+`$ java -cp bin voicesplitting.voice.hmm.HmmVoiceSplittingModelTester -w voice FILES`
 (also add `-l` if the files are live performance).
 
 This will create new MIDI files in the "voice" directory, with voice separation performed. Use these new MIDI files as input for meter alignment.
