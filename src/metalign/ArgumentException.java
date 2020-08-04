@@ -92,7 +92,8 @@ public class ArgumentException extends Exception {
 		sb.append("-E FILE = Print out the evaluation for each hypothesis as well with the given FILE as ground truth.\n");
 		sb.append("-a FILE = Search recursively under the given FILE for anacrusis files.\n");
 		sb.append("-L DOUBLE = Set the local grammar weight alpha. (default = 2/3)\n");
-		sb.append("-c = Do not apply the Rule of Congruence.");
+		sb.append("-c = Do not apply the Rule of Congruence.\n");
+		sb.append("-X = Do not skip files with time signature changes or irregular time signatures.");
 
 		return sb.toString();
 	}
